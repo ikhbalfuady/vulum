@@ -1,0 +1,2 @@
+ALTER TABLE `users` ADD `deleted_at` TIMESTAMP NULL DEFAULT NULL AFTER `updated_at`;
+ALTER TABLE `user_evidences` ADD `deleted_at` TIMESTAMP NULL AFTER `updated_at`;
