@@ -13,11 +13,10 @@ use Laravel\Lumen\Auth\Authorizable;
 
 /**
  * @property bigIncrements $id 
- * @property unsignedBigInteger $user_id 
- * @property unsignedBigInteger $role_id 
+ * @property string $name 
 
  */
-class UserRoles extends Model
+class MasterMenus extends Model
 {
     use Authenticatable, Authorizable, HasFactory;
     use SoftDeletes;
@@ -26,7 +25,7 @@ class UserRoles extends Model
      * Table Configuration
      * @var string
      */
-    protected $table = 'user_roles';
+    protected $table = 'master_menus';
     protected $primaryKey = 'id';
 
     /**
@@ -34,8 +33,7 @@ class UserRoles extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 
-        'role_id'
+        'name'
     ];
 
     // disabled timestamps data

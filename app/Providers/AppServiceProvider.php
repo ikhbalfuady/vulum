@@ -18,8 +18,11 @@ class AppServiceProvider extends ServiceProvider
             "Users",
             "UserSessions",
             "Permissions",
+            "RolePermissions",
             "Roles",
-            "UserRoles",
+            "MenuItems",
+            "Menus",
+            "MasterMenus",
  
          );
  

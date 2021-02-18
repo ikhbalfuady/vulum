@@ -195,7 +195,6 @@ class PermissionsRepositoryEloquent extends BaseRepository implements Permission
             //storing defined property    
             $data->name = $request['name']; 
             $data->slug = H_handleRequest($request, 'slug'); 
-            $data->prefix_group = H_handleRequest($request, 'prefix_group'); 
 
             
             $data->save();

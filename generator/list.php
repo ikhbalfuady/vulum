@@ -61,6 +61,16 @@ $list = array(
 				"attributes" => ['nullable'], 
 			),
 			array(
+				"name" => "role_id",
+				"type" => "unsignedBigInteger", 
+				"attributes" => ['nullable'],
+			),
+			array(
+				"name" => "menu_id",
+				"type" => "unsignedBigInteger", 
+				"attributes" => ['nullable'],
+			),
+			array(
 				"name" => "active",
 				"type" => "tinyInteger", 
 				"default" => 0, 
@@ -122,15 +132,10 @@ $list = array(
 				"type" => "string", 
 				"attributes" => ['nullable'], 
 			),
-			array(
-				"name" => "prefix_group",
-				"type" => "string", 
-				"attributes" => ['nullable'], 
-			),
 		),
 	),
 
-	array( "name" => "Roles",
+	array( "name" => "RolePermissions",
 		"loging_date" => true,
 		"column" => 
 		array(
@@ -145,6 +150,23 @@ $list = array(
 				"attributes" => ['index'],
 			),
 			array(
+				"name" => "role_id",
+				"type" => "unsignedBigInteger",
+				"attributes" => ['index'],
+			),
+		),
+	),
+
+	array( "name" => "Roles",
+		"loging_date" => true,
+		"column" => 
+		array(
+			array(
+				"name" => "id",
+				"type" => "bigIncrements", 
+				"attributes" => ['index'],
+			),
+			array(
 				"name" => "name",
 				"type" => "string", 
 			),
@@ -156,7 +178,7 @@ $list = array(
 		),
 	),
 
-	array( "name" => "UserRoles",
+	array( "name" => "MenuItems",
 		"loging_date" => true,
 		"column" => 
 		array(
@@ -166,14 +188,71 @@ $list = array(
 				"attributes" => ['index'],
 			),
 			array(
-				"name" => "user_id",
+				"name" => "parent_id",
+				"type" => "unsignedBigInteger", 
+				"attributes" => ['index', 'nullable'],
+			),
+			array(
+				"name" => "name",
+				"type" => "string",
+			),
+			array(
+				"name" => "slug",
+				"type" => "string",
+				"attributes" => ['index'],
+			),
+			array(
+				"name" => "icon",
+				"type" => "text",
+				"attributes" => ['nullable'],
+			),
+			array(
+				"name" => "path",
+				"type" => "text",
+				"attributes" => ['nullable'],
+			),
+			array(
+				"name" => "ordering",
+				"type" => "integer", 
+				"attributes" => ['nullable'],
+			),
+		),
+	),
+
+	array( "name" => "Menus",
+		"loging_date" => true,
+		"column" => 
+		array(
+			array(
+				"name" => "id",
+				"type" => "bigIncrements", 
+				"attributes" => ['index'],
+			),
+			array(
+				"name" => "menu_item_id",
 				"type" => "unsignedBigInteger",
 				"attributes" => ['index'],
 			),
 			array(
-				"name" => "role_id",
+				"name" => "master_menu_id",
 				"type" => "unsignedBigInteger",
 				"attributes" => ['index'],
+			),
+		),
+	),
+
+	array( "name" => "MasterMenus",
+		"loging_date" => true,
+		"column" => 
+		array(
+			array(
+				"name" => "id",
+				"type" => "bigIncrements", 
+				"attributes" => ['index'],
+			),
+			array(
+				"name" => "name",
+				"type" => "string",
 			),
 		),
 	),

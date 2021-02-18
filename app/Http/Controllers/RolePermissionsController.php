@@ -6,18 +6,18 @@ use Exception;
 use Validator;
 use App\Exports\ExportFromArray;
 use Illuminate\Http\Request;
-use App\Repositories\RolesRepository;
+use App\Repositories\RolePermissionsRepository;
 use App\Providers\HelperProvider;
 use Maatwebsite\Excel\Facades\Excel;
 
-class RolesController extends Controller
+class RolePermissionsController extends Controller
 {
 	protected $repository;
 	protected $request;
 
 	public function __construct(
         Request $request,
-        RolesRepository $repository
+        RolePermissionsRepository $repository
     ){
 		$this->request = $request;
 		$this->repository = $repository;
@@ -84,7 +84,7 @@ class RolesController extends Controller
 		$data = H_toArrayObject($data);
 		$export = new ExportFromArray($data);
 
-        $fileName = 'Roles-'.H_getCurrentDate();
+        $fileName = 'RolePermissions-'.H_getCurrentDate();
         return Excel::download($export, ''.$fileName.'.csv');
 	}
 
@@ -97,11 +97,13 @@ class RolesController extends Controller
 
 			$validator = Validator::make( $request->all(),
 				[
-                    'name' => 'required',  
+                    'permission_id' => 'required',  
+                    'role_id' => 'required' 
 
 				],
 				[
-                    'name.required' => 'name is required',  
+                    'permission_id.required' => 'permission_id is required',  
+                    'role_id.required' => 'role_id is required' 
 
 				]
 			);

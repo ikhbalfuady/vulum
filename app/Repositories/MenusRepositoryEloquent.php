@@ -6,14 +6,14 @@ use Laravel\Lumen\Application;
 use Illuminate\Http\Request;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
-use App\Repositories\UserRolesRepository;
-use App\Models\UserRoles;
-use App\Validators\UserRolesValidator;
+use App\Repositories\MenusRepository;
+use App\Models\Menus;
+use App\Validators\MenusValidator;
 use Exception;
 
 use App\Providers\HelperProvider;
 
-class UserRolesRepositoryEloquent extends BaseRepository implements UserRolesRepository
+class MenusRepositoryEloquent extends BaseRepository implements MenusRepository
 {
 
     public function __construct(
@@ -27,7 +27,7 @@ class UserRolesRepositoryEloquent extends BaseRepository implements UserRolesRep
      * @return array
      */
     public function model() {
-        return UserRoles::class;
+        return Menus::class;
     }
 
     /**
@@ -56,7 +56,7 @@ class UserRolesRepositoryEloquent extends BaseRepository implements UserRolesRep
      * @return object
      */
     public function initModel($id = null) {
-        $model = new UserRoles;
+        $model = new Menus;
         if (!empty($id)) $model = $this->model->where($this->model->getKeyName(), $id)->first();
         return $model;
     }
@@ -193,8 +193,8 @@ class UserRolesRepositoryEloquent extends BaseRepository implements UserRolesRep
             $data = $this->initModel($id);
 
             //storing defined property    
-            $data->user_id = $request['user_id']; 
-            $data->role_id = $request['role_id']; 
+            $data->menu_item_id = $request['menu_item_id']; 
+            $data->master_menu_id = $request['master_menu_id']; 
 
             
             $data->save();

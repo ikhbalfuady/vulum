@@ -6,14 +6,14 @@ use Laravel\Lumen\Application;
 use Illuminate\Http\Request;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
-use App\Repositories\RolesRepository;
-use App\Models\Roles;
-use App\Validators\RolesValidator;
+use App\Repositories\MasterMenusRepository;
+use App\Models\MasterMenus;
+use App\Validators\MasterMenusValidator;
 use Exception;
 
 use App\Providers\HelperProvider;
 
-class RolesRepositoryEloquent extends BaseRepository implements RolesRepository
+class MasterMenusRepositoryEloquent extends BaseRepository implements MasterMenusRepository
 {
 
     public function __construct(
@@ -27,7 +27,7 @@ class RolesRepositoryEloquent extends BaseRepository implements RolesRepository
      * @return array
      */
     public function model() {
-        return Roles::class;
+        return MasterMenus::class;
     }
 
     /**
@@ -56,7 +56,7 @@ class RolesRepositoryEloquent extends BaseRepository implements RolesRepository
      * @return object
      */
     public function initModel($id = null) {
-        $model = new Roles;
+        $model = new MasterMenus;
         if (!empty($id)) $model = $this->model->where($this->model->getKeyName(), $id)->first();
         return $model;
     }
@@ -194,7 +194,6 @@ class RolesRepositoryEloquent extends BaseRepository implements RolesRepository
 
             //storing defined property    
             $data->name = $request['name']; 
-            $data->slug = H_handleRequest($request, 'slug'); 
 
             
             $data->save();

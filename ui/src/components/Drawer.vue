@@ -90,7 +90,7 @@
                   <span class="animated fadeIn" v-if="userInfo.email !== ''" >{{userInfo.email}}</span>
                 </q-item-label>
                 <q-item-label caption class="text-yellow">
-                  <q-skeleton v-if="userInfo.email === ''" class="animated fadeIn" type="text" />
+                  <q-skeleton v-if="userInfo.role === ''" class="animated fadeIn" type="text" />
                   <q-badge color="yellow-10" :label="userInfo.role" class="capital animated fadeIn" />
                 </q-item-label>
               </q-item-section>
@@ -106,23 +106,15 @@
 </template>
 
 <script>
-// import { Menu } from '../services/menu'
-import { Config } from '../config'
-import { Helper } from '../services/helper'
-import Api from '../services/Api'
-import { Model } from '../services/model'
 
 export default {
-  name: 'Tabs',
-  tab: 'index',
+  name: 'Drawer',
   props: ['topBarMenu', 'topBarInfo', 'isOpenDrawer', 'display', 'reload'],
   data () {
     return {
       moduleName: 'Drawer',
-      appName: Config.appName(),
-      API: new Api(),
-      miniState: true,
-      loading: false,
+      appName: this.$Config.appName(),
+      API: this.$Api,
       menuList: [],
       showHeader: true,
       drawer: false,
@@ -139,18 +131,19 @@ export default {
       },
       topBar: {
         info: {
-          name: 'Diginomic',
+          name: 'Vulum',
           icon: 'offline_bolt',
           iconClass: 'cursor-pointer'
         },
         menu: this.topMenu
       },
       serverIp: '',
-      userInfo: Model.userInfo(),
+      userInfo: {
+        name: 'John Doe',
+        email: 'johndoe@mail.com',
+        role: 'system'
+      },
       platForm: '',
-      fabPos: [18, 18],
-      draggingFab: false,
-      appConfig: null,
       currentBreakPoint: '',
       pauseOnResize: false
     }
@@ -164,24 +157,19 @@ export default {
   },
 
   mounted () {
-    var credentials = Config.credentials()
+    var credentials = this.$Config.credentials()
     if (credentials !== false) {
       this.drawerCtrl()
       this.drawer = false
       this.user = credentials
-      this.serverIp = Config.getApiRoot()
+      this.serverIp = this.$Config.getApiRoot()
       this.reloadTopBar()
     }
-
-    this.appConfig = this.$ModuleConfig.getDefault('config')
   },
 
   updated () {
-    // var screen = this.$q.screen.lt
-    // console.log('screen', screen)
     this.reloadTopBar() // toggle menu
     this.platForm = this.$q.platform.is
-    // console.log('Platform : ', this.platForm)
   },
 
   methods: {
@@ -209,33 +197,31 @@ export default {
     },
 
     activate () {
-      // console.log('activate')
       this.getMenu()
     },
 
     getUserInfo () {
-      this.userInfo = Model.userInfo()
-      Helper.loading()
-      this.API.get('staffs/info', (status, data, message, response, full) => {
+      this.$Helper.loading()
+      this.API.get('me', (status, data, message, response, full) => {
+        this.$Helper.loading(false)
         if (status === 200) {
           setTimeout(() => {
-            Config.credentials({ user: data })
+            this.$Config.credentials({ user: data })
             this.userInfo = data
             //
           }, 100)
         }
-        Helper.loading(false)
       })
     },
 
     getMenu () {
-      Helper.loading()
-      this.API.get('staffs/menu', (status, data, message, response, full) => {
+      this.$Helper.loading()
+      this.API.get('me/menu', (status, data, message, response, full) => {
+        this.$Helper.loading(false)
         if (status === 200) {
           this.menuList = data
           this.getUserInfo()
         }
-        Helper.loading(false)
       })
     },
 
@@ -251,7 +237,7 @@ export default {
       var explodeExt = this.$route.path.split('/')
       if (explodeExt[1] === 'meta-list') extend = '/' + explodeExt[1]
 
-      if (splited !== 1) current = extend + '/' + Helper.replace('_', '/', menu)
+      if (splited !== 1) current = extend + '/' + this.$Helper.replace('_', '/', menu)
       console.log('current', current)
 
       // console.log('splited:' + name, splited.length)
@@ -265,20 +251,6 @@ export default {
           // if (this.$route.path === current) return 'bg-primary text-white'
           // else return 'bg-white'
         }
-      }
-    },
-
-    extractToPermission (data) {
-      if (data !== undefined) {
-        var pecah = data.split('-')
-        var perms = true
-
-        if (data !== 'module-kas' || data !== 'module-inventory') {
-          perms = this.$ModuleConfig.getPermission(pecah[1], pecah[0])
-        }
-
-        if (perms === null) this.$router.push({ name: 'login' })
-        else return perms
       }
     },
 
@@ -306,8 +278,8 @@ export default {
 
     windowAction (type) {
       // console.log(type)
-      if (type === 'minimize') Helper.setFullscreen(false)
-      if (type === 'fullscreen') Helper.setFullscreen()
+      if (type === 'minimize') this.$Helper.setFullscreen(false)
+      if (type === 'fullscreen') this.$Helper.setFullscreen()
     },
 
     actionMenu (props) {
@@ -318,7 +290,6 @@ export default {
         if (p === 'logout') this.logout()
         else if (p === 'ApiRoot') this.ApiRoot()
         else if (p === 'logout') this.logout()
-        else if (p === 'sync') this.bmsService()
         else {
           if (props.params !== undefined) this.$router.push({ name: p, params: props.params })
           else this.$router.push({ name: p })
@@ -333,25 +304,12 @@ export default {
     },
 
     logout () {
-      Config.credentials('destroy')
+      this.$Config.credentials('destroy')
       this.$router.push({ name: 'login' })
     },
 
     ApiRoot () {
-      Config.setApiRoot()
-    },
-
-    bmsService () {
-      Helper.showToast('Synchronize data..')
-      var apiRoot = this.$Config.getApiRoot()
-      var bmsServiceUrl = this.$Config.getApiTemp()
-      bmsServiceUrl = bmsServiceUrl + 'service.php?base=' + btoa(apiRoot)
-      this.$Helper.openLink(bmsServiceUrl)
-      // this.API.offlineData = true
-      // this.API.get('url', (status, data, message, response, full) => {
-      //   this.processData(data, type)
-      //   Helper.loading(false)
-      // })
+      this.$Config.setApiRoot()
     }
   }
 }

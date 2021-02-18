@@ -13,11 +13,11 @@ use Laravel\Lumen\Auth\Authorizable;
 
 /**
  * @property bigIncrements $id 
- * @property string $name 
- * @property string $slug 
+ * @property unsignedBigInteger $permission_id 
+ * @property unsignedBigInteger $role_id 
 
  */
-class Roles extends Model
+class RolePermissions extends Model
 {
     use Authenticatable, Authorizable, HasFactory;
     use SoftDeletes;
@@ -26,7 +26,7 @@ class Roles extends Model
      * Table Configuration
      * @var string
      */
-    protected $table = 'roles';
+    protected $table = 'role_permissions';
     protected $primaryKey = 'id';
 
     /**
@@ -34,8 +34,8 @@ class Roles extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 
-        'slug'
+        'permission_id', 
+        'role_id'
     ];
 
     // disabled timestamps data
@@ -46,6 +46,11 @@ class Roles extends Model
 
     public function Columns() {
         return $this->fillable;
+    }
+
+    public function Permissions()
+    {
+        return $this->belongsTo('App\Models\Permissions', 'permission_id', 'id');
     }
 
 }        

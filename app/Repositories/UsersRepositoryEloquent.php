@@ -100,6 +100,12 @@ class UsersRepositoryEloquent extends BaseRepository implements UsersRepository
         try {
             $payload = $raw_request->all();
             $data = $this->model;
+            $data = $data->with([
+                'Menu',
+                'Menus',
+                'Role',
+                'Roles'
+            ]);
             if (H_hasRequest($payload, 'trash')) $data = $data->onlyTrashed();
             
             $search = [];
@@ -198,6 +204,8 @@ class UsersRepositoryEloquent extends BaseRepository implements UsersRepository
             $data->password = $request['password']; 
             $data->email = $request['email']; 
             $data->picture = H_handleRequest($request, 'picture'); 
+            $data->role_id = H_handleRequest($request, 'role_id'); 
+            $data->menu_id = H_handleRequest($request, 'menu_id'); 
             $data->active = $request['active']; 
 
             

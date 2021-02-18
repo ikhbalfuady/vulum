@@ -13,11 +13,15 @@ use Laravel\Lumen\Auth\Authorizable;
 
 /**
  * @property bigIncrements $id 
+ * @property unsignedBigInteger $parent_id 
  * @property string $name 
  * @property string $slug 
+ * @property text $icon 
+ * @property text $path 
+ * @property integer $ordering 
 
  */
-class Roles extends Model
+class MenuItems extends Model
 {
     use Authenticatable, Authorizable, HasFactory;
     use SoftDeletes;
@@ -26,7 +30,7 @@ class Roles extends Model
      * Table Configuration
      * @var string
      */
-    protected $table = 'roles';
+    protected $table = 'menu_items';
     protected $primaryKey = 'id';
 
     /**
@@ -34,8 +38,12 @@ class Roles extends Model
      * @var array
      */
     protected $fillable = [
+        'parent_id', 
         'name', 
-        'slug'
+        'slug', 
+        'icon', 
+        'path', 
+        'ordering'
     ];
 
     // disabled timestamps data

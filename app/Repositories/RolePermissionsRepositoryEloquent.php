@@ -6,14 +6,14 @@ use Laravel\Lumen\Application;
 use Illuminate\Http\Request;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
-use App\Repositories\RolesRepository;
-use App\Models\Roles;
-use App\Validators\RolesValidator;
+use App\Repositories\RolePermissionsRepository;
+use App\Models\RolePermissions;
+use App\Validators\RolePermissionsValidator;
 use Exception;
 
 use App\Providers\HelperProvider;
 
-class RolesRepositoryEloquent extends BaseRepository implements RolesRepository
+class RolePermissionsRepositoryEloquent extends BaseRepository implements RolePermissionsRepository
 {
 
     public function __construct(
@@ -27,7 +27,7 @@ class RolesRepositoryEloquent extends BaseRepository implements RolesRepository
      * @return array
      */
     public function model() {
-        return Roles::class;
+        return RolePermissions::class;
     }
 
     /**
@@ -56,7 +56,7 @@ class RolesRepositoryEloquent extends BaseRepository implements RolesRepository
      * @return object
      */
     public function initModel($id = null) {
-        $model = new Roles;
+        $model = new RolePermissions;
         if (!empty($id)) $model = $this->model->where($this->model->getKeyName(), $id)->first();
         return $model;
     }
@@ -193,8 +193,8 @@ class RolesRepositoryEloquent extends BaseRepository implements RolesRepository
             $data = $this->initModel($id);
 
             //storing defined property    
-            $data->name = $request['name']; 
-            $data->slug = H_handleRequest($request, 'slug'); 
+            $data->permission_id = $request['permission_id']; 
+            $data->role_id = $request['role_id']; 
 
             
             $data->save();

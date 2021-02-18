@@ -18,6 +18,8 @@ use Laravel\Lumen\Auth\Authorizable;
  * @property string $password 
  * @property string $email 
  * @property text $picture 
+ * @property unsignedBigInteger $role_id 
+ * @property unsignedBigInteger $menu_id 
  * @property tinyInteger $active 
 
  */
@@ -43,6 +45,8 @@ class Users extends Model
         'password', 
         'email', 
         'picture', 
+        'role_id', 
+        'menu_id', 
         'active'
     ];
 
@@ -51,11 +55,31 @@ class Users extends Model
 
     // disable update col id
     protected $guarded = ['id'];
-
     protected $hidden = ['password'];
 
     public function Columns() {
         return $this->fillable;
+    }
+
+
+    public function Role()
+    {
+        return $this->belongsTo('App\Models\Roles', 'role_id', 'id');
+    }
+
+    public function Roles()
+    {
+        return $this->hasMany('App\Models\RolePermissions', 'role_id', 'role_id')->with(['Permissions']);
+    }
+
+    public function Menu()
+    {
+        return $this->belongsTo('App\Models\MasterMenus', 'menu_id', 'id');
+    }
+
+    public function Menus()
+    {
+        return $this->hasMany('App\Models\Menus', 'master_menu_id', 'menu_id')->with(['MenuItems']);
     }
 
 }        

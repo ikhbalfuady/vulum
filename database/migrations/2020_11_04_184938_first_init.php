@@ -21,6 +21,8 @@ class FirstInit extends Migration
             $table->string('password');
             $table->string('email');
             $table->text('picture')->nullable();
+            $table->unsignedBigInteger('role_id')->nullable();
+            $table->unsignedBigInteger('menu_id')->nullable();
             $table->tinyInteger('active')->default(0);
 
             $table->timestamps(0);
@@ -45,7 +47,16 @@ class FirstInit extends Migration
             $table->bigIncrements('id')->index();
             $table->string('name');
             $table->string('slug')->nullable();
-            $table->string('prefix_group')->nullable();
+
+            $table->timestamps(0);
+            $table->softDeletes('deleted_at');
+        });
+
+        
+        Schema::create('role_permissions', function (Blueprint $table) {
+            $table->bigIncrements('id')->index();
+            $table->unsignedBigInteger('permission_id')->index();
+            $table->unsignedBigInteger('role_id')->index();
 
             $table->timestamps(0);
             $table->softDeletes('deleted_at');
@@ -54,7 +65,6 @@ class FirstInit extends Migration
         
         Schema::create('roles', function (Blueprint $table) {
             $table->bigIncrements('id')->index();
-            $table->unsignedBigInteger('permission_id')->index();
             $table->string('name');
             $table->string('slug')->nullable();
 
@@ -63,10 +73,33 @@ class FirstInit extends Migration
         });
 
         
-        Schema::create('user_roles', function (Blueprint $table) {
+        Schema::create('menu_items', function (Blueprint $table) {
             $table->bigIncrements('id')->index();
-            $table->unsignedBigInteger('user_id')->index();
-            $table->unsignedBigInteger('role_id')->index();
+            $table->unsignedBigInteger('parent_id')->index()->nullable();
+            $table->string('name');
+            $table->string('slug')->index();
+            $table->text('icon')->nullable();
+            $table->text('path')->nullable();
+            $table->integer('ordering')->nullable();
+
+            $table->timestamps(0);
+            $table->softDeletes('deleted_at');
+        });
+
+        
+        Schema::create('menus', function (Blueprint $table) {
+            $table->bigIncrements('id')->index();
+            $table->unsignedBigInteger('menu_item_id')->index();
+            $table->unsignedBigInteger('master_menu_id')->index();
+
+            $table->timestamps(0);
+            $table->softDeletes('deleted_at');
+        });
+
+        
+        Schema::create('master_menus', function (Blueprint $table) {
+            $table->bigIncrements('id')->index();
+            $table->string('name');
 
             $table->timestamps(0);
             $table->softDeletes('deleted_at');
@@ -86,8 +119,11 @@ class FirstInit extends Migration
             Schema::dropIfExists('users'); 
         Schema::dropIfExists('user_sessions'); 
         Schema::dropIfExists('permissions'); 
+        Schema::dropIfExists('role_permissions'); 
         Schema::dropIfExists('roles'); 
-        Schema::dropIfExists('user_roles'); 
+        Schema::dropIfExists('menu_items'); 
+        Schema::dropIfExists('menus'); 
+        Schema::dropIfExists('master_menus'); 
 
     }
 }        

@@ -25,7 +25,7 @@ class UsersMiddleware
 
 			if(!$token || $token == 'null') {
 				// Unauthorized response if token not there
-				$msg = HelperProvider::getMessageInfo('token_required');
+				$msg = 'Token not provided!';
 				return H_apiResponse(null, $msg, 401);
 				exit(); 
 			}
@@ -37,9 +37,9 @@ class UsersMiddleware
 				$credentials = H_JWT_decode($token);
 				
 			} catch(ExpiredException $e) {
-				throw new Exception(HelperProvider::getMessageInfo('token_expired'));
+				throw new Exception('Token has expired');
 			} catch(Exception $e) {
-				$msg = HelperProvider::getMessageInfo('token_error') . ", INFO : " .$e->getMessage();
+				$msg =  "Token Error, INFO : " .$e->getMessage();
 				throw new Exception($msg);
 			}
 
@@ -55,7 +55,7 @@ class UsersMiddleware
 				} else $auth = false;
 
 			}
-			if (!$auth) throw new Exception(HelperProvider::getMessageInfo('token_expired'));
+			if (!$auth) throw new Exception('Token Expired!');
 
 			return $next($request);
 

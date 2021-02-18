@@ -15,7 +15,6 @@ use Laravel\Lumen\Auth\Authorizable;
  * @property bigIncrements $id 
  * @property string $name 
  * @property string $slug 
- * @property string $prefix_group 
 
  */
 class Permissions extends Model
@@ -36,8 +35,7 @@ class Permissions extends Model
      */
     protected $fillable = [
         'name', 
-        'slug', 
-        'prefix_group'
+        'slug'
     ];
 
     // disabled timestamps data

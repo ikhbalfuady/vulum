@@ -5,11 +5,11 @@ namespace App\Repositories;
 use Prettus\Repository\Contracts\RepositoryInterface;
 
 /**
- * Interface UserRolesRepository.
+ * Interface MenuItemsRepository.
  *
  * @package namespace App\Repositories;
  */
-interface UserRolesRepository extends RepositoryInterface
+interface MenuItemsRepository extends RepositoryInterface
 {
     public function initModel($id = null);
     public function totalData($request);

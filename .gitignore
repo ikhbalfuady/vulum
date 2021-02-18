@@ -5,5 +5,4 @@ Homestead.yaml
 .env
 .phpunit.result.cache
 generator/output
-runs_server.bat
 .DS_Store
