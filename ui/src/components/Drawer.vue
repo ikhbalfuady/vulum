@@ -158,6 +158,10 @@ export default {
     var screenSize = this.$q.screen.name
     // console.log('screenSize', screenSize)
     if (screenSize === 'sm' || screenSize === 'xs') this.onResize(screenSize)
+
+    if (this.$Helper.checkLdb('menu')) {
+      if (this.$Helper.getLdb('menu') !== null) this.menuList = this.$Helper.getLdb('menu')
+    }
   },
 
   mounted () {
@@ -224,6 +228,7 @@ export default {
         this.$Helper.loading(false)
         if (status === 200) {
           this.menuList = data
+          this.$Helper.saveLdb('menu', data)
           console.log('menu', this.menuList)
           this.getUserInfo()
         }
@@ -279,7 +284,7 @@ export default {
         if (p === 'logout') this.logout()
         else if (p === 'ApiRoot') this.ApiRoot()
         else {
-          this.$router.push({ path: p })
+          this.$router.replace({ path: p })
         }
       }
     },

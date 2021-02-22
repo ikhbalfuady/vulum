@@ -70,6 +70,12 @@ export default {
 
   },
 
+  watch: {
+    $route (to, from) {
+      this.dataModel = Meta.model
+    }
+  },
+
   methods: {
 
     checkPermission (mode = 'create') {
@@ -90,7 +96,6 @@ export default {
       } else { // checking access create
         if (this.checkPermission('create')) {
           //
-          this.dataModel = this.Meta.model
         }
       }
     },
@@ -105,10 +110,10 @@ export default {
 
     getData (id) {
       console.log('getData')
-      this.$Helper.loading()
+      this.$Helper.loadingOverlay(true, 'Loading..')
       var endpoint = this.Meta.module + '/' + id
       this.API.get(endpoint, (status, data, message, response, full) => {
-        this.$Helper.loading(false)
+        this.$Helper.loadingOverlay(false)
         if (status === 200) {
           // inject data
           this.dataModel = data

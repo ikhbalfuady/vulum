@@ -341,6 +341,12 @@ export default {
 
   },
 
+  watch: {
+    ".$dlr."route (to, from) {
+      this.dataModel = Meta.model
+    }
+  },
+
   methods: {
 
     checkPermission (mode = 'create') {
@@ -375,10 +381,10 @@ export default {
 
     getData (id) {
       console.log('getData')
-      this.".$dlr."Helper.loading()
+      this.".$dlr."Helper.loadingOverlay(true, 'Loading..')
       var endpoint = this.Meta.module + '/' + id
       this.API.get(endpoint, (status, data, message, response, full) => {
-        this.".$dlr."Helper.loading(false)
+        this.".$dlr."Helper.loadingOverlay(false)
         if (status === 200) {
           // inject data
           this.dataModel = data
@@ -616,8 +622,9 @@ $meta = "const Meta = {
   module: '$module',
   topBarMenu: [],
   permission: {
-    create: false,
-    update: false,
+    browse: true,
+    create: true,
+    update: true,
     delete: true,
     restore: true
   },

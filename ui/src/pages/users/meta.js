@@ -4,8 +4,9 @@ const Meta = {
   module: 'users',
   topBarMenu: [],
   permission: {
-    create: false,
-    update: false,
+    browse: true,
+    create: true,
+    update: true,
     delete: true,
     restore: true
   },
