@@ -13,7 +13,6 @@ use Laravel\Lumen\Auth\Authorizable;
 
 /**
  * @property bigIncrements $id 
- * @property unsignedBigInteger $parent_id 
  * @property string $name 
  * @property string $slug 
  * @property text $icon 
@@ -38,7 +37,6 @@ class MenuItems extends Model
      * @var array
      */
     protected $fillable = [
-        'parent_id', 
         'name', 
         'slug', 
         'icon', 

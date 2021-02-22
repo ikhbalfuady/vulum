@@ -13,6 +13,7 @@ use Laravel\Lumen\Auth\Authorizable;
 
 /**
  * @property bigIncrements $id 
+ * @property unsignedBigInteger $parent_id 
  * @property unsignedBigInteger $menu_item_id 
  * @property unsignedBigInteger $master_menu_id 
 
@@ -34,6 +35,7 @@ class Menus extends Model
      * @var array
      */
     protected $fillable = [
+        'parent_id', 
         'menu_item_id', 
         'master_menu_id'
     ];
@@ -48,7 +50,7 @@ class Menus extends Model
         return $this->fillable;
     }
 
-    public function MenuItems()
+    public function Detail()
     {
         return $this->belongsTo('App\Models\MenuItems', 'menu_item_id', 'id');
     }

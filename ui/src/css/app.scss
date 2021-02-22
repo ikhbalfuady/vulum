@@ -1632,7 +1632,21 @@ Orig :
 }
 
 .menuList .q-item__section--avatar i {
-  font-size: 1.4rem;
+  font-size: 1.4em;
+}
+
+.menuList .q-item__section {
+  padding-right: 0 !important;
+  min-width: 30px !important;
+}
+
+.single-line-menu .q-item__section {
+  padding-right: 0 !important;
+  min-width: 30px !important;
+}
+
+.menuList .q-item__section--main , .single-line-menu .q-item__section--main {
+  font-size: 13px;
 }
 
 .q-field__label {

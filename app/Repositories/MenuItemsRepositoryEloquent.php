@@ -193,7 +193,6 @@ class MenuItemsRepositoryEloquent extends BaseRepository implements MenuItemsRep
             $data = $this->initModel($id);
 
             //storing defined property    
-            $data->parent_id = $request['parent_id']; 
             $data->name = $request['name']; 
             $data->slug = $request['slug']; 
             $data->icon = H_handleRequest($request, 'icon'); 

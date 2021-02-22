@@ -3,9 +3,11 @@
 	Route::group(["prefix" => "/users"], function() use ($router) {
 		$router->get("/", "UsersController@index");
 		$router->get("/{id}", "UsersController@findById");
+		$router->get("/{id}/permissions", "UsersController@permissions");
+		$router->get("/{id}/menus", "UsersController@menus");
 		$router->post("/", "UsersController@store");
 		$router->put("/{id}", "UsersController@store");
-		$router->put("/restore/{id}", "UsersController@restore");
+		$router->put("/{id}/restore", "UsersController@restore");
 		$router->delete("/{id}", "UsersController@remove");
 	});
         

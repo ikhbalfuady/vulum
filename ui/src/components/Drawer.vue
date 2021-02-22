@@ -45,32 +45,32 @@
         :width="241"
         :breakpoint="500"
       >
-        <q-scroll-area class="drawer-area" style="height: calc(100% - 150px); margin-top: 140px;">
+        <q-scroll-area class="drawer-area" style="height: calc(100% - 150px); margin-top: 150px;">
           <q-list v-for="(menuItem, index) in menuList" :key="index">
 
-            <q-expansion-item class="animated fadeIn" v-if="!is_parent(menuItem)" @click="actionMenu(menuItem)" expand-separator :icon="menuItem.icon" :label="menuItem.name" header-class="menuList text-primary bold" >
+            <q-expansion-item class="animated fadeIn" v-if="menuItem.sub.length !== 0" @click="actionMenu(menuItem)" expand-separator :icon="menuIcon(menuItem.detail.icon)" :label="menuItem.detail.name" header-class="menuList text-light " >
 
-              <q-item v-for="(menuSubItem, index) in menuItem.sub" :key="index+'-'+menuSubItem.icon"  :class="isCurrentMenu(menuSubItem, 'sub')"
+              <q-item v-for="(menuSubItem, index) in menuItem.sub" :key="index+'-'+menuSubItem.id"  :class="isCurrentMenu(menuSubItem, 'sub')"
                 clickable @click="actionMenu(menuSubItem)" v-ripple>
-                <q-item-section avatar> <q-icon  style="font-size: 1.3em;"  :name="menuSubItem.icon" color="grey-9" /> </q-item-section>
-                <q-item-section class="text-grey-9 "> {{ menuSubItem.name }} </q-item-section>
+                <q-item-section avatar> <q-icon  style="font-size: 1.2em;"  :name="menuIcon(menuSubItem.detail.icon)" color="grey-9" /> </q-item-section>
+                <q-item-section class="text-light"> {{ menuSubItem.detail.name }} </q-item-section>
               </q-item>
 
             </q-expansion-item>
 
-            <q-item class="animated fadeIn" v-if="is_parent(menuItem)" clickable @click="actionMenu(menuItem)" v-ripple>
-              <q-item-section avatar> <q-icon style="font-size: 1.5em;"  :name="menuItem.icon" color="primary" /> </q-item-section>
-              <q-item-section class="text-primary bold"> {{ menuItem.name }} </q-item-section>
+            <q-item class="animated fadeIn single-line-menu" v-if="menuItem.sub.length === 0" clickable @click="actionMenu(menuItem)" v-ripple>
+              <q-item-section avatar> <q-icon style="font-size: 1.1em;"  :name="menuIcon(menuItem.detail.icon)" color="light" /> </q-item-section>
+              <q-item-section class="text-light ">{{ menuItem.detail.name }} </q-item-section>
             </q-item>
 
           </q-list>
         </q-scroll-area>
 
-        <q-img class="absolute-top bg-grad" style="height: 140px; !important;">
+        <q-img class="absolute-top bg-grad" style="height: 150px; !important;">
           <q-list class="bg-transparent" style="width: 100%;padding: 5px 0px 0px 1px;">
             <q-item >
               <div class="text-center" style="width: 100%;">
-                <img src="assets/icons/logo-md-light.png" width="130">
+                <img src="assets/icons/logo-md-light.png" width="90">
               </div>
             </q-item>
             <q-item >
@@ -90,8 +90,11 @@
                   <span class="animated fadeIn" v-if="userInfo.email !== ''" >{{userInfo.email}}</span>
                 </q-item-label>
                 <q-item-label caption class="text-yellow">
-                  <q-skeleton v-if="userInfo.role === ''" class="animated fadeIn" type="text" />
-                  <q-badge color="yellow-10" :label="userInfo.role" class="capital animated fadeIn" />
+                  <q-skeleton v-if="userInfo.role === !undefined" class="animated fadeIn" type="text" />
+                  <q-badge color="yellow-10" :label="userInfo.role.name" class="capital animated fadeIn" />
+                </q-item-label>
+                <q-item-label caption class="text-yellow">
+                  <q-btn size="xs" @click="logout" color="yellow-10" outline label="Logout" class="capital animated fadeIn" />
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -140,6 +143,7 @@ export default {
       serverIp: '',
       userInfo: {
         name: 'John Doe',
+        username: 'sijohn',
         email: 'johndoe@mail.com',
         role: 'system'
       },
@@ -152,7 +156,7 @@ export default {
   created () {
     this.$q.addressbarColor.set()
     var screenSize = this.$q.screen.name
-    console.log('screenSize', screenSize)
+    // console.log('screenSize', screenSize)
     if (screenSize === 'sm' || screenSize === 'xs') this.onResize(screenSize)
   },
 
@@ -197,7 +201,7 @@ export default {
     },
 
     activate () {
-      this.getMenu()
+
     },
 
     getUserInfo () {
@@ -216,34 +220,19 @@ export default {
 
     getMenu () {
       this.$Helper.loading()
-      this.API.get('me/menu', (status, data, message, response, full) => {
+      this.API.get('me/menus', (status, data, message, response, full) => {
         this.$Helper.loading(false)
         if (status === 200) {
           this.menuList = data
+          console.log('menu', this.menuList)
           this.getUserInfo()
         }
       })
     },
 
-    isCurrentMenu (props, type) {
-      // console.log('props', props)
-      var menu = props.name.split('-')
-      menu = menu[1]
-
-      var current = ''
-      var splited = name.split('_')
-
-      var extend = ''
-      var explodeExt = this.$route.path.split('/')
-      if (explodeExt[1] === 'meta-list') extend = '/' + explodeExt[1]
-
-      if (splited !== 1) current = extend + '/' + this.$Helper.replace('_', '/', menu)
-      console.log('current', current)
-
-      // console.log('splited:' + name, splited.length)
-      // console.warn('isCurrentMenu', this.$route.path, current)
-
-      if (props.page !== undefined) {
+    isCurrentMenu (menu, type) {
+      if (menu !== undefined) {
+      // var current = menu.name
         if (type === 'sub') {
           // if (this.$route.path === current) return 'bg-grey-5 text-white'
           // else return 'bg-grey-2 submenu'
@@ -282,17 +271,15 @@ export default {
       if (type === 'fullscreen') this.$Helper.setFullscreen()
     },
 
-    actionMenu (props) {
-      console.log(props)
-      var p = props.page
+    actionMenu (menu) {
+      console.log('actionMenu', menu)
 
-      if (props.sub === undefined || props.sub.length === 0) { // jika tidak ada sub, jadikan link
+      if (menu.sub === undefined || menu.sub.length === 0) { // jika tidak ada sub, jadikan link
+        var p = menu.detail.path
         if (p === 'logout') this.logout()
         else if (p === 'ApiRoot') this.ApiRoot()
-        else if (p === 'logout') this.logout()
         else {
-          if (props.params !== undefined) this.$router.push({ name: p, params: props.params })
-          else this.$router.push({ name: p })
+          this.$router.push({ path: p })
         }
       }
     },
@@ -304,12 +291,27 @@ export default {
     },
 
     logout () {
-      this.$Config.credentials('destroy')
-      this.$router.push({ name: 'login' })
+      this.$Helper.loadingOverlay(true, 'Loging out..')
+      this.API.cache = false
+      this.API.post('user/logout', this.dataModel,
+        (status, data, message, response, full) => {
+          this.$Helper.loadingOverlay(false)
+          console.log({ status, data, message, response, full })
+          if (status === 200) {
+            this.$Config.credentials('destroy')
+            this.$router.push({ name: 'login' })
+          }
+        }, {})
     },
 
     ApiRoot () {
       this.$Config.setApiRoot()
+    },
+
+    menuIcon (icon) {
+      if (icon === null) return 'circle'
+      else if (icon === '') return 'circle'
+      else return icon
     }
   }
 }

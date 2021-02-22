@@ -3,6 +3,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Exception;
 use App\Models\Users;
+use App\Models\UserSessions;
 use Firebase\JWT\JWT;
 use Firebase\JWT\ExpiredException;
 use App\Providers\HelperProvider;
@@ -27,14 +28,13 @@ class UsersMiddleware
 				// Unauthorized response if token not there
 				$msg = 'Token not provided!';
 				return H_apiResponse(null, $msg, 401);
-				exit(); 
 			}
 
 			try {
 
 				$one_day = 60 * 60 * 24;
 				JWT::$leeway = $one_day * env('SESSION_EXPIRED_DAY', 1); // $leeway in day
-				$credentials = H_JWT_decode($token);
+				// $credentials = H_JWT_decode($token);
 				
 			} catch(ExpiredException $e) {
 				throw new Exception('Token has expired');
@@ -44,18 +44,10 @@ class UsersMiddleware
 			}
 
 			// checking session
-			$auth = true;
 			$id = H_JWT_getUserId($request);
-			if ($id == null) $auth = false;
-			else {
+			if ($id == null) throw new Exception('Please login first!');
 
-				$user = Users::find($id);
-				if ($user) {
-					if ($token != $user->remember_token) $auth = false;
-				} else $auth = false;
-
-			}
-			if (!$auth) throw new Exception('Token Expired!');
+			if (!$this->findSession($id, $token)) throw new Exception('Session Expired, please login!');
 
 			return $next($request);
 
@@ -63,4 +55,12 @@ class UsersMiddleware
 			return H_apiResponse(null, $e->getMessage(), 401);
 		}
     }
+
+	public function findSession($user_id, $token) {
+		$session = UserSessions::where('user_id', $user_id)->where('token', $token)->first();
+		if ($session) {
+			if ($token != $session->token) return false;
+			else return true;
+		} else return false;
+	}
 }

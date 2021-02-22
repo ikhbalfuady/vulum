@@ -193,6 +193,7 @@ class MenusRepositoryEloquent extends BaseRepository implements MenusRepository
             $data = $this->initModel($id);
 
             //storing defined property    
+            $data->parent_id = $request['parent_id']; 
             $data->menu_item_id = $request['menu_item_id']; 
             $data->master_menu_id = $request['master_menu_id']; 
 
@@ -249,6 +250,52 @@ class MenusRepositoryEloquent extends BaseRepository implements MenusRepository
             $data = $this->model->whereId($id)->onlyTrashed()->first();
             if ($data) return $data->restore();
             else return null;
+
+        } catch (Exception $e){
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    public function getMenu($raw_request, $id) {
+        try {
+            $payload = $raw_request->all();
+            $data = $this->model;
+            $data = $data->with(['Detail']);
+            $data = $data->where('master_menu_id', $id);
+            $data = $data->where('parent_id', null);
+            $data = $data->get();
+
+            $fix = [];
+            foreach ($data as $key => $menu) {
+                $obj = $menu;
+                $obj->sub = $this->getSubMenu($menu->id);
+                $fix[] = $obj;
+            }
+
+            return $fix;
+
+        } catch (Exception $e){
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    function getSubMenu($id) {
+        try {
+            $data = $this->model;
+            $data = $data->where('parent_id', $id);
+            $data = $data->with(['Detail']);
+            $data = $data->get();
+
+            $fix = [];
+            foreach ($data as $key => $menu) {
+                $haveSub = $this->model->where('parent_id', $menu->id)->count();
+                $obj = $menu;
+                $obj->sub = [];
+                if ($haveSub > 0) $obj->sub = $this->getSubMenu($menu->id);
+                $fix[] = $obj;
+            }
+
+            return $fix;
 
         } catch (Exception $e){
             throw new Exception($e->getMessage());

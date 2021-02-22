@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => null,
                 'name' => 'Users',
                 'slug' => null,
-                'path' => '/user',
+                'path' => '/users',
                 'icon' => null,
 
             ],
@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => 2,
                 'name' => 'User List',
                 'slug' => null,
-                'path' => '/user',
+                'path' => '/users',
                 'icon' => null,
 
             ],
@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => 2,
                 'name' => 'Add User',
                 'slug' => null,
-                'path' => '/user-form',
+                'path' => '/users/form',
                 'icon' => null,
 
             ],
@@ -68,7 +68,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => null,
                 'name' => 'Permissions',
                 'slug' => null,
-                'path' => '/permission',
+                'path' => '/permissions',
                 'icon' => null,
 
             ],
@@ -76,7 +76,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => 5,
                 'name' => 'Permission List',
                 'slug' => null,
-                'path' => '/permission',
+                'path' => '/permissions',
                 'icon' => null,
 
             ],
@@ -84,7 +84,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => 5,
                 'name' => 'Add Permission',
                 'slug' => null,
-                'path' => '/permission-form',
+                'path' => '/permissions/form',
                 'icon' => null,
 
             ],
@@ -92,7 +92,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => null,
                 'name' => 'Roles',
                 'slug' => null,
-                'path' => '/role',
+                'path' => '/roles',
                 'icon' => null,
 
             ],
@@ -100,7 +100,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => 8,
                 'name' => 'Role List',
                 'slug' => null,
-                'path' => '/role',
+                'path' => '/roles',
                 'icon' => null,
 
             ],
@@ -108,7 +108,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => 8,
                 'name' => 'Add Role',
                 'slug' => null,
-                'path' => '/role-form',
+                'path' => '/roles/form',
                 'icon' => null,
 
             ],
@@ -124,7 +124,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => 11,
                 'name' => 'Menus List',
                 'slug' => null,
-                'path' => '/menu',
+                'path' => '/menus',
                 'icon' => null,
 
             ],
@@ -132,7 +132,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => 11,
                 'name' => 'Add Menus',
                 'slug' => null,
-                'path' => '/menu-form',
+                'path' => '/menus/form',
                 'icon' => null,
 
             ],
@@ -140,7 +140,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => null,
                 'name' => 'Master Menus',
                 'slug' => null,
-                'path' => '/master-menu',
+                'path' => '/master-menus',
                 'icon' => null,
 
             ],
@@ -148,7 +148,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => 14,
                 'name' => 'Master Menu List',
                 'slug' => null,
-                'path' => '/master-menu',
+                'path' => '/master-menus',
                 'icon' => null,
 
             ],
@@ -156,7 +156,7 @@ class DatabaseSeeder extends Seeder
                 'parent_id' => 14,
                 'name' => 'Add Master Menu',
                 'slug' => null,
-                'path' => '/master-menu-form',
+                'path' => '/master-menus/form',
                 'icon' => null,
 
             ]
@@ -176,29 +176,48 @@ class DatabaseSeeder extends Seeder
             if (empty($slug)) $slug = strtolower(str_replace(' ', '-', $menu['name']));
 
             // generatin menus
+            $parent = $menu['parent_id'];
             $menu = MenuItems::create([
-                'parent_id' => $menu['parent_id'],
                 'name' => $menu['name'],
                 'slug' => $slug,
                 'path' => $menu['path'],
                 'icon' => $menu['icon'],
-            ]);
-
+                ]);
+                
             Menus::create([
+                'parent_id' => $parent,
                 'menu_item_id' => $menu->id,
                 'master_menu_id' => 1,
             ]);
 
-            // generating roles permissions
-            $permission = Permissions::create([
-                'name' => $menu['name'],
-                'slug' => $slug,
-            ]);
+            if ($parent == null && $menu['name'] != 'Dashboard') { // defined only head module generate permission
 
-            RolePermissions::create([
-                'permission_id' => $permission->id,
-                'role_id' => 1,
-            ]);
+                $crud = [
+                    'Browse',
+                    'Create',
+                    'Read',
+                    'Update',
+                    'Delete',
+                    'Restore',
+                ];
+
+                foreach ($crud as $key => $role) {
+                    // generating roles permissions
+                    $slugs = strtolower($slug.'-'.$role);
+                    $permission = Permissions::create([
+                        'name' => $menu['name'] . ' ' . $role,
+                        'slug' => $slugs,
+                    ]);
+
+                    RolePermissions::create([
+                        'permission_id' => $permission->id,
+                        'role_id' => 1,
+                    ]);
+                }
+               
+            }
+
+            
 
         }
 

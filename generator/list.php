@@ -188,11 +188,6 @@ $list = array(
 				"attributes" => ['index'],
 			),
 			array(
-				"name" => "parent_id",
-				"type" => "unsignedBigInteger", 
-				"attributes" => ['index', 'nullable'],
-			),
-			array(
 				"name" => "name",
 				"type" => "string",
 			),
@@ -227,6 +222,11 @@ $list = array(
 				"name" => "id",
 				"type" => "bigIncrements", 
 				"attributes" => ['index'],
+			),
+			array(
+				"name" => "parent_id",
+				"type" => "unsignedBigInteger", 
+				"attributes" => ['index', 'nullable'],
 			),
 			array(
 				"name" => "menu_item_id",

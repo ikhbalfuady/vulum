@@ -258,5 +258,51 @@ class UserSessionsRepositoryEloquent extends BaseRepository implements UserSessi
         }
     }
 
+    public function logout($token, $user_id) {
+        try {
+
+            $data = $this->model->where('user_id', $user_id)->where('token', $token)->first();
+            if ($data) return $data->forceDelete();
+            else return null;
+
+        } catch (Exception $e){
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    public function login($request, $user) {
+        try {
+            $sessions = $this->tokenizer($request, $user);
+            $save = [
+                "user_id" => $user->id,
+                "token" => $sessions->token,
+                "ip" => $sessions->ip,
+                "agent" => $sessions->agent,
+                "platform" => 'web',
+            ];
+            $save = $this->store($request, null, $save);
+        return $save;
+        } catch (Exception $e){
+            throw new Exception($e->getMessage());
+        }
+        
+    }
+
+    public function tokenizer($request, $user) {
+        $requiredData = array(
+            "id" => $user->id,
+            "name" => $user->name,
+            "username" => $user->username,
+            "email" => $user->email,
+        );
+        $data = [
+            "id" => $user->id,
+            "token" => H_JWT_encode($user->id, $requiredData),
+            "agent" => $request->header('User-Agent'),
+            "ip" => H_getIpClient(),
+        ];
+        return H_toArrayObject($data);
+    }
+
 }
         

@@ -77,7 +77,7 @@ export const Helper = {
     return string.replace(regex, replace)
   },
 
-  loadingOverlay (show = true, msg = 'Memproses...') {
+  loadingOverlay (show = true, msg = 'Loading...') {
     /* This is for Codepen (using UMD) to work */
     const spinner = typeof QSpinnerFacebook !== 'undefined'
       ? QSpinnerFacebook // Non-UMD, imported above

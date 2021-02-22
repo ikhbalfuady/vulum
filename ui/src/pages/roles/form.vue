@@ -10,8 +10,8 @@
       <div class="row pl-2 pt-2">
         <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
           <div class="title">
-            <span class="text-caption text-grey-8">{{title}}</span><br>
-            <span class="text-h5 bold text-primary capital">{{Meta.name}}</span>
+            <span class="text-caption text-grey-8">Master {{Meta.name}}</span><br>
+            <span class="text-h5 bold text-primary capital">{{title}} {{Meta.name}} <span v-if="title === 'Update'" >#{{dataModel.id}}</span></span>
           </div>
         </div>
       </div>
@@ -40,9 +40,6 @@
 </template>
 
 <script>
-import { Helper } from '../../services/helper'
-import { Model } from '../../services/model'
-import Api from '../../services/Api'
 import Meta from './meta'
 
 export default {
@@ -50,12 +47,12 @@ export default {
   data () {
     return {
       Meta,
-      API: new Api(),
+      API: this.$Api,
       // default data
-      dataModel: Model.Roles(),
-      title: 'Add',
+      title: 'Create',
+      dataModel: Meta.model,
       rules: {
-        permission: {}
+        permission: Meta.permission
       },
       disableSubmit: false
     }
@@ -63,7 +60,10 @@ export default {
 
   created () {
     this.initTopBar()
-    this.initialize()
+    this.$ModuleConfig.getCurrentPermissions((status, data) => {
+      console.log('initPermissionPage:' + Meta.module, data)
+      this.initialize()
+    }, 'user-form')
   },
 
   mounted () {
@@ -72,48 +72,42 @@ export default {
 
   methods: {
 
+    checkPermission (mode = 'create') {
+      var access = this.$ModuleConfig.checkPermission(this.$router, this.Meta.module + '-' + mode)
+      if (access) return true
+      else this.$router.push({ name: '403' })
+    },
+
     initialize () {
-      this.rules.permission = this.$ModuleConfig.getDefault('permission', this.Meta.module)
-      console.log('permission', this.rules.permission)
-      this.onRefresh()
+      var params = this.$route.params
+      if (this.$Helper.checkParams(params)) { // checking access update
+        if (this.checkPermission('update')) {
+          if (params.id !== undefined) {
+            this.onRefresh()
+            this.getData(params.id)
+          } else this.backToRoot()
+        }
+      } else { // checking access create
+        if (this.checkPermission('create')) {
+          //
+        }
+      }
     },
 
     onRefresh () {
-      this.initRules()
+      //
     },
 
     initTopBar () {
       this.Meta.topBarMenu = [{ name: 'Refresh', event: this.onRefresh }]
     },
 
-    initRules () {
-      this.$ModuleConfig.loadAppConfig((status, data) => {
-      }, this.Meta.module)
-
-      this.$ModuleConfig.getCurrentPermission((status, data) => {
-        var access = data[this.Meta.module]
-        if (access !== undefined) {
-          this.rules.permission = access
-          if (!access.view) this.$router.push({ name: '401' }) // view module
-          else {
-            var params = this.$route.params
-            setTimeout(() => {
-              if (Helper.checkParams(params)) {
-                if (params.id !== undefined) this.getData(params.id)
-                else this.backToRoot()
-              }
-            }, 200)
-          }
-        } else this.$router.push({ name: '401' })
-      }, this.Meta.module)
-    },
-
     getData (id) {
       console.log('getData')
-      Helper.loading()
+      this.$Helper.loading()
       var endpoint = this.Meta.module + '/' + id
       this.API.get(endpoint, (status, data, message, response, full) => {
-        Helper.loading(false)
+        this.$Helper.loading(false)
         if (status === 200) {
           // inject data
           this.dataModel = data
@@ -144,16 +138,16 @@ export default {
 
     validateSubmit () {
       // if (this.dataModel.name === null) {
-      //   Helper.showAlert('Nama Kosong!', 'Nama harus di isi!')
+      //   this.$Helper.showAlert('Nama Kosong!', 'Nama harus di isi!')
       //   return false
       // } else return true
       return true
     },
 
     save () {
-      Helper.loadingOverlay()
+      this.$Helper.loadingOverlay(true, 'Saving..')
       this.API.post(this.Meta.module, this.dataModel, (status, data, message, response, full) => {
-        Helper.loadingOverlay(false)
+        this.$Helper.loadingOverlay(false)
         if (status === 200) {
           this.messageSubmit('Saving', message)
           this.backToRoot()
@@ -162,9 +156,9 @@ export default {
     },
 
     update () {
-      Helper.loadingOverlay()
+      this.$Helper.loadingOverlay(true, 'Saving..')
       this.API.put(this.Meta.module + '/' + this.dataModel.id, this.dataModel, (status, data, message, response, full) => {
-        Helper.loadingOverlay(false)
+        this.$Helper.loadingOverlay(false)
         if (response.result === true && status === 200) {
           this.messageSubmit('Update', message)
           this.backToRoot()
@@ -173,7 +167,7 @@ export default {
     },
 
     messageSubmit (titleAdd = '', msg) {
-      Helper.showAlert(titleAdd + ' Succesfully', msg)
+      this.$Helper.showAlert(titleAdd + ' Succesfully', msg)
     }
   }
 }

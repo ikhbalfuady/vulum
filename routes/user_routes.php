@@ -1,16 +1,15 @@
 
 <?php 
 $router->post('user/login', ['uses' => 'UsersAuthController@authenticate']);
+$router->post('user/logout', ['uses' => 'UsersAuthController@logout']);
 
-Route::group(["prefix" => "/me"], function() use ($router) {
-	$router->get("/", "UsersController@info");
-	$router->get("/menu", "UsersController@menu");
-});
+$router->group(['middleware' => 'users.auth'],  function() use ($router) {
 
-$router->get('payment_gateways', ['uses' => 'MetaController@payment_gateways']);
-
-
-// $router->group(['middleware' => 'users.auth'],  function() use ($router) {
+	Route::group(["prefix" => "/me"], function() use ($router) {
+		$router->get("/", "UsersController@info");
+		$router->get("/permissions", "UsersController@permissions");
+		$router->get("/menus", "UsersController@menus");
+	});
 
 // 	$router->get('me/dashboard-pro', ['uses' => 'UserInvestmentController@dashboard']);
 
@@ -19,4 +18,4 @@ $router->get('payment_gateways', ['uses' => 'MetaController@payment_gateways']);
 // 		$router->get("/get_user_id", "UsersController@getUserId");
 // 	});
 
-// });
+});

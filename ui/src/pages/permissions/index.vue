@@ -7,20 +7,28 @@
 
       <!-- Header Title -->
       <div class="row pl-2 pt-2">
-        <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
+        <div class="col-12 col-sm-3 col-md-5 pb-1 pv info-page">
           <div class="title">
-            <span class="text-caption text-grey-8">Master Data</span><br>
+            <span class="text-caption text-grey-8">Master {{Meta.name}}</span><br>
             <span class="text-h5 bold text-primary capital">{{Meta.name}}</span>
           </div>
         </div>
 
-        <div class="col-6 col-sm-3 col-md-2 pb-1 pr-1">
+        <div class="col-6 col-sm-3 col-md-2 pb-1 pr-1 ">
+          <q-select :options="select.status" dense outlined  @input="val => { onRefresh() }"
+            v-model="dataModel.status" label="Status"
+            class="bg-white box-shadow" style="border-radius:5px; " transition-show="jump-up" transition-hide="jump-down"
+            >
+          </q-select>
+        </div>
+
+        <div class="col-6 col-sm-3 col-md-2 pb-1 pr-1-5">
           <q-select :options="table.searchBy" dense outlined
             v-model="dataModel.searchBy" label="Searc By" class="bg-white box-shadow"
             style="border-radius:5px; " transition-show="jump-up" transition-hide="jump-down" />
         </div>
 
-        <div class="col-6 col-sm-6 col-md-3 pb-1 pr-1-5">
+        <div class="col-12 col-sm-3 col-md-3 pb-1 pr-1-5">
           <q-input debounce="300" placeholder="Search..." v-model="table.search" outlined dense class="fix-after bg-white box-shadow " style="border-radius:5px; " >
               <template v-slot:append>
                 <q-icon v-if="table.search !== ''" name="close" @click="table.search = ''" class="cursor-pointer" />
@@ -50,7 +58,7 @@
 
           <template v-slot:body-cell-action="props">
             <q-td :props="props">
-              <q-btn v-if="rules.permission.edit" class="bg-soft" dense round flat color="green" @click="edit(props.row)" icon="edit"></q-btn>
+              <q-btn v-if="rules.permission.update" class="bg-soft" dense round flat color="green" @click="edit(props.row)" icon="edit"></q-btn>
               <q-btn class="bg-soft" dense round flat color="primary" @click="detail(props.row)" icon="visibility"></q-btn>
             </q-td>
           </template>
@@ -58,17 +66,18 @@
           <template v-slot:no-data="{icon}">
             <div class="full-width row flex-center text-primary q-gutter-sm">
               <q-icon size="2em" :name="icon" /><span class="bold text-h6"> Belum ada data {{Meta.name}} </span>
-              <q-btn v-if="rules.permission.add" @click="add" unelevated outline color="primary" label="Buat baru" />
+              <q-btn v-if="rules.permission.create" @click="add" unelevated outline color="primary" label="Buat baru" />
             </div>
           </template>
 
           <template v-slot:top>
-            <div class="action animated zoomIn" >
+            <div v-if="rules.permission.create" class="action animated zoomIn" >
               <q-btn @click="add" unelevated color="primary" class="capital  mr-1" icon="add" label="Add" />
             </div>
 
             <div v-if="rules.permission.delete && table.selected.length !== 0 ">
-              <q-btn @click="deleteSelected" unelevated class="capital " label="Delete"
+              <q-btn @click="deleteSelected" unelevated class="capital "
+                :label="(dataModel.status === 'TRASH') ? 'Re-Activate' : 'Delete' "
                 :color="(dataModel.status === 'TRASH') ? 'green' : 'negative' "
                 :icon="(dataModel.status === 'TRASH') ? 'check' : 'delete' "
               />
@@ -86,8 +95,6 @@
 </template>
 
 <script>
-import { Helper } from '../../services/helper'
-import Api from '../../services/Api'
 import Meta from './meta'
 
 export default {
@@ -95,25 +102,24 @@ export default {
   data () {
     return {
       Meta,
-      API: new Api(),
+      API: this.$Api,
       // default data
       dataModel: {
-        searchBy: null
+        searchBy: null,
+        status: 'ACTIVE'
       },
       rules: {
-        permission: {}
+        permission: Meta.permission
       },
       table: {
         search: '',
         data: [],
-        currentPage: 5,
         searchBy: [],
         columns: [
           { name: 'action', label: '#', align: 'left', style: 'width: 20px' },
           { name: 'id', label: 'id', field: 'id', align: 'left' },
           { name: 'name', label: 'name', field: 'name', align: 'left' },
-          { name: 'slug', label: 'slug', field: 'slug', align: 'left' },
-          { name: 'prefix_group', label: 'prefix_group', field: 'prefix_group', align: 'left' }
+          { name: 'slug', label: 'slug', field: 'slug', align: 'left' }
 
         ],
         pagination: {
@@ -125,7 +131,7 @@ export default {
         inFocus: false
       },
       select: {
-        status: ['ACTIVE', 'TRASH', 'ALL']
+        status: ['ACTIVE', 'TRASH']
 
       }
     }
@@ -133,7 +139,10 @@ export default {
 
   created () {
     this.initTopBar()
-    this.initialize()
+    this.$ModuleConfig.getCurrentPermissions((status, data) => {
+      console.log('initPermissionPage:' + Meta.module, data)
+      this.initialize()
+    }, 'user-index')
   },
 
   mounted () {
@@ -146,34 +155,28 @@ export default {
 
   methods: {
 
+    checkPermission () {
+      for (const perm in this.rules.permission) {
+        this.rules.permission[perm] = this.$ModuleConfig.checkPermission(this.$router, this.Meta.module + '-' + perm)
+      }
+    },
+
     onRefresh () {
-      this.initRules()
+      this.refreshList()
     },
 
     initialize () {
-      this.rules.permission = this.$ModuleConfig.getDefault('permission', this.Meta.module)
-      this.onRefresh()
+      var viewAccess = this.$ModuleConfig.checkPermission(this.$router, this.Meta.module + '-browse')
+      if (viewAccess) {
+        this.checkPermission()
+        this.onRefresh()
+      } else {
+        this.$router.push({ name: '403' })
+      }
     },
 
     initTopBar () {
       this.Meta.topBarMenu = [{ name: 'Refresh', event: this.onRefresh }]
-    },
-
-    initRules () {
-      this.$ModuleConfig.loadAppConfig((status, data) => {
-        // code
-      }, this.Meta.module)
-
-      this.$ModuleConfig.getCurrentPermission((status, data) => {
-        var access = data[this.Meta.module]
-        if (data[this.Meta.module] !== undefined) {
-          this.rules.permission = access
-          if (!access.view) this.$router.push({ name: '401' }) // view module
-          else {
-            this.refreshList()
-          }
-        } else this.$router.push({ name: '401' })
-      }, this.Meta.module)
     },
 
     getTableSelected () {
@@ -188,7 +191,7 @@ export default {
     },
 
     getList (props) {
-      Helper.loading()
+      this.$Helper.loading()
       this.table.loading = true
       this.table.selected = []
       const { page, rowsPerPage } = props.pagination
@@ -198,9 +201,10 @@ export default {
       endpoint = endpoint + '&page=' + page
       endpoint = endpoint + '&limit=' + perpage
       if (this.table.search !== '') endpoint = endpoint + '&search=' + this.dataModel.searchBy.field + ':' + this.table.search
+      if (this.dataModel.status === 'TRASH') endpoint = endpoint + '&trash=true'
 
       this.API.get(endpoint, (status, data, message, response, full) => {
-        Helper.loading(false)
+        this.$Helper.loading(false)
         this.table.loading = false
         if (status === 200) {
           // inject data
@@ -214,11 +218,11 @@ export default {
     },
 
     add () {
-      this.$router.push({ name: this.Meta.module + '-add' })
+      this.$router.push({ name: this.Meta.module + '-create' })
     },
 
     edit (data) {
-      this.$router.push({ name: this.Meta.module + '-edit', params: data })
+      this.$router.push({ name: this.Meta.module + '-update', params: data })
     },
 
     detail (data) {
@@ -237,7 +241,7 @@ export default {
         ok: type,
         cancel: 'Cancel'
       }).onOk(() => {
-        that.deleteDataSelected()
+        that.deleteDataSelected(type)
       }).onCancel(() => {
         // action
       }).onDismiss(() => {
@@ -245,19 +249,28 @@ export default {
       })
     },
 
-    deleteDataSelected () {
+    deleteDataSelected (type) {
       for (var row of this.table.selected) {
-        this.delete(row.id)
+        if (type === 'Delete') this.delete(row.id)
+        else this.restore(row.id)
       }
       this.table.selected = []
       setTimeout(() => { this.onRefresh() }, 500)
     },
 
     delete (id) {
-      Helper.loading()
+      this.$Helper.loading()
       this.API.delete(this.Meta.module + '/' + id, (status, data, message, response, full) => {
-        Helper.loading(false)
-        if (status === 200) Helper.showToast(message)
+        this.$Helper.loading(false)
+        if (status === 200) this.$Helper.showToast(message)
+      })
+    },
+
+    restore (id) {
+      this.$Helper.loading()
+      this.API.put(this.Meta.module + '/' + id + '/restore', (status, data, message, response, full) => {
+        this.$Helper.loading(false)
+        if (status === 200) this.$Helper.showToast(message)
       })
     }
 

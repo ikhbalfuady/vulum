@@ -8,6 +8,7 @@ use App\Exports\ExportFromArray;
 use Illuminate\Http\Request;
 use App\Repositories\RolesRepository;
 use App\Providers\HelperProvider;
+use App\Providers\AuthProvider;
 use Maatwebsite\Excel\Facades\Excel;
 
 class RolesController extends Controller
@@ -24,6 +25,7 @@ class RolesController extends Controller
     }
     
     public function index(Request $request) {
+		AuthProvider::has($request, 'roles-browse');
         try {
 			$payload = $request->all();
 			$data = $this->repository->getList($request);
@@ -35,6 +37,7 @@ class RolesController extends Controller
 	}
 
 	public function findById(Request $request, $id) {
+		AuthProvider::has($request, 'roles-read');
         try {
 			$data = $this->repository->findById($request, $id);
 			return H_apiResponse($data);
@@ -44,6 +47,8 @@ class RolesController extends Controller
 	}
 
 	public function store(Request $request, $id = null) {
+		if ($id) AuthProvider::has($request, 'roles-update');
+		else AuthProvider::has($request, 'roles-create');
 		try {
 			$validate = $this->validateStore($request, $id);
 			if($validate['result']) {
@@ -60,15 +65,17 @@ class RolesController extends Controller
 	}
 
 	public function restore(Request $request, $id = null) {
+		AuthProvider::has($request, 'roles-restore');
 		try {
 			$data = $this->repository->restore($request, $id);
-			return H_apiResponse($data);
+			return H_apiResponse($data, 'Data has successfully restored');
         } catch (Exception $e){
             return H_apiResError($e);
         }
 	}
 
 	public function remove(Request $request, $id) {
+		AuthProvider::has($request, 'roles-delete');
 		try {
 			$payload = $request->all();
 			$data = $this->repository->remove($request, $id);
@@ -111,7 +118,7 @@ class RolesController extends Controller
 			}
 
 			if (!$this->repository->findById($request, $id)) {
-				$message = 'Data ' . HelperProvider::getMessageInfo('404');
+				$message = 'Data not found';
 				$result = false;
 			}
 
@@ -122,7 +129,7 @@ class RolesController extends Controller
         } catch (Exception $e){
 			if(env('APP_DEBUG')) return H_apiResError($e);
 			else {
-				$msg = HelperProvider::getMessageInfo('error');
+				$msg = $e->getMessage();
 				return H_apiResponse(null, $msg, 400);
 			}
         }

@@ -14,8 +14,8 @@ foreach($list as $item){
     $scriptRoute .= "
       { name: '$module', path: '/$module', component: () => import('pages/$module/index.vue') },
       { name: '$module-detail', path: '/$module/view/:id', component: () => import('pages/$module/detail.vue') },
-      { name: '$module-add', path: '/$module/form', component: () => import('pages/$module/form.vue') },
-      { name: '$module-edit', path: '/$module/form/:id', component: () => import('pages/$module/form.vue') },
+      { name: '$module-create', path: '/$module/form', component: () => import('pages/$module/form.vue') },
+      { name: '$module-update', path: '/$module/form/:id', component: () => import('pages/$module/form.vue') },
 ";
 
   // model

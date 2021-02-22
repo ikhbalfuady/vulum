@@ -100,12 +100,6 @@ class UsersRepositoryEloquent extends BaseRepository implements UsersRepository
         try {
             $payload = $raw_request->all();
             $data = $this->model;
-            $data = $data->with([
-                'Menu',
-                'Menus',
-                'Role',
-                'Roles'
-            ]);
             if (H_hasRequest($payload, 'trash')) $data = $data->onlyTrashed();
             
             $search = [];
@@ -164,6 +158,33 @@ class UsersRepositoryEloquent extends BaseRepository implements UsersRepository
         return !empty($data) ? $data : null;
     }
 
+    public function rolePermissions($raw_request, $id) {
+        try {
+            $payload = $raw_request->all();
+            $data = $this->findAll($raw_request, true);
+            $data = $data->with([
+                'Role',
+                'Roles'
+            ]);
+            $data = $data->where($this->model->getKeyName(), $id)->first();
+
+            $send = [];
+            if ($data) {
+                if (count($data->roles) != 0) {
+                    foreach ($data->roles as $key => $role) {
+                        $obj = [];
+                        $obj['name'] = $role->permissions->name;
+                        $obj['slug'] = $role->permissions->slug;
+                        $send[] = $obj;
+                    }
+                }
+            } else return null;
+            return $send;
+        } catch (Exception $e){
+            throw new Exception($e->getMessage());
+        }
+    }
+
     public function getList($raw_request) {
 		try {
             $payload = $raw_request->all();
@@ -201,14 +222,12 @@ class UsersRepositoryEloquent extends BaseRepository implements UsersRepository
             //storing defined property    
             $data->name = $request['name']; 
             $data->username = $request['username']; 
-            $data->password = $request['password']; 
+            $data->password =  H_handleRequest($request, 'password', 'lds'); 
             $data->email = $request['email']; 
-            $data->picture = H_handleRequest($request, 'picture'); 
-            $data->role_id = H_handleRequest($request, 'role_id'); 
-            $data->menu_id = H_handleRequest($request, 'menu_id'); 
-            $data->active = $request['active']; 
-
-            
+            $data->picture = H_handleRequest($request, 'picture');
+            $data->role_id = H_handleRequest($request, 'role_id');
+            $data->menu_id = H_handleRequest($request, 'menu_id');
+            $data->active = H_handleRequest($request, 'active', true);
             $data->save();
             return $data;
 
@@ -265,6 +284,14 @@ class UsersRepositoryEloquent extends BaseRepository implements UsersRepository
         } catch (Exception $e){
             throw new Exception($e->getMessage());
         }
+    }
+
+    public function info($raw_request, $id) {
+        $payload = $raw_request->all();
+        $data = $this->findAll($raw_request, true);
+        $data = $data->with(['Role']);
+        $data = $data->where($this->model->getKeyName(), $id)->first();
+        return !empty($data) ? $data : null;
     }
 
 }

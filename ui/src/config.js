@@ -78,16 +78,6 @@ export const Config = {
     return LocalStorage.getItem('apiroot')
   },
 
-  getApiTemp () {
-    // if (LocalStorage.has('apitmp') === false) {
-    //   var url = 'http://localhost/bms_service/'
-    //   var icon = '<i aria-hidden="true" role="img" class="material-icons q-icon notranslate text-primary">offline_bolt</i>'
-    //   Helper.showAlert('API Tmp Not Defined', 'Sumber data untuk mode Offline aplikasi belum diatur di perangkat ini, sistem otomatis mengarahkan ke :  <br> <span class="text-primary">' + url + ' </span> <br> Klik icon petir (' + icon + ') di kiri atas samping icon roda gigi untuk mengatur. ')
-    //   LocalStorage.set('apitmp', url)
-    // }
-    // return LocalStorage.getItem('apitmp')
-  },
-
   saveApiRoot (val) {
     LocalStorage.set('apiroot', val)
   },
@@ -135,16 +125,14 @@ export const Config = {
   credentials (saving) {
     if (saving === 'destroy') {
       const apiroot = this.getApiRoot()
-      const apitmp = this.getApiTemp()
 
       localStorage.clear()
       this.saveApiRoot(apiroot)
-      this.saveApiTemp(apitmp)
     } else if (saving !== undefined) {
       console.log('saving cre', saving)
       if (saving.token !== undefined) Helper.saveLdb('token', saving.token)
-      saving.token = ''
-      saving.remember_token = ''
+      // saving.token = ''
+      // saving.remember_token = ''
       Helper.saveLdb('credentials', saving)
       return
     }

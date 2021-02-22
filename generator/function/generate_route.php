@@ -18,7 +18,7 @@ foreach($list as $item){
 		$router->get("/{id}", "'.$name.'Controller@findById");
 		$router->post("/", "'.$name.'Controller@store");
 		$router->put("/{id}", "'.$name.'Controller@store");
-		$router->put("/restore/{id}", "'.$name.'Controller@restore");
+		$router->put("/{id}/restore", "'.$name.'Controller@restore");
 		$router->delete("/{id}", "'.$name.'Controller@remove");
 	});
         ';

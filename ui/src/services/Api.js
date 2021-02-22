@@ -235,6 +235,9 @@ export default class Api {
     } else if (reCompile.status === 404) {
       Helper.showAlert('Resource 404', reCompile.message)
       return false
+    } else if (reCompile.status === 403) {
+      Helper.showAlert('Forbidden 403', reCompile.message)
+      return false
     } else if (reCompile.status === 500) {
       if (reCompile.data !== null) {
         if (reCompile.data.data === 'info') Helper.showNotif('Server ERROR', reCompile.data.message)

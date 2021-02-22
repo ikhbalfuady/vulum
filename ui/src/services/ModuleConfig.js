@@ -7,39 +7,39 @@ export const ModuleConfig = {
 
   init (permission, from) {
     this.loadAppConfig((status, data) => {
-      if (permission) {
-        this.loadPermission((status, data) => {}, from)
-      }
+      console.log('from')
+    }, from)
+
+    this.getCurrentPermissions((status, data) => {
+      console.log('getCurrentPermissions', data)
     }, from)
   },
 
   loadAppConfig (callback, from = null) {
     if (from !== null) Helper.console('ModuleConfig[loadAppConfig]::' + from, '#17b360', '#1b2024')
-
-    var hasComplete = false
     var ldbName = 'moduleConfig'
     var result = null
+    var isSucccess = false
     if (Helper.checkLdb(ldbName)) {
       result = Helper.getLdb(ldbName)
-      // console.log(result)
-      hasComplete = true
-      callback(hasComplete, result)
-    } else callback(hasComplete, result)
+      isSucccess = true
+      callback(isSucccess, result)
+    } else callback(isSucccess, result)
   },
 
   getCurrentAppConfig (callback, from = null) {
     if (from !== null) Helper.console('ModuleConfig[getCurrentAppConfig]::' + from, '#17b360', '#1b2024')
-    var isSuccess = true
     var API = new Api()
     API.cache = false
+    var isSucccess = false
     API.get('meta/config', (status, data, message, response, full) => {
       if (status === 200) {
         Helper.saveLdb('moduleConfig', data)
-        callback(isSuccess, data)
+        isSucccess = true
+        callback(isSucccess, data)
       } else {
         data = Helper.getLdb('moduleConfig')
-        isSuccess = false
-        callback(isSuccess, data)
+        callback(isSucccess, data)
       }
     }, {})
   },
@@ -73,121 +73,47 @@ export const ModuleConfig = {
     } else return null
   },
 
-  loadPermission (callback, from = null) {
-    if (from !== null) Helper.console('ModuleConfig[loadPermission]::' + from, '#c29e00', '#1b2024')
+  permissionDB () {
+    return 'permissions'
+  },
 
-    var hasComplete = false
-    var ldbName = 'staffPermission'
-    var result = null
+  loadPermissions (router, mode = 'load', from = '') {
+    if (from !== '') Helper.console('ModuleConfig[loadPermissions]::' + from, '#17b360', '#1b2024')
+    var ldbName = this.permissionDB()
     if (Helper.checkLdb(ldbName)) {
-      result = Helper.getLdb(ldbName)
-      // console.log(result)
-      hasComplete = true
-      callback(hasComplete, result)
-    } else callback(hasComplete, result)
-  },
-
-  getCurrentPermission (callback, from = null) {
-    if (from !== null) Helper.console('ModuleConfig[getCurrentPermission]::' + from, '#c29e00', '#1b2024')
-    var hasComplete = true
-    var API = new Api()
-    // API.cache = false
-    API.get('staffs/permission', (status, data, message, response, full) => {
-      // console.log('loadperm - ' + from, data)
-      var result = data
-      Helper.saveLdb('staffPermission', data)
-      if (status === 200) {
-        callback(hasComplete, result)
-      } else {
-        hasComplete = true
-        callback(hasComplete, result)
-      }
-    }, {})
-  },
-
-  getPermission (type, attr = null) {
-    if (type === 'home') return true
-    else if (type === 'notification') return true
-    else if (type === 'data') return true
-    else if (type === 'apiconfig') return true
-    else if (type === 'logout') return true
-    else {
-      var name = 'staffPermission'
-      // if (!Helper.checkLdb(name)) this.init()
-      var moduleConfig = Helper.getLdb(name)
-      if (moduleConfig !== null) {
-        var getType = moduleConfig[type]
-        if (getType === undefined) {
-          console.error('Permission[' + type + '].' + attr + ' not found!')
-          return false
-        } else {
-          if (attr === null) {
-            return getType
-          } else {
-            var getAttr = getType[attr]
-            if (getAttr === undefined) {
-              console.error('Permission[' + type + '].' + attr + ' not found!')
-              return false
-            } else {
-              return getAttr
-            }
-          }
-        }
-      } else {
-        return false
-      }
-      //
-    }
-  },
-
-  getDefault (type, mode = null, condition = null) {
-    var list = Helper.getLdb('moduleConfig')
-    if (type === 'permission') list = Helper.getLdb('staffPermission')
-
-    if (list === null) {
-      if (type === 'permission') {
-        return {
-          add: true,
-          edit: true,
-          delete: true,
-          view: true
-        }
-      } else return null
-    }
-
-    var _mode = list[mode]
-    if (mode === null) return list
-    else if (_mode === undefined) {
-      console.error('[' + type + '].' + mode + ' not found!'); return false
+      return Helper.getLdb(ldbName)
     } else {
-      if (condition !== null) {
-        var cond = _mode[condition]
-        if (cond === undefined) {
-          console.error('[' + type + '].' + mode + '::' + condition + ' not found!')
-          return false
-        } else return cond
-      } else return _mode
+      if (mode === 'load') {
+        Helper.showAlert('Permission Needed', 'please login again, to continue!')
+        router.push({ name: 'login' })
+      }
+      return false
     }
   },
 
-  // kebutuhan init default ketika login
-  loadDefaultPermission (callback, from = null, userType = 'staff') {
-    if (from !== null) Helper.console('ModuleConfig[loadDefaultPermission]::' + from, '#c29e00', '#1b2024')
-    var isSuccess = true
+  getCurrentPermissions (callback, from = null) {
+    if (from !== null) Helper.console('ModuleConfig[getCurrentPermissions]::' + from, '#17b360', '#1b2024')
     var API = new Api()
     API.cache = false
-    var endpoint = 'users/permission'
-    if (userType === 'staff') endpoint = 'staffs/permission'
-    API.get(endpoint, (status, data, message, response, full) => {
+    var isSucccess = false
+    var ldbName = this.permissionDB()
+    API.get('me/permissions', (status, data, message, response, full) => {
       if (status === 200) {
-        Helper.saveLdb('defaultPermission', data)
-        callback(isSuccess, data)
+        // console.log('getPerm', data)
+        Helper.saveLdb(ldbName, data)
+        isSucccess = true
+        callback(isSucccess, data)
       } else {
-        data = Helper.getLdb('defaultPermission')
-        isSuccess = false
-        callback(isSuccess, data)
+        callback(isSucccess, Helper.getLdb(ldbName))
       }
     }, {})
+  },
+
+  checkPermission (router, moduleName) {
+    var permission = this.loadPermissions(router, 'check')
+    var check = Helper.findObjectByKey(permission, 'slug', moduleName)
+    if (check) return true
+    else return false
   }
 
 }

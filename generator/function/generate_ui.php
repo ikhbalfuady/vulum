@@ -13,6 +13,7 @@ $no = 1;
 $last = count($item->column);
 
 $tableColumns = "          { name: 'action', label: '#', align: 'left', style: 'width: 20px' },\r\n";
+$model = '';
 foreach ($item->column as $col) {
 
   $coma = ',';
@@ -20,18 +21,16 @@ foreach ($item->column as $col) {
 
   // for table : index
   $tableColumns .= "          { name: '".$col->name."', label: '".$col->name."', field: '".$col->name."', align: 'left' }$coma\r\n";
-
+  $model .= "    ".$col->name.": null$coma\r\n";
 $no++;}
 
 $dq = '"'; // double quotes
 $sq = "'"; // single quotes
 $sq2 = "''"; // single double quotes
-$dlr = "$"; // single double quotes
+$dlr = "$"; // dollar
 
 // INDEX --------------------------------------------------
 $indexScript = "<script>
-import { Helper } from '../../services/helper'
-import Api from '../../services/Api'
 import Meta from './meta'
 
 export default {
@@ -39,18 +38,18 @@ export default {
   data () {
     return {
       Meta,
-      API: new Api(),
+      API: this.".$dlr."Api,
       // default data
       dataModel: {
-        searchBy: null
+        searchBy: null,
+        status: 'ACTIVE'
       },
       rules: {
-        permission: {}
+        permission: Meta.permission
       },
       table: {
         search: '',
         data: [],
-        currentPage: 5,
         searchBy: [],
         columns: [
 $tableColumns
@@ -64,7 +63,7 @@ $tableColumns
         inFocus: false
       },
       select: {
-        status: ['ACTIVE', 'TRASH', 'ALL']
+        status: ['ACTIVE', 'TRASH']
 
       }
     }
@@ -72,7 +71,10 @@ $tableColumns
 
   created () {
     this.initTopBar()
-    this.initialize()
+    this.".$dlr."ModuleConfig.getCurrentPermissions((status, data) => {
+      console.log('initPermissionPage:' + Meta.module, data)
+      this.initialize()
+    }, 'user-index')
   },
 
   mounted () {
@@ -85,34 +87,28 @@ $tableColumns
 
   methods: {
 
+    checkPermission () {
+      for (const perm in this.rules.permission) {
+        this.rules.permission[perm] = this.".$dlr."ModuleConfig.checkPermission(this.".$dlr."router, this.Meta.module + '-' + perm)
+      }
+    },
+
     onRefresh () {
-      this.initRules()
+      this.refreshList()
     },
 
     initialize () {
-      this.rules.permission = this.".$dlr."ModuleConfig.getDefault('permission', this.Meta.module)
-      this.onRefresh()
+      var viewAccess = this.".$dlr."ModuleConfig.checkPermission(this.".$dlr."router, this.Meta.module + '-browse')
+      if (viewAccess) {
+        this.checkPermission()
+        this.onRefresh()
+      } else {
+        this.".$dlr."router.push({ name: '403' })
+      }
     },
 
     initTopBar () {
       this.Meta.topBarMenu = [{ name: 'Refresh', event: this.onRefresh }]
-    },
-
-    initRules () {
-      this.".$dlr."ModuleConfig.loadAppConfig((status, data) => {
-        // code
-      }, this.Meta.module)
-
-      this.".$dlr."ModuleConfig.getCurrentPermission((status, data) => {
-        var access = data[this.Meta.module]
-        if (data[this.Meta.module] !== undefined) {
-          this.rules.permission = access
-          if (!access.view) this.".$dlr."router.push({ name: '401' }) // view module
-          else {
-            this.refreshList()
-          }
-        } else this.".$dlr."router.push({ name: '401' })
-      }, this.Meta.module)
     },
 
     getTableSelected () {
@@ -127,7 +123,7 @@ $tableColumns
     },
 
     getList (props) {
-      Helper.loading()
+      this.".$dlr."Helper.loading()
       this.table.loading = true
       this.table.selected = []
       const { page, rowsPerPage } = props.pagination
@@ -137,9 +133,10 @@ $tableColumns
       endpoint = endpoint + '&page=' + page
       endpoint = endpoint + '&limit=' + perpage
       if (this.table.search !== '') endpoint = endpoint + '&search=' + this.dataModel.searchBy.field + ':' + this.table.search
+      if (this.dataModel.status === 'TRASH') endpoint = endpoint + '&trash=true'
 
       this.API.get(endpoint, (status, data, message, response, full) => {
-        Helper.loading(false)
+        this.".$dlr."Helper.loading(false)
         this.table.loading = false
         if (status === 200) {
           // inject data
@@ -153,11 +150,11 @@ $tableColumns
     },
 
     add () {
-      this.".$dlr."router.push({ name: this.Meta.module + '-add' })
+      this.".$dlr."router.push({ name: this.Meta.module + '-create' })
     },
 
     edit (data) {
-      this.".$dlr."router.push({ name: this.Meta.module + '-edit', params: data })
+      this.".$dlr."router.push({ name: this.Meta.module + '-update', params: data })
     },
 
     detail (data) {
@@ -176,7 +173,7 @@ $tableColumns
         ok: type,
         cancel: 'Cancel'
       }).onOk(() => {
-        that.deleteDataSelected()
+        that.deleteDataSelected(type)
       }).onCancel(() => {
         // action
       }).onDismiss(() => {
@@ -184,19 +181,28 @@ $tableColumns
       })
     },
 
-    deleteDataSelected () {
+    deleteDataSelected (type) {
       for (var row of this.table.selected) {
-        this.delete(row.id)
+        if (type === 'Delete') this.delete(row.id)
+        else this.restore(row.id)
       }
       this.table.selected = []
       setTimeout(() => { this.onRefresh() }, 500)
     },
 
     delete (id) {
-      Helper.loading()
+      this.".$dlr."Helper.loading()
       this.API.delete(this.Meta.module + '/' + id, (status, data, message, response, full) => {
-        Helper.loading(false)
-        if (status === 200) Helper.showToast(message)
+        this.".$dlr."Helper.loading(false)
+        if (status === 200) this.".$dlr."Helper.showToast(message)
+      })
+    },
+
+    restore (id) {
+      this.".$dlr."Helper.loading()
+      this.API.put(this.Meta.module + '/' + id + '/restore', (status, data, message, response, full) => {
+        this.".$dlr."Helper.loading(false)
+        if (status === 200) this.".$dlr."Helper.showToast(message)
       })
     }
 
@@ -214,20 +220,28 @@ $index = '<template >
 
       <!-- Header Title -->
       <div class="row pl-2 pt-2">
-        <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
+        <div class="col-12 col-sm-3 col-md-5 pb-1 pv info-page">
           <div class="title">
-            <span class="text-caption text-grey-8">Master Data</span><br>
+            <span class="text-caption text-grey-8">Master {{Meta.name}}</span><br>
             <span class="text-h5 bold text-primary capital">{{Meta.name}}</span>
           </div>
         </div>
 
-        <div class="col-6 col-sm-3 col-md-2 pb-1 pr-1">
+        <div class="col-6 col-sm-3 col-md-2 pb-1 pr-1 ">
+          <q-select :options="select.status" dense outlined  @input="val => { onRefresh() }"
+            v-model="dataModel.status" label="Status"
+            class="bg-white box-shadow" style="border-radius:5px; " transition-show="jump-up" transition-hide="jump-down"
+            >
+          </q-select>
+        </div>
+
+        <div class="col-6 col-sm-3 col-md-2 pb-1 pr-1-5">
           <q-select :options="table.searchBy" dense outlined
             v-model="dataModel.searchBy" label="Searc By" class="bg-white box-shadow"
             style="border-radius:5px; " transition-show="jump-up" transition-hide="jump-down" />
         </div>
 
-        <div class="col-6 col-sm-6 col-md-3 pb-1 pr-1-5">
+        <div class="col-12 col-sm-3 col-md-3 pb-1 pr-1-5">
           <q-input debounce="300" placeholder="Search..." v-model="table.search" outlined dense class="fix-after bg-white box-shadow " style="border-radius:5px; " >
               <template v-slot:append>
                 <q-icon v-if="table.search !== '.$sq2.'" name="close" @click="table.search = '.$sq2.'" class="cursor-pointer" />
@@ -257,7 +271,7 @@ $index = '<template >
 
           <template v-slot:body-cell-action="props">
             <q-td :props="props">
-              <q-btn v-if="rules.permission.edit" class="bg-soft" dense round flat color="green" @click="edit(props.row)" icon="edit"></q-btn>
+              <q-btn v-if="rules.permission.update" class="bg-soft" dense round flat color="green" @click="edit(props.row)" icon="edit"></q-btn>
               <q-btn class="bg-soft" dense round flat color="primary" @click="detail(props.row)" icon="visibility"></q-btn>
             </q-td>
           </template>
@@ -265,17 +279,18 @@ $index = '<template >
           <template v-slot:no-data="{icon}">
             <div class="full-width row flex-center text-primary q-gutter-sm">
               <q-icon size="2em" :name="icon" /><span class="bold text-h6"> Belum ada data {{Meta.name}} </span>
-              <q-btn v-if="rules.permission.add" @click="add" unelevated outline color="primary" label="Buat baru" />
+              <q-btn v-if="rules.permission.create" @click="add" unelevated outline color="primary" label="Buat baru" />
             </div>
           </template>
 
           <template v-slot:top>
-            <div class="action animated zoomIn" >
+            <div v-if="rules.permission.create" class="action animated zoomIn" >
               <q-btn @click="add" unelevated color="primary" class="capital  mr-1" icon="add" label="Add" />
             </div>
 
             <div v-if="rules.permission.delete && table.selected.length !== 0 ">
-              <q-btn @click="deleteSelected" unelevated class="capital " label="Delete"
+              <q-btn @click="deleteSelected" unelevated class="capital "
+                :label="(dataModel.status === '.$sq.'TRASH'.$sq.') ? '.$sq.'Re-Activate'.$sq.' : '.$sq.'Delete'.$sq.' "
                 :color="(dataModel.status === '.$sq.'TRASH'.$sq.') ? '.$sq.'green'.$sq.' : '.$sq.'negative'.$sq.' "
                 :icon="(dataModel.status === '.$sq.'TRASH'.$sq.') ? '.$sq.'check'.$sq.' : '.$sq.'delete'.$sq.' "
               />
@@ -296,9 +311,6 @@ $index = '<template >
 
 // FORM --------------------------------------------------
 $formScript = "<script>
-import { Helper } from '../../services/helper'
-import { Model } from '../../services/model'
-import Api from '../../services/Api'
 import Meta from './meta'
 
 export default {
@@ -306,12 +318,12 @@ export default {
   data () {
     return {
       Meta,
-      API: new Api(),
+      API: this.".$dlr."Api,
       // default data
-      dataModel: Model.$name(),
-      title: 'Add',
+      title: 'Create',
+      dataModel: Meta.model,
       rules: {
-        permission: {}
+        permission: Meta.permission
       },
       disableSubmit: false
     }
@@ -319,7 +331,10 @@ export default {
 
   created () {
     this.initTopBar()
-    this.initialize()
+    this.".$dlr."ModuleConfig.getCurrentPermissions((status, data) => {
+      console.log('initPermissionPage:' + Meta.module, data)
+      this.initialize()
+    }, 'user-form')
   },
 
   mounted () {
@@ -328,48 +343,42 @@ export default {
 
   methods: {
 
+    checkPermission (mode = 'create') {
+      var access = this.".$dlr."ModuleConfig.checkPermission(this.".$dlr."router, this.Meta.module + '-' + mode)
+      if (access) return true
+      else this.".$dlr."router.push({ name: '403' })
+    },
+
     initialize () {
-      this.rules.permission = this.".$dlr."ModuleConfig.getDefault('permission', this.Meta.module)
-      console.log('permission', this.rules.permission)
-      this.onRefresh()
+      var params = this.".$dlr."route.params
+      if (this.".$dlr."Helper.checkParams(params)) { // checking access update
+        if (this.checkPermission('update')) {
+          if (params.id !== undefined) {
+            this.onRefresh()
+            this.getData(params.id)
+          } else this.backToRoot()
+        }
+      } else { // checking access create
+        if (this.checkPermission('create')) {
+          //
+        }
+      }
     },
 
     onRefresh () {
-      this.initRules()
+      //
     },
 
     initTopBar () {
       this.Meta.topBarMenu = [{ name: 'Refresh', event: this.onRefresh }]
     },
 
-    initRules () {
-      this.".$dlr."ModuleConfig.loadAppConfig((status, data) => {
-      }, this.Meta.module)
-
-      this.".$dlr."ModuleConfig.getCurrentPermission((status, data) => {
-        var access = data[this.Meta.module]
-        if (access !== undefined) {
-          this.rules.permission = access
-          if (!access.view) this.".$dlr."router.push({ name: '401' }) // view module
-          else {
-            var params = this.".$dlr."route.params
-            setTimeout(() => {
-              if (Helper.checkParams(params)) {
-                if (params.id !== undefined) this.getData(params.id)
-                else this.backToRoot()
-              }
-            }, 200)
-          }
-        } else this.".$dlr."router.push({ name: '401' })
-      }, this.Meta.module)
-    },
-
     getData (id) {
       console.log('getData')
-      Helper.loading()
+      this.".$dlr."Helper.loading()
       var endpoint = this.Meta.module + '/' + id
       this.API.get(endpoint, (status, data, message, response, full) => {
-        Helper.loading(false)
+        this.".$dlr."Helper.loading(false)
         if (status === 200) {
           // inject data
           this.dataModel = data
@@ -400,16 +409,16 @@ export default {
 
     validateSubmit () {
       // if (this.dataModel.name === null) {
-      //   Helper.showAlert('Nama Kosong!', 'Nama harus di isi!')
+      //   this.".$dlr."Helper.showAlert('Nama Kosong!', 'Nama harus di isi!')
       //   return false
       // } else return true
       return true
     },
 
     save () {
-      Helper.loadingOverlay()
+      this.".$dlr."Helper.loadingOverlay(true, 'Saving..')
       this.API.post(this.Meta.module, this.dataModel, (status, data, message, response, full) => {
-        Helper.loadingOverlay(false)
+        this.".$dlr."Helper.loadingOverlay(false)
         if (status === 200) {
           this.messageSubmit('Saving', message)
           this.backToRoot()
@@ -418,9 +427,9 @@ export default {
     },
 
     update () {
-      Helper.loadingOverlay()
+      this.".$dlr."Helper.loadingOverlay(true, 'Saving..')
       this.API.put(this.Meta.module + '/' + this.dataModel.id, this.dataModel, (status, data, message, response, full) => {
-        Helper.loadingOverlay(false)
+        this.".$dlr."Helper.loadingOverlay(false)
         if (response.result === true && status === 200) {
           this.messageSubmit('Update', message)
           this.backToRoot()
@@ -429,7 +438,7 @@ export default {
     },
 
     messageSubmit (titleAdd = '', msg) {
-      Helper.showAlert(titleAdd + ' Succesfully', msg)
+      this.".$dlr."Helper.showAlert(titleAdd + ' Succesfully', msg)
     }
   }
 }
@@ -448,8 +457,8 @@ $form = '
       <div class="row pl-2 pt-2">
         <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
           <div class="title">
-            <span class="text-caption text-grey-8">{{title}}</span><br>
-            <span class="text-h5 bold text-primary capital">{{Meta.name}}</span>
+            <span class="text-caption text-grey-8">Master {{Meta.name}}</span><br>
+            <span class="text-h5 bold text-primary capital">{{title}} {{Meta.name}} <span v-if="title === '.$sq.'Update'.$sq.'" >#{{dataModel.id}}</span></span>
           </div>
         </div>
       </div>
@@ -481,9 +490,6 @@ $form = '
 
 // DETAIL --------------------------------------------------
 $detailScript = "<script>
-import { Helper } from '../../services/helper'
-import Api from '../../services/Api'
-import { Model } from '../../services/model'
 import Meta from './meta'
 
 export default {
@@ -491,12 +497,12 @@ export default {
   data () {
     return {
       Meta,
-      API: new Api(),
+      API: this.".$dlr."Api,
       // default data
+      dataModel: Meta.model,
       rules: {
-        permission: {}
-      },
-      dataModel: Model.$name()
+        permission: Meta.permission
+      }
     }
   },
 
@@ -515,52 +521,36 @@ export default {
       this.onRefresh()
     },
 
-    onRefresh () {
-      this.initRules()
+    checkPermission (mode = 'create') {
+      var access = this.".$dlr."ModuleConfig.checkPermission(this.".$dlr."router, this.Meta.module + '-' + mode)
+      if (access) return true
+      else this.".$dlr."router.push({ name: '403' })
     },
 
     initialize () {
-      this.rules.permission = this.".$dlr."ModuleConfig.getDefault('permission', this.Meta.module)
-      console.log('permission', this.rules.permission)
-      this.onRefresh()
+      var params = this.".$dlr."route.params
+      if (this.".$dlr."Helper.checkParams(params)) { // checking access update
+        if (this.checkPermission('read')) {
+          if (params.id !== undefined) this.getData(params.id)
+          else this.backToRoot()
+        }
+      } else this.backToRoot()
+    },
+
+    onRefresh () {
+      this.initialize()
     },
 
     initTopBar () {
       this.Meta.topBarMenu = [{ name: 'Refresh', event: this.onRefresh }]
     },
 
-    initRules () {
-      this.".$dlr."ModuleConfig.loadAppConfig((status, data) => {
-        // code
-      }, this.Meta.module)
-
-      this.".$dlr."ModuleConfig.getCurrentPermission((status, data) => {
-        // console.log('loadPermission', data, status)
-        console.log('akses', data[this.Meta.module])
-        if (data[this.Meta.module] !== undefined) {
-          var akses = data[this.Meta.module]
-          this.rules.permission = akses
-          if (!akses.view) this.".$dlr."router.push({ name: '401' }) // view module
-          else {
-            var params = this.".$dlr."route.params
-            console.log('params', params)
-            setTimeout(() => {
-              if (Helper.checkParams(params)) {
-                if (params.id !== undefined) this.getData(params.id)
-                else this.backToRoot()
-              }
-            }, 200)
-          }
-        } else this.".$dlr."router.push({ name: '401' })
-      }, this.Meta.module)
-    },
-
     getData (id) {
       console.log('getData')
-      Helper.loading()
+      this.".$dlr."Helper.loading()
       var endpoint = this.Meta.module + '/' + id
       this.API.get(endpoint, (status, data, message, response, full) => {
-        Helper.loading(false)
+        this.".$dlr."Helper.loading(false)
         if (status === 200) {
           // inject data
           this.dataModel = data
@@ -569,7 +559,7 @@ export default {
     },
 
     edit () {
-      this.".$dlr."router.push({ name: this.Meta.module + '-edit', params: this.dataModel })
+      this.".$dlr."router.push({ name: this.Meta.module + '-update', params: this.dataModel })
     },
 
     backToRoot () {
@@ -624,7 +614,16 @@ $meta = "const Meta = {
   name: '$name',
   icon: 'stop_circle',
   module: '$module',
-  topBarMenu: []
+  topBarMenu: [],
+  permission: {
+    create: false,
+    update: false,
+    delete: true,
+    restore: true
+  },
+  model: {
+$model
+  }
 }
 
 export default Meta

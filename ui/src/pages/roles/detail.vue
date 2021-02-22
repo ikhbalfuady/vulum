@@ -36,9 +36,6 @@
 </template>
 
 <script>
-import { Helper } from '../../services/helper'
-import Api from '../../services/Api'
-import { Model } from '../../services/model'
 import Meta from './meta'
 
 export default {
@@ -46,12 +43,12 @@ export default {
   data () {
     return {
       Meta,
-      API: new Api(),
+      API: this.$Api,
       // default data
+      dataModel: Meta.model,
       rules: {
-        permission: {}
-      },
-      dataModel: Model.Roles()
+        permission: Meta.permission
+      }
     }
   },
 
@@ -70,52 +67,36 @@ export default {
       this.onRefresh()
     },
 
-    onRefresh () {
-      this.initRules()
+    checkPermission (mode = 'create') {
+      var access = this.$ModuleConfig.checkPermission(this.$router, this.Meta.module + '-' + mode)
+      if (access) return true
+      else this.$router.push({ name: '403' })
     },
 
     initialize () {
-      this.rules.permission = this.$ModuleConfig.getDefault('permission', this.Meta.module)
-      console.log('permission', this.rules.permission)
-      this.onRefresh()
+      var params = this.$route.params
+      if (this.$Helper.checkParams(params)) { // checking access update
+        if (this.checkPermission('read')) {
+          if (params.id !== undefined) this.getData(params.id)
+          else this.backToRoot()
+        }
+      } else this.backToRoot()
+    },
+
+    onRefresh () {
+      this.initialize()
     },
 
     initTopBar () {
       this.Meta.topBarMenu = [{ name: 'Refresh', event: this.onRefresh }]
     },
 
-    initRules () {
-      this.$ModuleConfig.loadAppConfig((status, data) => {
-        // code
-      }, this.Meta.module)
-
-      this.$ModuleConfig.getCurrentPermission((status, data) => {
-        // console.log('loadPermission', data, status)
-        console.log('akses', data[this.Meta.module])
-        if (data[this.Meta.module] !== undefined) {
-          var akses = data[this.Meta.module]
-          this.rules.permission = akses
-          if (!akses.view) this.$router.push({ name: '401' }) // view module
-          else {
-            var params = this.$route.params
-            console.log('params', params)
-            setTimeout(() => {
-              if (Helper.checkParams(params)) {
-                if (params.id !== undefined) this.getData(params.id)
-                else this.backToRoot()
-              }
-            }, 200)
-          }
-        } else this.$router.push({ name: '401' })
-      }, this.Meta.module)
-    },
-
     getData (id) {
       console.log('getData')
-      Helper.loading()
+      this.$Helper.loading()
       var endpoint = this.Meta.module + '/' + id
       this.API.get(endpoint, (status, data, message, response, full) => {
-        Helper.loading(false)
+        this.$Helper.loading(false)
         if (status === 200) {
           // inject data
           this.dataModel = data
@@ -124,7 +105,7 @@ export default {
     },
 
     edit () {
-      this.$router.push({ name: this.Meta.module + '-edit', params: this.dataModel })
+      this.$router.push({ name: this.Meta.module + '-update', params: this.dataModel })
     },
 
     backToRoot () {

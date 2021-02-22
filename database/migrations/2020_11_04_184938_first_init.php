@@ -75,7 +75,6 @@ class FirstInit extends Migration
         
         Schema::create('menu_items', function (Blueprint $table) {
             $table->bigIncrements('id')->index();
-            $table->unsignedBigInteger('parent_id')->index()->nullable();
             $table->string('name');
             $table->string('slug')->index();
             $table->text('icon')->nullable();
@@ -89,6 +88,7 @@ class FirstInit extends Migration
         
         Schema::create('menus', function (Blueprint $table) {
             $table->bigIncrements('id')->index();
+            $table->unsignedBigInteger('parent_id')->index()->nullable();
             $table->unsignedBigInteger('menu_item_id')->index();
             $table->unsignedBigInteger('master_menu_id')->index();
 

@@ -57,6 +57,21 @@ function H_apiResponse($data, $msg = 'success', $code = 200){
     return response($res, $code);
 }
 
+
+function H_api403(){
+    header("Access-Control-Allow-Origin: *");
+    header("Content-Type: application/json; charset=UTF-8");
+    header("Access-Control-Allow-Headers: *");
+    header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+    header("HTTP/1.0 403");
+	$result = array(
+		"message"=> "You don't have permission to perform this!",
+		"data"=> null,
+	);
+    echo json_encode($result);
+    die();
+}
+
 function H_apiResError($e){
 
     $message = 'ERROR';
