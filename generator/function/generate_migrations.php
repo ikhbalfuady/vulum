@@ -108,8 +108,9 @@ class FirstInit extends Migration
 }
 
 $scriptMigrations = str_replace('"',"'", $scriptMigrations);
-
-$createMigrations = fopen($outputDir."installDatabase.php", "w") or die("Unable to open file!");
+// $fname = gmdate("Y_m_d_His", time() + 60 * 60 * 7) . "_update_" . gmdate("YmdHis", time() + 60 * 60 * 7);
+$fname = '2020_11_04_184938_first_init';
+$createMigrations = fopen($outputDir."$fname.php", "w") or die("Unable to open file!");
 fwrite($createMigrations, $scriptMigrations);
 fclose($createMigrations);   
 

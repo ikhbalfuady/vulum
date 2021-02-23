@@ -156,7 +156,7 @@ class '.$name.'Controller extends Controller
 				$result = false;
 			}
 
-			if (!$this->repository->findById($request, $id)) {
+			if ($id != null && empty($this->repository->findById($request, $id))) {
 				$message = "Data not found";
 				$result = false;
 			}
