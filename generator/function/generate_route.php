@@ -2,8 +2,10 @@
 
 function generateRoute ($list, $outputDir = '') {
 
+$_seedMenu = '';
 $_scriptRoute = '';
 $importer = '';
+$no = 1;
 foreach($list as $item){
 
 	$name = $item->name;
@@ -23,8 +25,44 @@ foreach($list as $item){
 	});
         ';
 
-}
-$scriptRoute = '<?php ' ."\r\n\r\n" .'$importer = array( '.$importer . "\r\n".');'. "\r\n\r\n" .$_scriptRoute;
+		$menuName = splitUppercaseToSpace($name);
+
+		$subMenu = "[
+			'parent_id' => $no,
+			'name' => '$menuName List',
+			'slug' => null,
+			'path' => '$selector',
+			'icon' => null,
+
+		],
+		[
+			'parent_id' => $no,
+			'name' => 'Add $menuName',
+			'slug' => null,
+			'path' => '$selector/form',
+			'icon' => null,
+
+		],
+        ";
+
+		$_seedMenu .= "[
+			'parent_id' => null,
+			'name' => '$menuName',
+			'slug' => null,
+			'path' => '/',
+			'icon' => null,
+
+		],
+		$subMenu
+        ";
+
+
+$no++;}
+
+$nl = "\r\n\r\n";
+
+$scriptRoute = '<?php ' ."\r\n\r\n" .'$importer = array( '.$importer . "\r\n".');'. "\r\n\r\n" .$_scriptRoute . "\r\n\r\n";
+$scriptRoute = $scriptRoute . '$menus = ['.$_seedMenu . $nl .'];';
  
 $createRoute = fopen($outputDir."routes.php", "w") or die("Unable to open file!");
 fwrite($createRoute, $scriptRoute);
