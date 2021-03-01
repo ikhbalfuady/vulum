@@ -12,10 +12,10 @@ foreach($list as $item){
 	$slug = strtolower(splitUppercaseToUnderscore($name));
 	
     $scriptRoute .= "
-      { name: '$module', path: '/$module', component: () => import('pages/$module/index.vue') },
-      { name: '$module-detail', path: '/$module/view/:id', component: () => import('pages/$module/detail.vue') },
-      { name: '$module-create', path: '/$module/form', component: () => import('pages/$module/form.vue') },
-      { name: '$module-update', path: '/$module/form/:id', component: () => import('pages/$module/form.vue') },
+      { name: '$module-list', path: '/$module', component: () => import('pages/$module/index.vue') },
+      { name: 'view-$module', path: '/$module/view/:id', component: () => import('pages/$module/detail.vue') },
+      { name: 'add-$module', path: '/$module/form', component: () => import('pages/$module/form.vue') },
+      { name: 'edit-$module', path: '/$module/form/:id', component: () => import('pages/$module/form.vue') },
 ";
 
   // model

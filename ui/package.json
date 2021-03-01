@@ -1,8 +1,8 @@
 {
-  "name": "vulum",
+  "name": "yoominers",
   "version": "0.0.1",
-  "description": "Vulum App - Data Management System with CRUD Generator",
-  "productName": "Vulum",
+  "description": "yoominers user apps",
+  "productName": "YooMiners",
   "author": "ikhbalfuady <ikhbalfuady@gmail.com>",
   "private": true,
   "scripts": {

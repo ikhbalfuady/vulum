@@ -1,6 +1,6 @@
 <?php
 
-function generateUi($list, $outputDir = '') {
+function generateUiNonPermission($list, $outputDir = '') {
 
 foreach($list as $item){
 
@@ -71,10 +71,6 @@ $tableColumns
 
   created () {
     this.initTopBar()
-    this.".$dlr."ModuleConfig.getCurrentPermissions((status, data) => {
-      console.log('initPermissionPage:' + Meta.module, data)
-      this.initialize()
-    }, 'user-index')
   },
 
   mounted () {
@@ -83,28 +79,13 @@ $tableColumns
       if (col.name !== 'action') this.table.searchBy.push(col)
     }
     this.dataModel.searchBy = this.table.columns[1].name
+    this.onRefresh()
   },
 
   methods: {
 
-    checkPermission () {
-      for (const perm in this.rules.permission) {
-        this.rules.permission[perm] = this.".$dlr."ModuleConfig.checkPermission(this.".$dlr."router, this.Meta.module + '-' + perm)
-      }
-    },
-
     onRefresh () {
       this.refreshList()
-    },
-
-    initialize () {
-      var viewAccess = this.".$dlr."ModuleConfig.checkPermission(this.".$dlr."router, this.Meta.module + '-browse')
-      if (viewAccess) {
-        this.checkPermission()
-        this.onRefresh()
-      } else {
-        this.".$dlr."router.push({ name: '403' })
-      }
     },
 
     initTopBar () {
@@ -331,14 +312,16 @@ export default {
 
   created () {
     this.initTopBar()
-    this.".$dlr."ModuleConfig.getCurrentPermissions((status, data) => {
-      console.log('initPermissionPage:' + Meta.module, data)
-      this.initialize()
-    }, 'user-form')
   },
 
   mounted () {
-
+    var params = this.".$dlr."route.params
+    if (this.".$dlr."Helper.checkParams(params)) { // checking access update
+      if (params.id !== undefined) {
+        this.onRefresh()
+        this.getData(params.id)
+      } else this.backToRoot()
+    }
   },
 
   watch: {
@@ -348,28 +331,6 @@ export default {
   },
 
   methods: {
-
-    checkPermission (mode = 'create') {
-      var access = this.".$dlr."ModuleConfig.checkPermission(this.".$dlr."router, this.Meta.module + '-' + mode)
-      if (access) return true
-      else this.".$dlr."router.push({ name: '403' })
-    },
-
-    initialize () {
-      var params = this.".$dlr."route.params
-      if (this.".$dlr."Helper.checkParams(params)) { // checking access update
-        if (this.checkPermission('update')) {
-          if (params.id !== undefined) {
-            this.onRefresh()
-            this.getData(params.id)
-          } else this.backToRoot()
-        }
-      } else { // checking access create
-        if (this.checkPermission('create')) {
-          //
-        }
-      }
-    },
 
     onRefresh () {
       //
@@ -391,10 +352,6 @@ export default {
           this.title = 'Edit'
         }
       })
-    },
-
-    edit (data) {
-      this.triggerForm(data)
     },
 
     backToRoot () {
@@ -514,11 +471,10 @@ export default {
 
   created () {
     this.initTopBar()
-    this.initialize()
   },
 
   mounted () {
-
+    this.onRefresh()
   },
 
   methods: {
@@ -527,24 +483,13 @@ export default {
       this.onRefresh()
     },
 
-    checkPermission (mode = 'create') {
-      var access = this.".$dlr."ModuleConfig.checkPermission(this.".$dlr."router, this.Meta.module + '-' + mode)
-      if (access) return true
-      else this.".$dlr."router.push({ name: '403' })
-    },
-
-    initialize () {
+    onRefresh () {
       var params = this.".$dlr."route.params
       if (this.".$dlr."Helper.checkParams(params)) { // checking access update
-        if (this.checkPermission('read')) {
-          if (params.id !== undefined) this.getData(params.id)
-          else this.backToRoot()
-        }
-      } else this.backToRoot()
-    },
-
-    onRefresh () {
-      this.initialize()
+        if (params.id !== undefined) {
+          this.getData(params.id)
+        } else this.backToRoot()
+      }
     },
 
     initTopBar () {
@@ -639,7 +584,7 @@ export default Meta
 // Routes --------------------------------------------------
 
 if($module != null || $module != ''){
-    $target = $outputDir."UI/$module";
+    $target = $outputDir."UI-Non-Permission/$module";
     if (!file_exists($target)) mkdir($target, 0777, true); // generate folder module
 
     $create_index = fopen($target."/index.vue", "w") or die("Unable to open file index.vue!");

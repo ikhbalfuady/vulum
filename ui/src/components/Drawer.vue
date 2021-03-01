@@ -280,11 +280,12 @@ export default {
       console.log('actionMenu', menu)
 
       if (menu.sub === undefined || menu.sub.length === 0) { // jika tidak ada sub, jadikan link
-        var p = menu.detail.path
+        var p = menu.detail.slug
         if (p === 'logout') this.logout()
         else if (p === 'ApiRoot') this.ApiRoot()
         else {
-          this.$router.replace({ path: p })
+          console.log('router', this.$router)
+          this.$router.push({ name: p })
         }
       }
     },

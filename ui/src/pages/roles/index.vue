@@ -218,15 +218,15 @@ export default {
     },
 
     add () {
-      this.$router.push({ name: this.Meta.module + '-create' })
+      this.$router.push({ name: 'add-' + this.Meta.module })
     },
 
     edit (data) {
-      this.$router.push({ name: this.Meta.module + '-update', params: data })
+      this.$router.push({ name: 'edit-' + this.Meta.module, params: data })
     },
 
     detail (data) {
-      this.$router.push({ name: this.Meta.module + '-detail', params: data })
+      this.$router.push({ name: 'view-' + this.Meta.module, params: data })
     },
 
     deleteSelected () {

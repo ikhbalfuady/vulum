@@ -46,7 +46,7 @@ module.exports = function (/* ctx */) {
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
 
       // transpile: false,
 
@@ -131,9 +131,9 @@ module.exports = function (/* ctx */) {
       workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: 'Vulum',
-        short_name: 'vulum',
-        description: 'Vulum App - Data Management System with CRUD Generator',
+        name: 'yoominers',
+        short_name: 'yoominers',
+        description: 'yoominers user apps',
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',

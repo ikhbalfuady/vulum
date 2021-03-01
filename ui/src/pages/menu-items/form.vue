@@ -127,7 +127,7 @@ export default {
     },
 
     backToRoot () {
-      this.$router.push({ name: this.Meta.module })
+      this.$router.push({ name: this.Meta.module + '-list' })
     },
 
     emitModel (target, val) {

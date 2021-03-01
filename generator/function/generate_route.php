@@ -57,7 +57,8 @@ foreach($list as $item){
         ";
 
 
-$no = $no + 3;}
+		$no = $no + 3;
+}
 
 $nl = "\r\n\r\n";
 

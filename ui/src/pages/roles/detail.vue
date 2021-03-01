@@ -105,11 +105,11 @@ export default {
     },
 
     edit () {
-      this.$router.push({ name: this.Meta.module + '-update', params: this.dataModel })
+      this.$router.push({ name: 'edit-' + this.Meta.module, params: this.dataModel })
     },
 
     backToRoot () {
-      this.$router.push({ name: this.Meta.module })
+      this.$router.push({ name: this.Meta.module + '-list' })
     }
   }
 }
