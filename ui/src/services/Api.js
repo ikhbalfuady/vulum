@@ -230,7 +230,7 @@ export default class Api {
       return false
     } else if (reCompile.status === 401) {
       Helper.showAlert('Unauthorized', reCompile.message + '<br> Please Login to continue')
-      window.location = '/#/login'
+      window.location = '/login'
       return false
     } else if (reCompile.status === 404) {
       Helper.showAlert('Resource 404', reCompile.message)

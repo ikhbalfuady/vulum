@@ -131,9 +131,9 @@ module.exports = function (/* ctx */) {
       workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: 'yoominers',
-        short_name: 'yoominers',
-        description: 'yoominers user apps',
+        name: 'VulumFramework',
+        short_name: 'VulumFramework',
+        description: 'VulumFramework user apps',
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',
