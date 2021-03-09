@@ -436,7 +436,7 @@ export default {
       this.".$dlr."Helper.loadingOverlay(true, 'Saving..')
       this.API.put(this.Meta.module + '/' + this.dataModel.id, this.dataModel, (status, data, message, response, full) => {
         this.".$dlr."Helper.loadingOverlay(false)
-        if (response.result === true && status === 200) {
+        if (status === 200) {
           this.messageSubmit('Update', message)
           this.backToRoot()
         } else this.disableSubmit = false

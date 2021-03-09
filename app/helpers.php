@@ -919,3 +919,21 @@ function H_isNoData($request, $data) {
 
     return $null_info;
 }
+
+function H_isObject($arr) {
+    if (!empty($arr) && is_array($arr)) { // user is_array to makesure array format sended
+        if (count($arr) != 0 ) { 
+            $arr = H_toArrayObject($arr);
+            return is_object($arr);
+        }
+    } else return false;
+}
+
+function H_isArray($arr) {
+    if (!empty($arr) && is_array($arr)) { // user is_array to makesure array format sended
+        if (count($arr) != 0 ) { 
+            $arr = H_toArrayObject($arr);
+            return is_array($arr);
+        }
+    } else return false;
+}
