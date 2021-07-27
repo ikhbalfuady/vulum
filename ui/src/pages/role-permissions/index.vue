@@ -6,7 +6,7 @@
     <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
 
       <!-- Header Title -->
-      <div class="row pl-2 pt-2">
+      <div class="row pl-2 pt-3 pb-2 mb-2 box-shadow bg-white">
         <div class="col-12 col-sm-3 col-md-5 pb-1 pv info-page">
           <div class="title">
             <span class="text-caption text-grey-8">Master {{Meta.name}}</span><br>
@@ -24,7 +24,7 @@
 
         <div class="col-6 col-sm-3 col-md-2 pb-1 pr-1-5">
           <q-select :options="table.searchBy" dense outlined
-            v-model="dataModel.searchBy" label="Searc By" class="bg-white box-shadow"
+            v-model="dataModel.searchBySelected" label="Search By" class="bg-white box-shadow"
             style="border-radius:5px; " transition-show="jump-up" transition-hide="jump-down" />
         </div>
 
@@ -65,8 +65,8 @@
 
           <template v-slot:no-data="{icon}">
             <div class="full-width row flex-center text-primary q-gutter-sm">
-              <q-icon size="2em" :name="icon" /><span class="bold text-h6"> Belum ada data {{Meta.name}} </span>
-              <q-btn v-if="rules.permission.create" @click="add" unelevated outline color="primary" label="Buat baru" />
+              <q-icon size="2em" :name="icon" /><span class="bold text-h6"> There are no data {{Meta.name}} yet</span>
+              <q-btn v-if="rules.permission.create" @click="add" unelevated outline color="primary" label="Add New" />
             </div>
           </template>
 
@@ -115,6 +115,7 @@ export default {
         search: '',
         data: [],
         searchBy: [],
+        searchBySelected: null,
         columns: [
           { name: 'action', label: '#', align: 'left', style: 'width: 20px' },
           { name: 'id', label: 'id', field: 'id', align: 'left' },
@@ -148,9 +149,11 @@ export default {
   mounted () {
     // generate filter search
     for (const col of this.table.columns) {
-      if (col.name !== 'action') this.table.searchBy.push(col)
+      if (col.name !== 'action') {
+        if (col.name !== 'logInfo') this.table.searchBy.push(col)
+      }
     }
-    this.dataModel.searchBy = this.table.columns[1].name
+    this.dataModel.searchBySelected = this.table.searchBy[0]
   },
 
   methods: {
@@ -200,7 +203,7 @@ export default {
       var endpoint = this.Meta.module + '?table'
       endpoint = endpoint + '&page=' + page
       endpoint = endpoint + '&limit=' + perpage
-      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.dataModel.searchBy.field + ':' + this.table.search
+      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.dataModel.searchBySelected.field + ':' + this.table.search
       if (this.dataModel.status === 'TRASH') endpoint = endpoint + '&trash=true'
 
       this.API.get(endpoint, (status, data, message, response, full) => {

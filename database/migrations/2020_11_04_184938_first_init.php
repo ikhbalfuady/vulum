@@ -14,7 +14,7 @@ class FirstInit extends Migration
     public function up()
     {
 
-                Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id')->index();
             $table->string('name');
             $table->string('username');
@@ -23,7 +23,11 @@ class FirstInit extends Migration
             $table->text('picture')->nullable();
             $table->unsignedBigInteger('role_id')->nullable();
             $table->unsignedBigInteger('menu_id')->nullable();
+            $table->unsignedBigInteger('department_id')->nullable();
             $table->tinyInteger('active')->default(0);
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
 
             $table->timestamps(0);
             $table->softDeletes('deleted_at');
@@ -37,6 +41,9 @@ class FirstInit extends Migration
             $table->string('ip')->nullable();
             $table->string('agent')->nullable();
             $table->string('platform')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
 
             $table->timestamps(0);
             $table->softDeletes('deleted_at');
@@ -47,6 +54,9 @@ class FirstInit extends Migration
             $table->bigIncrements('id')->index();
             $table->string('name');
             $table->string('slug')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
 
             $table->timestamps(0);
             $table->softDeletes('deleted_at');
@@ -57,6 +67,9 @@ class FirstInit extends Migration
             $table->bigIncrements('id')->index();
             $table->unsignedBigInteger('permission_id')->index();
             $table->unsignedBigInteger('role_id')->index();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
 
             $table->timestamps(0);
             $table->softDeletes('deleted_at');
@@ -65,8 +78,12 @@ class FirstInit extends Migration
         
         Schema::create('roles', function (Blueprint $table) {
             $table->bigIncrements('id')->index();
+            $table->string('code')->nullable();
             $table->string('name');
             $table->string('slug')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
 
             $table->timestamps(0);
             $table->softDeletes('deleted_at');
@@ -79,7 +96,9 @@ class FirstInit extends Migration
             $table->string('slug')->index();
             $table->text('icon')->nullable();
             $table->text('path')->nullable();
-            $table->integer('ordering')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
 
             $table->timestamps(0);
             $table->softDeletes('deleted_at');
@@ -91,6 +110,11 @@ class FirstInit extends Migration
             $table->unsignedBigInteger('parent_id')->index()->nullable();
             $table->unsignedBigInteger('menu_item_id')->index();
             $table->unsignedBigInteger('master_menu_id')->index();
+            $table->string('overline')->nullable();
+            $table->integer('ordering')->default(0);
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
 
             $table->timestamps(0);
             $table->softDeletes('deleted_at');
@@ -100,12 +124,36 @@ class FirstInit extends Migration
         Schema::create('master_menus', function (Blueprint $table) {
             $table->bigIncrements('id')->index();
             $table->string('name');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
 
             $table->timestamps(0);
             $table->softDeletes('deleted_at');
         });
 
         
+        Schema::create('user_notifications', function (Blueprint $table) {
+            $table->bigIncrements('id')->index();
+            $table->unsignedBigInteger('user_id')->index();
+            $table->boolean('is_read')->default(false);
+            $table->string('title')->nullable();
+            $table->text('description')->nullable();
+            $table->string('type')->nullable();
+            $table->string('link_path')->nullable();
+            $table->json('link_params')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+
+            $table->timestamps(0);
+            $table->softDeletes('deleted_at');
+        });
+
+        DB::statement('ALTER TABLE 
+        user_notifications ADD FULLTEXT 
+        user_notifications_fulltext(title,description)
+        ');
 
     }
 
@@ -116,7 +164,7 @@ class FirstInit extends Migration
      */
     public function down()
     {
-            Schema::dropIfExists('users'); 
+        Schema::dropIfExists('users'); 
         Schema::dropIfExists('user_sessions'); 
         Schema::dropIfExists('permissions'); 
         Schema::dropIfExists('role_permissions'); 

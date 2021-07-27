@@ -5,7 +5,7 @@ function generateRepository($list, $outputDir = '') {
 foreach($list as $item){
 
     $name = $item->name;
-	$selector =  strtolower(splitUppercaseToUnderscore($name));
+    $selector =  strtolower(splitUppercaseToUnderscore($name));
  
     $objectName = '';
     $no = 1;
@@ -52,10 +52,15 @@ use App\Providers\HelperProvider;
 class '.$name.'RepositoryEloquent extends BaseRepository implements '.$name.'Repository
 {
 
+    protected $log;
+
     public function __construct(
-        Application $app
-	){
-		parent::__construct($app);
+        Application $app,
+        ActivityRepository $log
+    ){
+        parent::__construct($app);
+
+        $this->log = $log;
     }
 
     /**
@@ -195,7 +200,7 @@ class '.$name.'RepositoryEloquent extends BaseRepository implements '.$name.'Rep
     }
 
     public function getList($raw_request) {
-		try {
+        try {
             $payload = $raw_request->all();
             $data = $this->findAll($raw_request, true);
  
@@ -208,7 +213,7 @@ class '.$name.'RepositoryEloquent extends BaseRepository implements '.$name.'Rep
                 else return $data->limit($limit)->get();
             }
         } catch (Exception $e){
-			throw new Exception($e->getMessage());
+            throw new Exception($e->getMessage());
         }
     }
 

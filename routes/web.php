@@ -18,7 +18,7 @@ $router->get('/', function () use ($router) {
 });
   
 $router->get('/', function () use ($router) {
-  	$appname = env('APP_NAME');
+$appname = env('APP_NAME');
 return "<!DOCTYPE html> <html> <head> <title>$appname v." . H_appVersion()."</title> </head> <body style='margin:0 !important; padding:20px; background:#262626; color: #ff1fdc;font-family: consolas;'>
 <div style='text-align:center; margin-top:40vh;'>
 $appname v." . H_appVersion() ." <br>
@@ -26,6 +26,10 @@ $appname v." . H_appVersion() ." <br>
 </div>
 </body> </html> 
   	";
+});
+
+$router->get('/version', function () use ($router) {
+	return H_apiResponse(H_appVersion());
 });
   
 include 'public_routes.php';

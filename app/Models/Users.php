@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Lumen\Auth\Authorizable;
 
+use App\Traits\GlobalRelations;
+
 
 /**
  * @property bigIncrements $id 
@@ -20,13 +22,14 @@ use Laravel\Lumen\Auth\Authorizable;
  * @property text $picture 
  * @property unsignedBigInteger $role_id 
  * @property unsignedBigInteger $menu_id 
+ * @property unsignedBigInteger $department_id 
  * @property tinyInteger $active 
 
  */
 class Users extends Model
 {
     use Authenticatable, Authorizable, HasFactory;
-    use SoftDeletes;
+    use SoftDeletes, GlobalRelations;
 
     /**
      * Table Configuration
@@ -47,7 +50,11 @@ class Users extends Model
         'picture', 
         'role_id', 
         'menu_id', 
-        'active'
+        'department_id', 
+        'active', 
+        'created_by', 
+        'updated_by', 
+        'deleted_by'
     ];
 
     // disabled timestamps data
@@ -55,12 +62,19 @@ class Users extends Model
 
     // disable update col id
     protected $guarded = ['id'];
+
+    protected $casts = [ 
+        'role_id' => 'integer',
+        'menu_id' => 'integer',
+        'active' => 'boolean',
+
+    ];
+
     protected $hidden = ['password'];
 
     public function Columns() {
         return $this->fillable;
     }
-
 
     public function Role()
     {

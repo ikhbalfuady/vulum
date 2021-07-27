@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Lumen\Auth\Authorizable;
 
+use App\Traits\GlobalRelations;
+
 
 /**
  * @property bigIncrements $id 
@@ -19,7 +21,7 @@ use Laravel\Lumen\Auth\Authorizable;
 class MasterMenus extends Model
 {
     use Authenticatable, Authorizable, HasFactory;
-    use SoftDeletes;
+    use SoftDeletes, GlobalRelations;
 
     /**
      * Table Configuration
@@ -33,7 +35,10 @@ class MasterMenus extends Model
      * @var array
      */
     protected $fillable = [
-        'name'
+        'name', 
+        'created_by', 
+        'updated_by', 
+        'deleted_by'
     ];
 
     // disabled timestamps data
@@ -46,5 +51,13 @@ class MasterMenus extends Model
         return $this->fillable;
     }
 
+    public function Users()
+    {
+        return $this->hasMany('App\Models\Users', 'menu_id', 'id');
+    }
+
+    public function menus() {
+        return $this->hasMany(Menus::class, 'master_menu_id');
+    }
 }        
         

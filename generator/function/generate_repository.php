@@ -5,7 +5,7 @@ function generateRepository($list, $outputDir = '') {
 foreach($list as $item){
 
     $name = $item->name;
-	$selector =  strtolower(splitUppercaseToUnderscore($name));
+    $selector =  strtolower(splitUppercaseToUnderscore($name));
  
     $objectName = '';
     $no = 1;
@@ -34,6 +34,15 @@ foreach($list as $item){
 
     $dq = '"'; // double quotes
 
+    $userLogging = '';
+    if (isset($item->loging_user) && $item->loging_user == true) {
+        $userLogging = '
+            if ($id) $data->updated_by = H_handleRequest($request, "updated_by", H_JWT_getUserId($raw_request)); 
+            else $data->created_by = H_handleRequest($request, "created_by", H_JWT_getUserId($raw_request)); 
+    ';
+    }
+
+
     $script = '<?php
 
 namespace App\Repositories;
@@ -55,15 +64,30 @@ class '.$name.'RepositoryEloquent extends BaseRepository implements '.$name.'Rep
 {
     use StandardRepo;
 
+    protected $log;
+
     public function __construct(
-        Application $app
-	){
-		parent::__construct($app);
+        Application $app,
+        ActivityRepository $log
+    ){
+        parent::__construct($app);
+
+        $this->log = $log;
     }
 
 
     public function model() {
         return '.$name.'::class;
+    }
+
+    /**
+     * Model initiate
+     * @return object
+     */
+    public function initModel($id = null) {
+        $model = new '.$name.';
+        if (!empty($id)) $model = $this->model->where($this->model->getKeyName(), $id)->first();
+        return $model;
     }
 
     public function store($raw_request, $id = null, $customRequest = null) {
@@ -76,7 +100,7 @@ class '.$name.'RepositoryEloquent extends BaseRepository implements '.$name.'Rep
 
             //storing defined property    
 '.$objectName.'
-            
+'.$userLogging.'
             $data->save();
             return $data;
 

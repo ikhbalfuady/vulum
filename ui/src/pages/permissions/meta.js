@@ -1,4 +1,5 @@
 const Meta = {
+  parent: 'Master Data',
   name: 'Permissions',
   icon: 'stop_circle',
   module: 'permissions',

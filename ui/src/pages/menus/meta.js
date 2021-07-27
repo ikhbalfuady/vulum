@@ -14,7 +14,8 @@ const Meta = {
     id: null,
     parent_id: null,
     menu_item_id: null,
-    master_menu_id: null
+    master_menu_id: null,
+    overline: null
 
   }
 }

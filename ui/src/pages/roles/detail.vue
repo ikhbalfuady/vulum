@@ -7,7 +7,7 @@
     <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
 
       <!-- Header Title -->
-      <div class="row pl-2 pt-2">
+      <div class="row pl-2 pt-3 pb-2 mb-2 box-shadow bg-white">
         <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
           <div class="title">
             <span class="text-caption text-grey-8">Detail</span><br>
@@ -109,7 +109,7 @@ export default {
     },
 
     backToRoot () {
-      this.$router.push({ name: this.Meta.module + '-list' })
+      this.$router.push({ name: this.Meta.module })
     }
   }
 }

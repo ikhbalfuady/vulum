@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Lumen\Auth\Authorizable;
 
+use App\Traits\GlobalRelations;
+
 
 /**
  * @property bigIncrements $id 
@@ -21,7 +23,7 @@ use Laravel\Lumen\Auth\Authorizable;
 class Menus extends Model
 {
     use Authenticatable, Authorizable, HasFactory;
-    use SoftDeletes;
+    use SoftDeletes, GlobalRelations;
 
     /**
      * Table Configuration
@@ -37,7 +39,12 @@ class Menus extends Model
     protected $fillable = [
         'parent_id', 
         'menu_item_id', 
-        'master_menu_id'
+        'master_menu_id',
+        'overline',
+        'ordering',
+        'created_by', 
+        'updated_by', 
+        'deleted_by'
     ];
 
     // disabled timestamps data
@@ -45,6 +52,13 @@ class Menus extends Model
 
     // disable update col id
     protected $guarded = ['id'];
+
+    protected $casts = [
+        'parent_id' => 'integer',
+        'menu_item_id' => 'integer',
+        'master_menu_id' => 'integer',
+        'ordering' => 'integer',
+    ];
 
     public function Columns() {
         return $this->fillable;

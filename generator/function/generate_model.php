@@ -5,8 +5,8 @@ function generateModel ($list, $outputDir = '') {
 foreach($list as $item){
 
     $name = $item->name;
-	$selector =  strtolower(splitUppercaseToUnderscore($name));
- 
+    $selector =  strtolower(splitUppercaseToUnderscore($name));
+
     $property = '';
     foreach ($item->column as $col) {
         $property .= ' * @property '.$col->type.' $'.$col->name.' ' ."\r\n";
@@ -14,6 +14,7 @@ foreach($list as $item){
 
     $last = count($item->column) - 1;
     $fillable = '';
+
     foreach ($item->column as $index => $value) {
         $coma = ', 
         ';
@@ -34,6 +35,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Lumen\Auth\Authorizable;
 
+use App\Traits\RelationActionBy;
+
 
 /**
 '.$property.'
@@ -41,7 +44,7 @@ use Laravel\Lumen\Auth\Authorizable;
 class '.$name.' extends Model
 {
     use Authenticatable, Authorizable, HasFactory;
-    use SoftDeletes;
+    use SoftDeletes, RelationActionBy; 
 
     /**
      * Table Configuration

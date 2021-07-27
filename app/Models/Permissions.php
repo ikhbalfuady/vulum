@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Lumen\Auth\Authorizable;
 
+use App\Traits\GlobalRelations;
+
 
 /**
  * @property bigIncrements $id 
@@ -20,7 +22,7 @@ use Laravel\Lumen\Auth\Authorizable;
 class Permissions extends Model
 {
     use Authenticatable, Authorizable, HasFactory;
-    use SoftDeletes;
+    use SoftDeletes, GlobalRelations;
 
     /**
      * Table Configuration
@@ -35,7 +37,10 @@ class Permissions extends Model
      */
     protected $fillable = [
         'name', 
-        'slug'
+        'slug', 
+        'created_by', 
+        'updated_by', 
+        'deleted_by'
     ];
 
     // disabled timestamps data

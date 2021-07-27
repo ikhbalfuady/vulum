@@ -13,6 +13,7 @@
     "@quasar/extras": "^1.0.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "he-tree-vue": "^2.0.7",
     "quasar": "^1.0.0",
     "v-money": "^0.8.1"
   },

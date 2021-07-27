@@ -7,7 +7,7 @@
     <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
 
       <!-- Header Title -->
-      <div class="row pl-2 pt-2">
+      <div class="row pl-2 pt-3 pb-2 mb-2 box-shadow bg-white">
         <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
           <div class="title">
             <span class="text-caption text-grey-8">Detail</span><br>
@@ -21,7 +21,7 @@
 
         <q-list bordered separator class="box-shadow bg-white" style="width:100%">
 
-          <q-item  v-for="(props, index) in dataModel" :key="index" v-ripple>
+          <q-item  v-for="(props, index) in filteredDataModel" :key="index" v-ripple>
             <q-item-section>
               <q-item-label caption>{{index}}</q-item-label>
               <q-item-section>{{props}}</q-item-section>
@@ -61,6 +61,17 @@ export default {
 
   },
 
+  computed: {
+    filteredDataModel () {
+      const { dataModel } = this
+      return {
+        id: dataModel.id,
+        name: dataModel.name,
+        slug: dataModel.slug
+      }
+    }
+  },
+
   methods: {
 
     callbackForm (params = null) {
@@ -98,7 +109,6 @@ export default {
       this.API.get(endpoint, (status, data, message, response, full) => {
         this.$Helper.loading(false)
         if (status === 200) {
-          // inject data
           this.dataModel = data
         }
       })
@@ -109,7 +119,7 @@ export default {
     },
 
     backToRoot () {
-      this.$router.push({ name: this.Meta.module + '-list' })
+      this.$router.push({ name: this.Meta.module })
     }
   }
 }

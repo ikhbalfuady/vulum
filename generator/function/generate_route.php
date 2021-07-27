@@ -8,56 +8,56 @@ $importer = '';
 $no = 1;
 foreach($list as $item){
 
-	$name = $item->name;
-	$selector =  strtolower(splitUppercaseToStrip($name));
+    $name = $item->name;
+    $selector =  strtolower(splitUppercaseToStrip($name));
 
     $importer .=  "\r\n".'"'.$item->name.'",' ;
 
     $_scriptRoute .= '
 
-	Route::group(["prefix" => "/'.$selector.'"], function() use ($router) {
-		$router->get("/", "'.$name.'Controller@index");
-		$router->get("/{id}", "'.$name.'Controller@findById");
-		$router->post("/", "'.$name.'Controller@store");
-		$router->put("/{id}", "'.$name.'Controller@store");
-		$router->put("/{id}/restore", "'.$name.'Controller@restore");
-		$router->delete("/{id}", "'.$name.'Controller@remove");
-	});
+    Route::group(["prefix" => "/'.$selector.'"], function() use ($router) {
+        $router->get("/", "'.$name.'Controller@index");
+        $router->get("/{id}", "'.$name.'Controller@findById");
+        $router->post("/", "'.$name.'Controller@store");
+        $router->put("/{id}", "'.$name.'Controller@store");
+        $router->put("/{id}/restore", "'.$name.'Controller@restore");
+        $router->delete("/{id}", "'.$name.'Controller@remove");
+    });
         ';
 
-		$menuName = splitUppercaseToSpace($name);
+        $menuName = splitUppercaseToSpace($name);
 
-		$subMenu = "[
-			'parent_id' => $no,
-			'name' => '$menuName List',
-			'slug' => null,
-			'path' => '$selector',
-			'icon' => null,
+        $subMenu = "[
+            'parent_id' => $no,
+            'name' => '$menuName List',
+            'slug' => null,
+            'path' => '$selector',
+            'icon' => null,
 
-		],
-		[
-			'parent_id' => $no,
-			'name' => 'Add $menuName',
-			'slug' => null,
-			'path' => '$selector/form',
-			'icon' => null,
+        ],
+        [
+            'parent_id' => $no,
+            'name' => 'Add $menuName',
+            'slug' => null,
+            'path' => '$selector/form',
+            'icon' => null,
 
-		],
+        ],
         ";
 
-		$_seedMenu .= "[
-			'parent_id' => null,
-			'name' => '$menuName',
-			'slug' => null,
-			'path' => '/',
-			'icon' => null,
+        $_seedMenu .= "[
+            'parent_id' => null,
+            'name' => '$menuName',
+            'slug' => null,
+            'path' => '/',
+            'icon' => null,
 
-		],
-		$subMenu
+        ],
+        $subMenu
         ";
 
 
-		$no = $no + 3;
+        $no = $no + 3;
 }
 
 $nl = "\r\n\r\n";

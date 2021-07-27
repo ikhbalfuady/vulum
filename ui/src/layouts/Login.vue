@@ -14,7 +14,7 @@
 
               <div style="text-align: center;padding-top: 3px;" v-touch-hold.mouse="ApiRoot" class="mt-3 pb-2">
 
-                <q-img src="/assets/icons/logo.png" spinner-color="white" style="width: 220px;" >
+                <q-img src="/assets/icons/logo-md.png" spinner-color="white" style="width: 220px;" >
                     <template v-slot:error>
                       <div class="absolute-full bg-white flex flex-center text-grey-4 text-caption text-center">
                         <q-icon name="broken_image" style="font-size: 42px;"/>
@@ -26,13 +26,13 @@
               <q-form class="form-area row" @submit.prevent="login" >
 
                 <div class="col-12 col-md-12 pv-2 pb-1">
-                    <q-input square filled v-model="dataModel.email" ref="email" placeholder="username / email" lazy-rules :rules="[
-                      val => val !== null && val !== '' || 'username / email belum di isi!',
-                      ]">
-                        <template v-slot:prepend>
-                        <q-icon name="person" />
-                        </template>
-                    </q-input>
+                  <q-input square filled v-model="dataModel.email" ref="email" placeholder="username / email" lazy-rules :rules="[
+                    val => val !== null && val !== '' || 'username / email belum di isi!',
+                    ]">
+                    <template v-slot:prepend>
+                      <q-icon name="person" />
+                    </template>
+                  </q-input>
                 </div>
 
                 <div class="col-12 col-md-12 pv-2 pb-1" style="margin-top: 0;">
@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="col-12 col-md-12 pv-2 pb-1">
-                  <q-btn type="submit" color="primary" class="full-width" label="Login" size="lg" :loading="loading" >
+                  <q-btn unelevated type="submit" color="primary" class="bg-grad full-width capital" label="Login" size="lg" :loading="loading" >
                     <template v-slot:loading>
                       <q-spinner-facebook />
                     </template>
@@ -62,8 +62,8 @@
 
                 <div class="col-12 col-md-12 pb-2 text-center">
                   <small class="bold text-grey-7">
-                    <span class="">App {{version}} </span> -
-                    <span class="">Backend {{version_be}}</span>
+                    <span class="">App v.{{version}} </span> <br>
+                    <span v-if="version_be" class="animated fadeIn">Backend v.{{version_be}}</span>
 
                   </small>
                 </div>
@@ -102,25 +102,24 @@ export default {
       isPwd: true,
       disableSubmit: false,
       version: Config.version(),
-      version_be: ''
+      version_be: null
     }
   },
 
   beforeCreate () {
     // this.$ModuleConfig.init(false, 'login')
-
   },
 
   mounted () {
+    this.getVersion()
     // init default
-
   },
 
   methods: {
 
     auth () {
       this.$ModuleConfig.init(true, 'login sucess')
-      this.$router.push({ name: 'dashboard' })
+      this.$router.push({ name: 'home' })
     },
 
     login () {
@@ -143,17 +142,20 @@ export default {
       // end
     },
 
+    getVersion () {
+      this.API.get('version', (status, data, message, response, full) => {
+        if (status === 200) this.version_be = data
+      })
+    },
+
     ApiRoot () {
       Config.setApiRoot()
     },
 
     ApiTmp () {
       Config.setApiTemp()
-    },
-
-    openSite () {
-      this.$Helper.openLink('https://www.diginomic.id/')
     }
+
   }
 }
 </script>

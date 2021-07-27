@@ -1,5 +1,5 @@
 const Meta = {
-  name: 'UserSessions',
+  name: 'User Sessions',
   icon: 'stop_circle',
   module: 'user-sessions',
   topBarMenu: [],

@@ -109,7 +109,7 @@ export default {
     },
 
     backToRoot () {
-      this.$router.push({ name: this.Meta.module + '-list' })
+      this.$router.push({ name: this.Meta.module })
     }
   }
 }

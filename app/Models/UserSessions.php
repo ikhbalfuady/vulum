@@ -41,7 +41,10 @@ class UserSessions extends Model
         'token', 
         'ip', 
         'agent', 
-        'platform'
+        'platform', 
+        'created_by', 
+        'updated_by', 
+        'deleted_by'
     ];
 
     // disabled timestamps data
@@ -49,6 +52,11 @@ class UserSessions extends Model
 
     // disable update col id
     protected $guarded = ['id'];
+
+    protected $casts = [ 
+        'user_id' => 'integer',
+
+    ];
 
     public function Columns() {
         return $this->fillable;

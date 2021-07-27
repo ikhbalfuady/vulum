@@ -1,9 +1,12 @@
 <?php
+
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
-use App\Providers\HelperProvider;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use App\Helpers\UploadFile;
 
 /**
  * Get the configuration path.
@@ -13,11 +16,15 @@ use App\Providers\HelperProvider;
  */
 
 function H_appVersion() {
-    return '1.0.14-0109';
+    return '2.0.1';
 }
 
 function H_lastUpdateApp() {
-    return '2021-01-24 00:52';
+    return '2021-07-27 11:52';
+}
+
+function H_resources_path($path = null) {
+    return rtrim(app()->basePath('resources/' . $path), '/');
 }
 
 function config_path($path = '') {
@@ -64,10 +71,10 @@ function H_api403(){
     header("Access-Control-Allow-Headers: *");
     header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
     header("HTTP/1.0 403");
-	$result = array(
-		"message"=> "You don't have permission to perform this!",
-		"data"=> null,
-	);
+    $result = array(
+        "message"=> "You don't have permission to perform this!",
+        "data"=> null,
+    );
     echo json_encode($result);
     die();
 }
@@ -285,7 +292,7 @@ function H_createDate($d, $type = ''){
     
     if($type == 'system'){
         $date= preg_replace($hexdate, '',$d);
-        $date= date('Y-m-d H:i:s', strtotime($date));	
+        $date= date('Y-m-d H:i:s', strtotime($date));    
         
     }elseif($type == 'start'){
         $date= preg_replace($hexdate, '',$d);
@@ -307,10 +314,10 @@ function H_createDate($d, $type = ''){
         }
         
         $date= preg_replace($hexdate, '',$d);
-        $date= date($dateType, strtotime($date));	
+        $date= date($dateType, strtotime($date));    
     }
     
-    return $date;	
+    return $date;    
     
 }
 
@@ -405,11 +412,14 @@ function H_JWT_decode($token){
 
 function H_JWT_getUserId($raw_request){
     $token = H_getHeaderToken($raw_request);
-    if ($token != null) {
-        $info = H_JWT_decode($token);
-        if (isset($info->sub) && !empty($info->sub)) return $info->sub;
-        else return null;
-    } else return null;
+    $res = null;
+    if ($token != "null") {
+        if (!empty($token)) {
+            $info = H_JWT_decode($token);
+            if (isset($info->sub) && !empty($info->sub)) $res = $info->sub;
+        }
+    }
+    return $res;
 }
 
 function H_JWT_getData($raw_request){
@@ -423,11 +433,13 @@ function H_cleanToken($token){
 }
 
 function H_getHeaderToken($raw_request){
-    $headers = $raw_request->headers->all();
-    if (isset($headers['authorization']) && !empty($headers['authorization'])) {
-        $token = H_cleanToken($headers['authorization'][0]); 
-        return $token;
-    } else return null;  
+    if ($raw_request) {
+        $headers = $raw_request->headers->all();
+        if (isset($headers['authorization']) && !empty($headers['authorization'])) {
+            $token = H_cleanToken($headers['authorization'][0]); 
+            return $token;
+        } else return null;  
+    } else return null;
 }
 
 function H_hasValue($value, $typeValue = 'string' ,$defaultValue = null){
@@ -462,39 +474,50 @@ function H_setterModel($model, $attribute, $defaultValue = null){
     return $res;
 }
 
-function H_uploadFile($request){
+function H_uploadFile($request, $attributeName = 'file', $customPath = ''){
+    try {
+        $fileInfo = null;
+        if ($request->hasFile($attributeName)) {
+            $file = $request->file($attributeName);
 
-    $fileInfo = false;
-    if ($request->hasFile('file')) {
-        $file = $request->file('file');
-        $error = $file->getError();
-        $errorMsg = $file->getErrorMessage();
+            $basePathUpload = 'uploads';
+            $path = env('APP_UPLOAD_DIR', $basePathUpload) . $customPath;
+            if (!file_exists($path)) mkdir($path, 0777, true); // generate folder output
 
-        $path = env('APP_UPLOAD_DIR') . "/" . strtoupper($file->getClientOriginalExtension());
-        $fileInfo = array(
-            "name" => H_formatName(),
-            "size" => $file->getClientSize(),
-            "type" => $file->getClientMimeType(),
-            "extension" => $file->getClientOriginalExtension(),
-            "ip_location" => $request->ip(),
-            "path" => $path,
-            "error" => $error,
-            "message" => $errorMsg,
-        );
-        
-        $fileName = $fileInfo['name'] . '.' . $fileInfo['extension'];   
-        $storeFile = $file->move($fileInfo['path'], $fileName);
-        
-        if ($storeFile) {
-            $fileInfo['message'] = "Upload succesfully.";
-        } else{
-            $fileInfo['error'] = true;
-            $fileInfo['message'] = "Upload failed.";
-        } 
-        
+            $fileName = H_formatName() .'.'. $file->getClientOriginalExtension();
+            $fileInfo = array(
+                "name" => $fileName,
+                "size" => $file->getSize(),
+                "size_readable" => H_fileSizeFormater($file->getSize()),
+                "type" => $file->getClientMimeType(),
+                "extension" => $file->getClientOriginalExtension(),
+                "ip_location" => H_getIpClient(),
+                "error" => $file->getError(),
+                "error_message" => $file->getErrorMessage(),
+                "path" => $path,
+                "url" => $path .'/'. $fileName,
+            );
+
+            if ($fileInfo['extension'] == 'exe' || $fileInfo['extension'] == 'bat') {
+                $msg = "File format not allowed to upload";
+                return H_apiResponse(null, $msg, 400);
+            }
+
+            $storeFile = $file->move($fileInfo['path'], $fileName);
+
+            if ($storeFile) {
+                $fileInfo['message'] = "Upload succesfully.";
+                $fileInfo['error_message'] = null;
+            } else{
+                $fileInfo['error'] = true;
+                $fileInfo['message'] = "Upload failed." . $fileInfo['error_message'];
+            } 
+        }
+
+        return $fileInfo;
+    } catch (Exception $e){
+        return $e->getMessage();
     }
-
-    return $fileInfo;
 }
 
 function H_cleanJSON($data){
@@ -537,7 +560,7 @@ function H_getObjectKey($obj){
     return array_keys($obj[0]);
 }
 
-function H_getFileSize($fileSize,$fromPath = '') {
+function H_getFileSize($fileSize, $fromPath = '') {
 
     $size = $fileSize;
     if($fromPath != '') $size = filesize($fromPath);
@@ -581,7 +604,7 @@ function H_autoNumber($lastIndex = 1, $digit = 5){
 }
 
 function H_autoNumberDateBy($lastIndex = 1, $date = 'y', $digit = 4){
-    $date   = gmdate($date, time()+60*60*7);	
+    $date   = gmdate($date, time()+60*60*7);    
     $number = str_pad($lastIndex, $digit, "0", STR_PAD_LEFT);
     return $date.$number;
 }
@@ -758,7 +781,7 @@ function H_handleRequest($payload, $attribute, $default = null) {
 function H_handleRequestJson($payload, $attribute, $default = null) {
     $check = H_hasRequest($payload, $attribute);
     if ($check) {
-        if (is_array($payload[$attribute])) return json_encode($payload[$attribute]);
+        if (is_array($payload[$attribute])) return $payload[$attribute];
         else return json_decode($payload[$attribute]);
     } else return $default;
 }
@@ -849,9 +872,12 @@ function H_extractParamsAttribute($params) {
                     if (isset($child[0]) && $child[0] != '') {
                         if (isset($child[1]) && $child[1] != '') {
                             if ($child[0] != '' && $child[1] != '') {
+                                $val = $child[1];
+                                if (isset($child[2])) $val = $val.':'.$child[2]; // untuk optimal nilai type dateTime
+                                if (isset($child[3])) $val = $val.':'.$child[3]; // untuk optimal nilai type dateTime
                                 $fix_params[] = array(
                                     "key" => $child[0],
-                                    "value" => $child[1],
+                                    "value" => $val,
                                 );
                             }
                         }
@@ -863,6 +889,12 @@ function H_extractParamsAttribute($params) {
     return $fix_params;
 }
 
+function H_extractSingleParamsAttribute($params) {
+
+    $parent = explode('|', $params);
+    return $parent;
+}
+
 function H_toArrayObject($data) {
     $data = json_encode($data);
     $data = json_decode($data);
@@ -870,17 +902,17 @@ function H_toArrayObject($data) {
 }
 
 function H_escapeStringTable($data){
-    $hex = '/[^a-z-A-Z_!\^0-9\x00-\x1f\x05\x0E\x16\x03]/';
+    $hex = '/[^a-z-A-Z_!.-@\^0-9\x00-\x1f\x05\x0E\x16\x03]/';
     $steril = preg_replace($hex, '',$data);
     $steril = str_replace('-', '',$steril);
 
     return $steril;
 }
 
-function H_escapeString($data){
-    $hex = '/[^a-z-A-Z_ \^0-9\x00-\x1f\x05\x0E\x16\x03]/';
+function H_escapeString($data, $useStrip = true){
+    $hex = '/[^a-z-A-Z_ \-\^0-9\x00-\x1f\x05\x0E\x16\x03]/';
     $steril = preg_replace($hex, '',$data);
-    $steril = str_replace('-', '',$steril);
+    if ($useStrip) $steril = str_replace('-', '',$steril);
 
     return $steril;
 }
@@ -936,4 +968,241 @@ function H_isArray($arr) {
             return is_array($arr);
         }
     } else return false;
+}
+
+function H_makeSlug($var) {
+    $var = H_splitUppercaseWithSpace($var);
+    $var = str_replace(' ', '-', $var);
+    return strtolower($var);
+}
+
+function H_makeSlugString($var) {
+    $var = H_escapeString($var, false);
+    $var = str_replace(' ', '-', $var);
+    $var = str_replace('--', '-', $var);
+    $var = str_replace('---', '-', $var);
+    $var = str_replace('----', '-', $var);
+    return strtolower($var);
+}
+
+function H_fixNullValue($arr) {
+    foreach ($arr as $key => $value) {
+        if ($value == 'null') $arr[$key] = null;
+    }
+    return $arr;
+}
+
+function H_causer($id) {
+    return \App\Models\Users::find($id);
+}
+
+function formatGetRepo($model) {
+    $str = strtolower(substr($model, 0, 1));
+    $checkIes = substr($model, -3);
+    if ($checkIes === 'ies') $str .= substr($model, 1, strlen($model) - 4).'y';
+    else $str .= substr($model, 1, strlen($model) - 2);
+    $str .= 'Repository';
+
+    return $str;
+    return $str;
+}
+
+function H_formatToRoman($number) {
+    $map = [
+        'M'  => 1000,
+        'CM' => 900,
+        'D'  => 500,
+        'CD' => 400,
+        'C'  => 100,
+        'XC' => 90,
+        'L'  => 50,
+        'XL' => 40,
+        'X'  => 10,
+        'IX' => 9,
+        'V'  => 5,
+        'IV' => 4,
+        'I'  => 1
+    ];
+    $returnValue = '';
+    while ($number > 0) {
+        foreach ($map as $roman => $int) {
+            if($number >= $int) {
+                $number -= $int;
+                $returnValue .= $roman;
+                break;
+            }
+        }
+    }
+    return $returnValue;
+}
+
+function H_uploadFileV2($file) {
+    return new UploadFile($file);
+}
+
+function H_getModuleName ($data) {
+    $moduleName = str_replace(
+        ['App\Models\\'],
+        ['', ''],
+        $data->getMorphClass()
+    );
+    return $moduleName;
+}
+
+function H_dropColumnIfExists($myTable, $column)
+{
+    if (Schema::hasColumn($myTable, $column)) //check the column
+    {
+        Schema::table($myTable, function (Blueprint $table) use ($column)
+        {
+            $table->dropColumn($column); //drop it
+        });
+    }
+
+}
+
+function H_extractKeyRelation($key) {
+    $res = null;
+    $ex = explode('.', $key);
+    if (
+        count($ex) > 1 && count($ex) < 3 && // check validation
+        strlen($ex[0]) > 0 && strlen($ex[1]) > 0  // check value
+    ) {
+        $importantCheck = explode('!', $ex[1]);
+        $column = $importantCheck[0];
+
+        $operatoCheck = explode('@', $column);
+        $column = $operatoCheck[0];
+
+        $res = [
+            'relation' => $ex[0],
+            'column' => $column,
+        ];
+    }
+    return $res;
+}
+
+function H_toStandardDate($date) { 
+    // agar tanggal sesua dengan db dan config laravel
+    // jadi saat query ke db jam yg di ui akan sesuai dengan di db
+    $date = Carbon::parse($date);
+    $date->setTimezone('-3');
+    return $date;
+}
+
+function H_isValidDate($date) {
+    if (strtotime($date)) {
+        $date = Carbon::parse(strtotime($date))->toDateTimeString();
+        return H_toStandardDate($date);
+    } else return false;
+}
+
+function H_operatorIdentifier() {
+    return '@';
+}
+
+function H_getOperatorType($type) {
+    $identifier = H_operatorIdentifier();
+    if (
+        // integer format
+        $type == 'lt' // less than
+        || $type == 'lte' // less than equal
+        || $type == 'gt' // greater than
+        || $type == 'gte' // greater than equal
+        // date format
+        || $type == 'ltd' // less than equal
+        || $type == 'lted' // less than equal
+        || $type == 'gtd' // greater than
+        || $type == 'gted' // greater than equal
+        || $type == 'start' // start point
+        || $type == 'end' // end point
+    ) {
+        return $identifier.$type;
+    } else return null;
+}
+
+function H_getOperatorMode($key) {
+    $ex = explode(H_operatorIdentifier(), $key);
+    return $ex[1];
+}
+
+function H_getOperatorSearch($key) {
+    $res = null;
+    $ex = explode(H_operatorIdentifier(), $key);
+    if (count($ex) > 1) {
+        if ($ex[1] == 'lt' || $ex[1] == 'ltd') $res = '<';
+        if ($ex[1] == 'lte' || $ex[1] == 'lted') $res = '<=';
+        if ($ex[1] == 'gt' || $ex[1] == 'gtd') $res = '>';
+        if ($ex[1] == 'gte' || $ex[1] == 'gted') $res = '>=';
+        if ($ex[1] == 'start') $res = '>=';
+        if ($ex[1] == 'end') $res = '<=';
+    }
+    return $res;
+}
+
+function H_getColumSearch($key) {
+    $checker = explode('!', $key); // exact checker
+    $column = $checker[0];
+    
+    // integer checker
+    $checker = explode(H_getOperatorType('gt'), $column); // greater than checker
+    $column = $checker[0];
+    $checker = explode(H_getOperatorType('gte'), $column); // greater than equal checker
+    $column = $checker[0];
+    $checker = explode(H_getOperatorType('lt'), $column); // greater than checker
+    $column = $checker[0];
+    $checker = explode(H_getOperatorType('lte'), $column); // less than equal checker
+    $column = $checker[0];
+    // date checker
+    $checker = explode(H_getOperatorType('gtd'), $column); // greater than checker
+    $column = $checker[0];
+    $checker = explode(H_getOperatorType('gted'), $column); // greater than equal checker
+    $column = $checker[0];
+    $checker = explode(H_getOperatorType('ltd'), $column); // greater than checker
+    $column = $checker[0];
+    $checker = explode(H_getOperatorType('lted'), $column); // less than equal checker
+    $column = $checker[0];
+    $checker = explode(H_getOperatorType('start'), $column); // less than equal checker
+    $column = $checker[0];
+    $checker = explode(H_getOperatorType('end'), $column); // less than equal checker
+    $column = $checker[0];
+
+    // if use relation
+    $checker = explode('.', $column); // exact checker
+    $column = $checker[1] ?? $checker[0];
+    return $column;
+}
+
+function H_getValueForOperator($key, $val) {
+    try {
+
+        $mode = H_getOperatorMode($key);
+        // integer format
+        if ( $mode == 'lt' // less than
+            || $mode == 'lte' // less than equal
+            || $mode == 'gt' // greater than
+            || $mode == 'gte' // greater than equal
+        ) {
+            $val = (int) $val;
+        }
+
+        // date format
+        if ( $mode == 'ltd' // less than equal
+            || $mode == 'lted' // less than equal
+            || $mode == 'gtd' // greater than
+            || $mode == 'gted' // greater than equal
+            || $mode == 'start' // start point
+            || $mode == 'end' // end point
+        ) {
+            $val = H_isValidDate($val);
+            if ($mode == 'start') $val = H_formatDate($val, 'Y-m-d ').'00:00:00';
+            if ($mode == 'end') $val = H_formatDate($val, 'Y-m-d ').'23:59:00';
+            if ($val == false) throw new Exception('Date value not compatible, please makesure the value is valid date format (Y-m-d) or (Y-m-d H:i)');
+            // dd($val);
+        } 
+
+        return $val;
+    } catch (Exception $e){
+        throw new Exception($e->getMessage());
+    }
 }

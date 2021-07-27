@@ -19,15 +19,26 @@ class PermissionsRepositoryEloquent extends BaseRepository implements Permission
 {
     use StandardRepo;
 
+    protected $log;
+
     public function __construct(
-        Application $app
-	){
-		parent::__construct($app);
+        Application $app,
+        ActivityRepository $log
+    ){
+        parent::__construct($app);
+
+        $this->log = $log;
     }
 
 
     public function model() {
         return Permissions::class;
+    }
+
+    public function initModel($id = null) {
+        $model = new Permissions;
+        if (!empty($id)) $model = $this->model->where($this->model->getKeyName(), $id)->first();
+        return $model;
     }
 
     public function store($raw_request, $id = null, $customRequest = null) {
@@ -39,11 +50,17 @@ class PermissionsRepositoryEloquent extends BaseRepository implements Permission
             $data = $this->initModel($id);
 
             //storing defined property    
-            $data->name = $request['name']; 
-            $data->slug = H_handleRequest($request, 'slug'); 
+            $data->name = $request['name'];
 
-            
+            if (H_hasRequest($request, 'slug')) $slug = $request['slug'];
+            else $slug = H_makeSlug(strtolower($data->name));
+            $data->slug = $slug ; 
+
+            if ($id) $data->updated_by = $request['updated_by'] ?? H_JWT_getUserId($raw_request);
+            else $data->created_by = $request['created_by'] ?? H_JWT_getUserId($raw_request);
+    
             $data->save();
+ 
             return $data;
 
         } catch (Exception $e){ 
@@ -52,5 +69,25 @@ class PermissionsRepositoryEloquent extends BaseRepository implements Permission
     }
 
     // add your customize function
+    public function generateNewModule($modules = []) {
+        try {
+            $crud = [ 'Browse', 'Create', 'Read', 'Update', 'Delete', 'Restore' ];
+            $data = [];
+            foreach ($modules as $module) {
+                $fixName = H_splitUppercaseWithSpace($module);
+                $slug = H_makeSlug($module);
 
+                foreach ($crud as $r) {
+                    $data[] = [
+                        'name' => $fixName.' '.$r,
+                        'slug' => strtolower($slug.'-'.$r),
+                    ];
+                }
+            }
+            $this->model->insert($data);
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+
+    }
 }

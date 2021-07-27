@@ -7,6 +7,7 @@ foreach($list as $item){
 $name = $item->name;
 $module = strtolower(splitUppercaseToStrip($name));
 $slug = strtolower(splitUppercaseToUnderscore($name));
+$moduleName = splitUppercaseToSpace($name);
 
 $objectName = '';
 $no = 1;
@@ -51,6 +52,7 @@ export default {
         search: '',
         data: [],
         searchBy: [],
+        searchBySelected: null,
         columns: [
 $tableColumns
         ],
@@ -113,7 +115,7 @@ $tableColumns
       var endpoint = this.Meta.module + '?table'
       endpoint = endpoint + '&page=' + page
       endpoint = endpoint + '&limit=' + perpage
-      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.dataModel.searchBy.field + ':' + this.table.search
+      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.dataModel.searchBySelected.field + ':' + this.table.search
       if (this.dataModel.status === 'TRASH') endpoint = endpoint + '&trash=true'
 
       this.API.get(endpoint, (status, data, message, response, full) => {
@@ -218,7 +220,7 @@ $index = '<template >
 
         <div class="col-6 col-sm-3 col-md-2 pb-1 pr-1-5">
           <q-select :options="table.searchBy" dense outlined
-            v-model="dataModel.searchBy" label="Searc By" class="bg-white box-shadow"
+            v-model="dataModel.searchBySelected" label="Searc By" class="bg-white box-shadow"
             style="border-radius:5px; " transition-show="jump-up" transition-hide="jump-down" />
         </div>
 
@@ -259,8 +261,8 @@ $index = '<template >
 
           <template v-slot:no-data="{icon}">
             <div class="full-width row flex-center text-primary q-gutter-sm">
-              <q-icon size="2em" :name="icon" /><span class="bold text-h6"> Belum ada data {{Meta.name}} </span>
-              <q-btn v-if="rules.permission.create" @click="add" unelevated outline color="primary" label="Buat baru" />
+              <q-icon size="2em" :name="icon" /><span class="bold text-h6"> There are no data {{Meta.name}} yet</span>
+              <q-btn v-if="rules.permission.create" @click="add" unelevated outline color="primary" label="Add New" />
             </div>
           </template>
 
@@ -302,7 +304,7 @@ export default {
       API: this.".$dlr."Api,
       // default data
       title: 'Create',
-      dataModel: Meta.model,
+      dataModel: {},
       rules: {
         permission: Meta.permission
       },
@@ -311,6 +313,7 @@ export default {
   },
 
   created () {
+    this.dataModel = this.".$dlr."Helper.unReactive(this.Meta.model)
     this.initTopBar()
   },
 
@@ -320,8 +323,8 @@ export default {
       if (params.id !== undefined) {
         this.onRefresh()
         this.getData(params.id)
-      } else this.backToRoot()
-    }
+      } else this.onRefresh()
+    } else this.onRefresh()
   },
 
   watch: {
@@ -355,7 +358,7 @@ export default {
     },
 
     backToRoot () {
-      this.".$dlr."router.push({ name: this.Meta.module + '-list' })
+      this.".$dlr."router.push({ name: this.Meta.module })
     },
 
     emitModel (target, val) {
@@ -401,7 +404,7 @@ export default {
     },
 
     messageSubmit (titleAdd = '', msg) {
-      this.".$dlr."Helper.showAlert(titleAdd + ' Succesfully', msg)
+      this.".$dlr."Helper.showSuccess(titleAdd + ' Succesfully', msg)
     }
   }
 }
@@ -462,7 +465,7 @@ export default {
       Meta,
       API: this.".$dlr."Api,
       // default data
-      dataModel: Meta.model,
+      dataModel: this.".$dlr."Helper.unReactive(Meta.model),
       rules: {
         permission: Meta.permission
       }
@@ -514,7 +517,7 @@ export default {
     },
 
     backToRoot () {
-      this.".$dlr."router.push({ name: this.Meta.module + '-list' })
+      this.".$dlr."router.push({ name: this.Meta.module })
     }
   }
 }
@@ -562,7 +565,7 @@ $detail ='
 
 // META --------------------------------------------------
 $meta = "const Meta = {
-  name: '$name',
+  name: '$moduleName',
   icon: 'stop_circle',
   module: '$module',
   topBarMenu: [],

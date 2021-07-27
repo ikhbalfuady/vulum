@@ -12,6 +12,10 @@ foreach($list as $item){
  
 	$selector =  strtolower(splitUppercaseToUnderscore($item->name));
 
+    if (isset($item->loging_user) && $item->loging_user == true) {
+        $item->column = enableLogingUser($item->column);
+    }
+
     $columList = '';
     $no = 1;
     foreach ($item->column as $col) {
@@ -20,7 +24,7 @@ foreach($list as $item){
 
         $basic = $tab.'$table->'.$col->type.'("'.$col->name.'"';
         if (isset($col->length))  $basic =  $basic . ', '.$col->length;
-        if (isset($col->lengt2))  $basic =  $basic . ', '.$col->length2;
+        if (isset($col->length2))  $basic =  $basic . ', '.$col->length2;
         if ($col->type == 'enum' && isset($col->enum_list))  $basic =  $basic . ', '.$col->enum_list;
 
         $basic = $basic . ')'; // wrapping

@@ -23,7 +23,7 @@ const routes = [
     path: '/',
     component: () => import('layouts/Main.vue'),
     children: [
-      { name: 'dashboard', path: '/', component: () => import('pages/index.vue') },
+      { name: 'home', path: '/', component: () => import('pages/index.vue') },
       { name: 'users-list', path: '/users', component: () => import('pages/users/index.vue') },
       { name: 'view-users', path: '/users/view/:id', component: () => import('pages/users/detail.vue') },
       { name: 'add-users', path: '/users/form', component: () => import('pages/users/form.vue') },

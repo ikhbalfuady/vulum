@@ -15,6 +15,7 @@ class AppServiceProvider extends ServiceProvider
     {
 
          $models = array(
+            "Activity",
             "Users",
             "UserSessions",
             "Permissions",
@@ -23,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
             "MenuItems",
             "Menus",
             "MasterMenus",
+            "UserNotifications",
  
          );
  

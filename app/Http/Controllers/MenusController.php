@@ -13,131 +13,133 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class MenusController extends Controller
 {
-	protected $repository;
-	protected $request;
+    protected $repository;
+    protected $request;
 
-	public function __construct(
+    public function __construct(
         Request $request,
         MenusRepository $repository
     ){
-		$this->request = $request;
-		$this->repository = $repository;
+        $this->request = $request;
+        $this->repository = $repository;
     }
     
     public function index(Request $request) {
-		AuthProvider::has($request, 'menus-browse');
+        AuthProvider::has($request, 'menus-browse');
         try {
-			$payload = $request->all();
-			$data = $this->repository->getList($request);
-			if (isset($payload['csv'])) return $this->exportCSV($data);
-			else return H_apiResponse($data);
-        } catch (Exception $e){
-			return H_apiResError($e);
-        }
-	}
-
-	public function findById(Request $request, $id) {
-		AuthProvider::has($request, 'menus-read');
-        try {
-			$data = $this->repository->findById($request, $id);
-			return H_apiResponse($data);
-        } catch (Exception $e){
-			return H_apiResError($e);
-        }
-	}
-
-	public function store(Request $request, $id = null) {
-		if ($id) AuthProvider::has($request, 'menus-update');
-		else AuthProvider::has($request, 'menus-create');
-		try {
-			$validate = $this->validateStore($request, $id);
-			if($validate['result']) {
-				$data = $this->repository->store($request, $id);
-				$msg = 'succes saving data';
-				if ($id) $msg = 'success update data';
-				return H_apiResponse($data, $msg);
-			} else {
-				return H_apiResponse(null, $validate['message'], 400);
-			}
-        } catch (Exception $e){
-			return H_apiResError($e);
-        }
-	}
-
-	public function restore(Request $request, $id = null) {
-		AuthProvider::has($request, 'menus-restore');
-		try {
-			$data = $this->repository->restore($request, $id);
-			return H_apiResponse($data, 'Data has successfully restored');
+            $payload = $request->all();
+            $data = $this->repository->getList($request);
+            if (isset($payload['csv'])) return $this->exportCSV($data);
+            else return H_apiResponse($data);
         } catch (Exception $e){
             return H_apiResError($e);
         }
-	}
+    }
 
-	public function remove(Request $request, $id) {
-		AuthProvider::has($request, 'menus-delete');
-		try {
-			$payload = $request->all();
-			$data = $this->repository->remove($request, $id);
-			$msg = 'success deleted data';
-			if(isset($payload['permanent'])) $msg = $msg . ' permanently';
-			return H_apiResponse($data, $msg);
+    public function findById(Request $request, $id) {
+        AuthProvider::has($request, 'menus-read');
+        try {
+            $data = $this->repository->findAll($request, true, [
+                'createdByUser',
+                'updatedByUser',
+                'deletedByUser',
+            ])->find($id);
+            return H_apiResponse($data);
         } catch (Exception $e){
             return H_apiResError($e);
         }
-	}
+    }
 
-	public function exportCSV($data) {
-		$data = H_toArrayObject($data);
-		$export = new ExportFromArray($data);
+    public function store(Request $request, $id = null) {
+        if ($id) AuthProvider::has($request, 'menus-update');
+        else AuthProvider::has($request, 'menus-create');
+        try {
+            $validate = $this->validateStore($request, $id);
+            if($validate['result']) {
+                $data = $this->repository->store($request, $id);
+                $msg = 'succes saving data';
+                if ($id) $msg = 'success update data';
+                return H_apiResponse($data, $msg);
+            } else {
+                return H_apiResponse(null, $validate['message'], 400);
+            }
+        } catch (Exception $e){
+            return H_apiResError($e);
+        }
+    }
+
+    public function restore(Request $request, $id = null) {
+        AuthProvider::has($request, 'menus-restore');
+        try {
+            $data = $this->repository->restore($request, $id);
+            return H_apiResponse($data, 'Data has successfully restored');
+        } catch (Exception $e){
+            return H_apiResError($e);
+        }
+    }
+
+    public function remove(Request $request, $id) {
+        AuthProvider::has($request, 'menus-delete');
+        try {
+            $payload = $request->all();
+            $data = $this->repository->remove($request, $id);
+            $msg = 'success deleted data';
+            if(isset($payload['permanent'])) $msg = $msg . ' permanently';
+            return H_apiResponse($data, $msg);
+        } catch (Exception $e){
+            return H_apiResError($e);
+        }
+    }
+
+    public function exportCSV($data) {
+        $data = H_toArrayObject($data);
+        $export = new ExportFromArray($data);
 
         $fileName = 'Menus-'.H_getCurrentDate();
         return Excel::download($export, ''.$fileName.'.csv');
-	}
+    }
 
-	// Validator
-	public function validateStore($request, $id = null) {
-		try {
-			$result = true;
-			$message = '';
-			$payload = $request->all();
+    // Validator
+    public function validateStore($request, $id = null) {
+        try {
+            $result = true;
+            $message = '';
+            $payload = $request->all();
 
-			$validator = Validator::make( $request->all(),
-				[
-                    'parent_id' => 'required',  
+            $validator = Validator::make( $request->all(),
+                [
                     'menu_item_id' => 'required',  
-                    'master_menu_id' => 'required' 
+                    'master_menu_id' => 'required',  
 
-				],
-				[
-                    'parent_id.required' => 'parent_id is required',  
+                ],
+                [
                     'menu_item_id.required' => 'menu_item_id is required',  
-                    'master_menu_id.required' => 'master_menu_id is required' 
+                    'master_menu_id.required' => 'master_menu_id is required',  
 
-				]
-			);
-			if ($validator->fails()) {
-				$message = $validator->messages()->first();
-				$result = false;
-			}
+                ]
+            );
+            if ($validator->fails()) {
+                $message = $validator->messages()->first();
+                $result = false;
+            }
 
-			if (!$this->repository->findById($request, $id)) {
-				$message = 'Data not found';
-				$result = false;
-			}
+            if ($id != null && empty($this->repository->findById($request, $id))) {
+                $message = 'Data not found';
+                $result = false;
+            }
 
-			return [
-				'result' => $result,
-				'message' => $message,
-			];
+            return [
+                'result' => $result,
+                'message' => $message,
+            ];
         } catch (Exception $e){
-			if(env('APP_DEBUG')) return H_apiResError($e);
-			else {
-				$msg = $e->getMessage();
-				return H_apiResponse(null, $msg, 400);
-			}
+            if(env('APP_DEBUG')) return H_apiResError($e);
+            else {
+                $msg = $e->getMessage();
+                return H_apiResponse(null, $msg, 400);
+            }
         }
-	}
+    }
 
 }
   

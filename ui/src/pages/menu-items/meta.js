@@ -1,5 +1,6 @@
 const Meta = {
-  name: 'MenuItems',
+  parent: 'Master Data',
+  name: 'Menu Items',
   icon: 'stop_circle',
   module: 'menu-items',
   topBarMenu: [],
@@ -15,8 +16,7 @@ const Meta = {
     name: null,
     slug: null,
     icon: null,
-    path: null,
-    ordering: null
+    path: null
 
   }
 }

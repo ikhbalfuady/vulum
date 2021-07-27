@@ -7,10 +7,10 @@
     <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
 
       <!-- Header Title -->
-      <div class="row pl-2 pt-2">
+      <div class="row pl-2 pt-3 pb-2 mb-2 box-shadow bg-white">
         <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
           <div class="title">
-            <span class="text-caption text-grey-8">Master {{Meta.name}}</span><br>
+            <span class="text-caption text-grey-8">{{Meta.parent}}</span><br>
             <span class="text-h5 bold text-primary capital">{{title}} {{Meta.name}} <span v-if="title === 'Update'" >#{{dataModel.id}}</span></span>
           </div>
         </div>
@@ -21,9 +21,66 @@
             <q-form @submit="submit">
               <q-card-section class="row">
 
-                <div class="col-12 col-sm-6 col-md-6 pv ph"
-                  v-for="(props, index) in dataModel" :key="index">
-                  <q-input v-model="dataModel[index]" :label="index" dense filled square />
+                <div class="col-12 col-sm-4 col-md-4 pv ph" >
+                  <q-input v-model="dataModel.name" label="name" dense filled square
+                  lazy-rules :rules="[
+                    val => val !== null && val !== '' || 'Name must be filled!',
+                  ]" />
+                </div>
+
+                <div class="col-12 col-sm-4 col-md-4 pv ph" >
+                  <q-input v-model="dataModel.username" label="username" dense filled square
+                  lazy-rules :rules="[
+                    val => val !== null && val !== '' || 'username must be filled!',
+                  ]" />
+                </div>
+
+                <div class="col-12 col-sm-4 col-md-4 pv ph" >
+                  <q-input v-model="dataModel.email" label="email" dense filled square
+                  lazy-rules :rules="[
+                    val => val !== null && val !== '' || 'email must be filled!',
+                  ]" />
+                </div>
+
+                <div class="col-12 col-sm-4 col-md-4 pv ph" >
+                  <q-input v-model="dataModel.password" label="password" dense filled square
+                  :hint="(dataModel.id === null) ? 'Password is required' : 'Leave blank if dont want to change' " />
+                </div>
+
+                <div class="col-12 col-sm-4 col-md-4 pv ph" >
+                  <q-select label="Menu" dense filled square
+                    :options="select.menus"
+                    v-model="dataModel.menu_id"
+                    option-value="id" option-label="name"
+                    emit-value map-options  use-input clearable
+                    @filter="(val, update) => filterSelect(val, update, 'menus')"
+                    lazy-rules :rules="[
+                      val => val !== null && val !== '' || 'Menu is required!',
+                    ]"
+                  >
+                    <template v-slot:selected-item="row"> <span class="ellipsis">{{ row.opt.name }}</span> </template>
+                    <template v-slot:no-option>
+                      <q-item> <q-item-section class="text-grey"> Data not found </q-item-section> </q-item>
+                    </template>
+                  </q-select>
+                </div>
+
+                <div class="col-12 col-sm-4 col-md-4 pv ph" >
+                  <q-select label="Role" dense filled square
+                    :options="select.roles"
+                    v-model="dataModel.role_id"
+                    option-value="id" option-label="name"
+                    emit-value map-options  use-input clearable
+                    @filter="(val, update) => filterSelect(val, update, 'roles')"
+                    lazy-rules :rules="[
+                      val => val !== null && val !== '' || 'Role is required!',
+                    ]"
+                  >
+                    <template v-slot:selected-item="row"> <span class="ellipsis">{{ row.opt.name }}</span> </template>
+                    <template v-slot:no-option>
+                      <q-item> <q-item-section class="text-grey"> Data not found </q-item-section> </q-item>
+                    </template>
+                  </q-select>
                 </div>
 
               </q-card-section>
@@ -50,15 +107,22 @@ export default {
       API: this.$Api,
       // default data
       title: 'Create',
-      dataModel: Meta.model,
+      dataModel: {},
       rules: {
         permission: Meta.permission
       },
-      disableSubmit: false
+      disableSubmit: false,
+      select: {
+        roles: [],
+        rolesTmp: [],
+        menus: [],
+        menusTmp: []
+      }
     }
   },
 
   created () {
+    this.dataModel = this.$Helper.unReactive(this.Meta.model)
     this.initTopBar()
     this.$ModuleConfig.getCurrentPermissions((status, data) => {
       console.log('initPermissionPage:' + Meta.module, data)
@@ -95,13 +159,15 @@ export default {
         }
       } else { // checking access create
         if (this.checkPermission('create')) {
-          //
+          this.onRefresh()
         }
       }
     },
 
     onRefresh () {
       //
+      this.getListSelect('master-menus', 'menus')
+      this.getListSelect('roles')
     },
 
     initTopBar () {
@@ -127,7 +193,7 @@ export default {
     },
 
     backToRoot () {
-      this.$router.push({ name: this.Meta.module + '-list' })
+      this.$router.push({ name: this.Meta.module })
     },
 
     emitModel (target, val) {
@@ -143,11 +209,10 @@ export default {
     },
 
     validateSubmit () {
-      // if (this.dataModel.name === null) {
-      //   this.$Helper.showAlert('Nama Kosong!', 'Nama harus di isi!')
-      //   return false
-      // } else return true
-      return true
+      if (this.dataModel.id === null && this.dataModel.password === null) {
+        this.$Helper.showAlert('Password Empty!', 'Password must be filled!')
+        return false
+      } else return true
     },
 
     save () {
@@ -165,7 +230,7 @@ export default {
       this.$Helper.loadingOverlay(true, 'Saving..')
       this.API.put(this.Meta.module + '/' + this.dataModel.id, this.dataModel, (status, data, message, response, full) => {
         this.$Helper.loadingOverlay(false)
-        if (response.result === true && status === 200) {
+        if (status === 200) {
           this.messageSubmit('Update', message)
           this.backToRoot()
         } else this.disableSubmit = false
@@ -174,7 +239,28 @@ export default {
 
     messageSubmit (titleAdd = '', msg) {
       this.$Helper.showAlert(titleAdd + ' Succesfully', msg)
+    },
+
+    async filterSelect (val, update, target) {
+      this.select = await this.$Helper.filterSelect(val, update, target, this.select)
+    },
+
+    getListSelect (endpoint, selectSource = null) {
+      this.$Helper.loadingOverlay(true)
+      // var endpoint = 'menus'
+      this.API.get(endpoint, (status, data, message, response, full) => {
+        this.$Helper.loadingOverlay(false)
+        if (status === 200) {
+          var targetSource = endpoint
+          if (selectSource) targetSource = selectSource
+          var tmpName = targetSource + 'Tmp'
+
+          this.select[targetSource] = data
+          this.select[tmpName] = data
+        }
+      })
     }
+
   }
 }
 </script>

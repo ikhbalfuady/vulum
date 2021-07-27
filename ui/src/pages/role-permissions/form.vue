@@ -7,7 +7,7 @@
     <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
 
       <!-- Header Title -->
-      <div class="row pl-2 pt-2">
+      <div class="row pl-2 pt-3 pb-2 mb-2 box-shadow bg-white">
         <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
           <div class="title">
             <span class="text-caption text-grey-8">Master {{Meta.name}}</span><br>
@@ -50,7 +50,7 @@ export default {
       API: this.$Api,
       // default data
       title: 'Create',
-      dataModel: Meta.model,
+      dataModel: {},
       rules: {
         permission: Meta.permission
       },
@@ -59,6 +59,7 @@ export default {
   },
 
   created () {
+    this.dataModel = this.$Helper.unReactive(this.Meta.model)
     this.initTopBar()
     this.$ModuleConfig.getCurrentPermissions((status, data) => {
       console.log('initPermissionPage:' + Meta.module, data)
@@ -127,7 +128,7 @@ export default {
     },
 
     backToRoot () {
-      this.$router.push({ name: this.Meta.module + '-list' })
+      this.$router.push({ name: this.Meta.module })
     },
 
     emitModel (target, val) {
@@ -165,7 +166,7 @@ export default {
       this.$Helper.loadingOverlay(true, 'Saving..')
       this.API.put(this.Meta.module + '/' + this.dataModel.id, this.dataModel, (status, data, message, response, full) => {
         this.$Helper.loadingOverlay(false)
-        if (response.result === true && status === 200) {
+        if (status === 200) {
           this.messageSubmit('Update', message)
           this.backToRoot()
         } else this.disableSubmit = false

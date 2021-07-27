@@ -18,10 +18,15 @@ class UsersRepositoryEloquent extends BaseRepository implements UsersRepository
 {
     use StandardRepo;
 
+    protected $log;
+
     public function __construct(
-        Application $app
-	){
-		parent::__construct($app);
+        Application $app,
+        ActivityRepository $log
+    ){
+        parent::__construct($app);
+
+        $this->log = $log;
     }
 
     /**
@@ -30,6 +35,12 @@ class UsersRepositoryEloquent extends BaseRepository implements UsersRepository
      */
     public function model() {
         return Users::class;
+    }
+
+    public function initModel($id = null) {
+        $model = new Users;
+        if (!empty($id)) $model = $this->model->where($this->model->getKeyName(), $id)->first();
+        return $model;
     }
 
     public function store($raw_request, $id = null, $customRequest = null) {
@@ -43,15 +54,31 @@ class UsersRepositoryEloquent extends BaseRepository implements UsersRepository
             //storing defined property    
             $data->name = $request['name']; 
             $data->username = $request['username']; 
-            $data->password = $request['password']; 
             $data->email = $request['email']; 
             $data->picture = H_handleRequest($request, 'picture'); 
             $data->role_id = H_handleRequest($request, 'role_id'); 
             $data->menu_id = H_handleRequest($request, 'menu_id'); 
-            $data->active = $request['active']; 
+            $data->department_id = H_handleRequest($request, 'department_id'); 
+            $data->active = H_handleRequest($request, 'active', 1); 
 
-            
+            if ($id) $data->updated_by = H_handleRequest($request, 'updated_by', H_JWT_getUserId($raw_request));
+            else $data->created_by = H_handleRequest($request, 'created_by', H_JWT_getUserId($raw_request));
+
+            if ($id) {
+                if (!empty($request['password'])) {
+                    $data->password = H_passwordMaker($request['password']);   
+                }
+            } else $data->password = H_passwordMaker($request['password']);  
+
             $data->save();
+            $this->log->store([
+                'description' => $id ? 'Update user' : 'Create user',
+                'subject' => $data,
+                'causer' => $id ? $data->updated_by : $data->created_by,
+                'properties' => [
+                    'color' => $id ? 'yellow' : 'green',
+                ]
+            ]);
             return $data;
 
         } catch (Exception $e){ 
@@ -95,6 +122,66 @@ class UsersRepositoryEloquent extends BaseRepository implements UsersRepository
             throw new Exception($e->getMessage());
         }
     }
+
+    public function changePassword($raw_request, $id = null, $customRequest = null) {
+        try {
+            if ($customRequest === null) $request = $raw_request->all();
+            else $request = $customRequest;
+
+            $data = $this->initModel($id);
+            if ($id) {
+                if (!empty($request['password'])) {
+                    $data->password = H_passwordMaker($request['password']);   
+                }
+            } else $data->password = H_passwordMaker($request['password']);  
+
+            if ($id) $data->updated_by = $request['updated_by'] ?? H_JWT_getUserId($raw_request);
+            else $data->created_by = $request['created_by'] ?? H_JWT_getUserId($raw_request);
+            $data->save();
+            $this->log->store([
+                'description' => 'Change password user',
+                'subject' => $data,
+                'causer' => $id ? $data->updated_by : $data->created_by,
+                'properties' => [
+                    'color' => $id ? 'yellow' : 'green',
+                ]
+            ]);
+            return $data;
+
+        } catch (Exception $e){ 
+            throw new Exception($e->getMessage());
+        } 
+    }
+
+    public function updateProfile($raw_request, $id = null, $customRequest = null) {
+        try {
+            if ($customRequest === null) $request = $raw_request->all();
+            else $request = $customRequest;
+
+            $data = $this->initModel($id);
+            $data->name = $request['name']; 
+            $data->username = $request['username'];
+            $data->email = $request['email'];
+
+            if ($id) $data->updated_by = $request['updated_by'] ?? H_JWT_getUserId($raw_request);
+            else $data->created_by = $request['created_by'] ?? H_JWT_getUserId($raw_request);
+
+            $data->save();
+            $this->log->store([
+                'description' => 'Update user',
+                'subject' => $data,
+                'causer' => $id ? $data->updated_by : $data->created_by,
+                'properties' => [
+                    'color' => $id ? 'yellow' : 'green',
+                ]
+            ]);
+            return $data;
+
+        } catch (Exception $e){ 
+            throw new Exception($e->getMessage());
+        } 
+    }
+    
 
 }
         

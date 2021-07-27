@@ -19,10 +19,15 @@ class UserSessionsRepositoryEloquent extends BaseRepository implements UserSessi
 {
     use StandardRepo;
 
+    protected $log;
+
     public function __construct(
-        Application $app
-	){
-		parent::__construct($app);
+        Application $app,
+        ActivityRepository $log
+    ){
+        parent::__construct($app);
+
+        $this->log = $log;
     }
 
     /**
@@ -31,6 +36,12 @@ class UserSessionsRepositoryEloquent extends BaseRepository implements UserSessi
      */
     public function model() {
         return UserSessions::class;
+    }
+
+    public function initModel($id = null) {
+        $model = new UserSessions;
+        if (!empty($id)) $model = $this->model->where($this->model->getKeyName(), $id)->first();
+        return $model;
     }
 
     /**
@@ -56,8 +67,11 @@ class UserSessionsRepositoryEloquent extends BaseRepository implements UserSessi
             $data->agent = H_handleRequest($request, 'agent'); 
             $data->platform = H_handleRequest($request, 'platform'); 
 
-            
+            if ($id) $data->updated_by = H_handleRequest($request, 'updated_by', $request['user_id']); 
+            else $data->created_by = H_handleRequest($request, 'created_by', $request['user_id']); 
+
             $data->save();
+
             return $data;
 
         } catch (Exception $e){ 
@@ -88,7 +102,7 @@ class UserSessionsRepositoryEloquent extends BaseRepository implements UserSessi
                 "platform" => 'web',
             ];
             $save = $this->store($request, null, $save);
-        return $save;
+            return $save;
         } catch (Exception $e){
             throw new Exception($e->getMessage());
         }

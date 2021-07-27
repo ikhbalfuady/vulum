@@ -1,5 +1,5 @@
 const Meta = {
-  name: 'RolePermissions',
+  name: 'Role Permissions',
   icon: 'stop_circle',
   module: 'role-permissions',
   topBarMenu: [],

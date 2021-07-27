@@ -35,6 +35,14 @@ function createList ($obj) {
 
     return json_decode($res);
 }
+
+function enableLogingUser ($column) {
+    $column[] = json_decode(json_encode(["name" => "created_by", "type" => "unsignedBigInteger", "attributes" => ['nullable'] ]));
+    $column[] = json_decode(json_encode(["name" => "updated_by", "type" => "unsignedBigInteger", "attributes" => ['nullable'] ]));
+    $column[] = json_decode(json_encode(["name" => "deleted_by", "type" => "unsignedBigInteger", "attributes" => ['nullable'] ]));
+    return $column;
+}
+
 $outputDir = 'output/'; 
 if (!file_exists($outputDir)) mkdir($outputDir, 0777, true); // generate folder output
 
@@ -56,7 +64,7 @@ include 'list.php';
 $list = json_encode($list);
 $list = json_decode($list);
 
-generateMigrations($list, $outputDir);
+generateMigrations($list, $outputDir); // login user di exec disini
 generateModel($list, $outputDir);
 generateController($list, $outputDir);
 generateRepository($list, $outputDir);

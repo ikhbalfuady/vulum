@@ -6,10 +6,10 @@
     <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
 
       <!-- Header Title -->
-      <div class="row pl-2 pt-2">
+      <div class="row pl-2 pt-3 pb-2 mb-2 box-shadow bg-white">
         <div class="col-12 col-sm-3 col-md-5 pb-1 pv info-page">
           <div class="title">
-            <span class="text-caption text-grey-8">Master {{Meta.name}}</span><br>
+            <span class="text-caption text-grey-8">{{Meta.parent}}</span><br>
             <span class="text-h5 bold text-primary capital">{{Meta.name}}</span>
           </div>
         </div>
@@ -24,7 +24,7 @@
 
         <div class="col-6 col-sm-3 col-md-2 pb-1 pr-1-5">
           <q-select :options="table.searchBy" dense outlined
-            v-model="dataModel.searchBy" label="Searc By" class="bg-white box-shadow"
+            v-model="dataModel.searchBySelected" label="Search By" class="bg-white box-shadow"
             style="border-radius:5px; " transition-show="jump-up" transition-hide="jump-down" />
         </div>
 
@@ -63,11 +63,44 @@
             </q-td>
           </template>
 
+          <template v-slot:body-cell-role="props">
+            <q-td :props="props">
+              <span v-if="props.row.role" >
+              <q-badge color="primary">{{props.row.role_id}}</q-badge>
+              {{props.row.role.name}}
+              </span>
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-menu="props">
+            <q-td :props="props">
+              <span v-if="props.row.menu" >
+              <q-badge color="primary">{{props.row.menu_id}}</q-badge>
+              {{props.row.menu.name}}
+              </span>
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-active="props">
+            <q-td :props="props">
+              <q-btn unelevated size="xs"
+              :color="(props.row.active === 0) ? 'red' : 'green' "
+              :label="(props.row.active === 0) ? 'UnActive [0]' : 'Active [1]' "
+              />
+            </q-td>
+          </template>
+
           <template v-slot:no-data="{icon}">
             <div class="full-width row flex-center text-primary q-gutter-sm">
-              <q-icon size="2em" :name="icon" /><span class="bold text-h6"> Belum ada data {{Meta.name}} </span>
-              <q-btn v-if="rules.permission.create" @click="add" unelevated outline color="primary" label="Buat baru" />
+              <q-icon size="2em" :name="icon" /><span class="bold text-h6"> There are no data {{Meta.name}} yet</span>
+              <q-btn v-if="rules.permission.create" @click="add" unelevated outline color="primary" label="Add New" />
             </div>
+          </template>
+
+          <template v-slot:body-cell-log_info="props">
+            <q-td :props="props">
+              <log-info :data="props.row" />
+            </q-td>
           </template>
 
           <template v-slot:top>
@@ -115,17 +148,16 @@ export default {
         search: '',
         data: [],
         searchBy: [],
+        searchBySelected: null,
         columns: [
           { name: 'action', label: '#', align: 'left', style: 'width: 20px' },
-          { name: 'id', label: 'id', field: 'id', align: 'left' },
           { name: 'name', label: 'name', field: 'name', align: 'left' },
           { name: 'username', label: 'username', field: 'username', align: 'left' },
-          { name: 'password', label: 'password', field: 'password', align: 'left' },
           { name: 'email', label: 'email', field: 'email', align: 'left' },
-          { name: 'picture', label: 'picture', field: 'picture', align: 'left' },
-          { name: 'role_id', label: 'role_id', field: 'role_id', align: 'left' },
-          { name: 'menu_id', label: 'menu_id', field: 'menu_id', align: 'left' },
-          { name: 'active', label: 'active', field: 'active', align: 'left' }
+          { name: 'role', label: 'role', field: 'role_id', align: 'left' },
+          { name: 'menu', label: 'menu', field: 'menu_id', align: 'left' },
+          { name: 'active', label: 'active', field: 'active', align: 'left' },
+          { name: 'log_info', label: 'Record Log', field: 'log_info', align: 'left' }
 
         ],
         pagination: {
@@ -154,9 +186,11 @@ export default {
   mounted () {
     // generate filter search
     for (const col of this.table.columns) {
-      if (col.name !== 'action') this.table.searchBy.push(col)
+      if (col.name !== 'action') {
+        if (col.name !== 'logInfo') this.table.searchBy.push(col)
+      }
     }
-    this.dataModel.searchBy = this.table.columns[1].name
+    this.dataModel.searchBySelected = this.table.searchBy[0]
   },
 
   methods: {
@@ -206,7 +240,7 @@ export default {
       var endpoint = this.Meta.module + '?table'
       endpoint = endpoint + '&page=' + page
       endpoint = endpoint + '&limit=' + perpage
-      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.dataModel.searchBy.field + ':' + this.table.search
+      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.dataModel.searchBySelected.field + ':' + this.table.search
       if (this.dataModel.status === 'TRASH') endpoint = endpoint + '&trash=true'
 
       this.API.get(endpoint, (status, data, message, response, full) => {

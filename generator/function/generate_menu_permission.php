@@ -6,11 +6,11 @@ $permission = '';
 $menu = '';
 foreach($list as $item){
 
-	$name = $item->name;
-	$module = strtolower(splitUppercaseToStrip($name));
-	$slug = strtolower(splitUppercaseToUnderscore($name));
-	$label = strtolower(splitUppercaseToSpace($name));
-	
+    $name = $item->name;
+    $module = strtolower(splitUppercaseToStrip($name));
+    $slug = strtolower(splitUppercaseToUnderscore($name));
+    $label = strtolower(splitUppercaseToSpace($name));
+    
     $permission .= '
     "'.$module.'" => [
       "add" => true,
