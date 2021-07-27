@@ -416,7 +416,7 @@ export default {
     getNotif () {
       this.notifList = []
       this.notifSkeleton = true
-      this.$Helper.loading()
+      // this.$Helper.loading()
       this.API.get('me/notifications', (status, data, message, response, full) => {
         this.notifSkeleton = false
         this.$Helper.loading(false)
@@ -432,7 +432,7 @@ export default {
     },
 
     readNotif (id) {
-      this.$Helper.loading()
+      // this.$Helper.loading()
       this.API.get(`/user-notifications/${id}/read`, (status, data, message, response, full) => {
         this.$Helper.loading(false)
       })
