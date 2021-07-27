@@ -18,8 +18,6 @@ import {
 
 const { getScrollTarget, setScrollPosition } = scroll
 
-import { ModuleConfig } from './ModuleConfig'
-
 export const Helper = {
   test () {
     console.log('Halo Helper berhasil di panggil')
@@ -183,6 +181,13 @@ export const Helper = {
     return LocalStorage.remove(key)
   },
 
+  getFromLdb (ldbName, defaultData = null) {
+    if (this.checkLdb(ldbName)) {
+      if (this.getLdb(ldbName) !== null) defaultData = this.getLdb(ldbName)
+    }
+    return defaultData
+  },
+
   geolocate () {
     navigator.geolocation.getCurrentPosition(position => {
       var marker = {
@@ -215,7 +220,7 @@ export const Helper = {
     return body + judul + pesan
   },
 
-  showSuccess (title, msg = null, className) {
+  showSuccess (title, msg = null, className = 'text-center') {
     Dialog.create({
       transitionShow: 'jump-up',
       transitionHide: 'jump-down',
@@ -293,18 +298,6 @@ export const Helper = {
     this.showAlert('ERROR', err)
   },
 
-  showErrorOfflineData (params = '') {
-    Helper.showAlert('Offline Data ' + params, 'Offline data tidak bekerja, pastikan <b>BMS Services</b> berjalan dengan baik, atau bisa hubungi support Sopeus.')
-  },
-
-  alertOfflineMode (params = '', dateInfo = 'sebelumnya.') {
-    Helper.showAlert('Offline Mode', 'Anda sedang dalam keadaan offline / tidak memiliki internet, data ' + params + ' diambil dari hasil caching ' + dateInfo, true)
-  },
-
-  alertProdukOffline () {
-    Helper.showAlert('Penjualan Offline', 'Pastikan Offline Mode di topbar dalam keadaan aktif agar bisa melakukan penjualan, klik untuk mengubah status, Validasi Stok tidak berfungsi dalam keadaan Offline!', true)
-  },
-
   showFailProcess (e, json) {
     var err = e
     if (json) err = JSON.stringify(e)
@@ -374,7 +367,7 @@ export const Helper = {
     // var isMinus = false
     // if (number < 0) isMinus = true
 
-    var language = 'id'
+    var language = 'US'
     if (lang !== undefined) language = lang
 
     if (number === null || number === undefined) number = 0
@@ -458,9 +451,9 @@ export const Helper = {
       thn = tanggal.getFullYear(),
       jam = tanggal.getHours(),
       menit = tanggal.getMinutes()
-    var sbulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
-    // var sbulan = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    var shari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
+    // var sbulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
+    var sbulan = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    var shari = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
     var sep = ''
     if (csep === null || csep === '') sep = ' '
@@ -539,6 +532,16 @@ export const Helper = {
       }
       return null
     } else return null
+  },
+
+  findObjectByKeyV2 (arr, key, value) {
+    return arr.filter(r => {
+      let check = false
+      value.map(val => {
+        if (val === r[key] && !check) check = true
+      })
+      return check
+    })
   },
 
   getKeyObject (obj, index) {
@@ -658,109 +661,12 @@ export const Helper = {
     else return sizeDefault
   },
 
-  pecahSatuan (satuan, availStok) {
-    var send = []
-    for (var row of satuan) {
-      var tersedia = availStok / row.isi
-      tersedia = Math.floor(tersedia)
-
-      var ambil = row.isi * tersedia
-      console.log('ambil', ambil)
-
-      availStok = availStok - ambil
-      console.log('update avail', availStok)
-
-      var obj = {
-        isi: row.isi,
-        name: row.name,
-        avail: row.stok,
-        stok: tersedia
-      }
-      send.push(obj)
-      console.log(obj)
-    }
-
-    return send
-  },
-
   valueFromPercent (percent, total) {
     // var realTotal = 0
     // if (percent !== 0) realTotal = (percent / 100) * total
     // if (percent < 100) return realTotal
     // else return percent
     return this.persentase(percent, total)
-  },
-
-  isBonus (produk, appConfig, type) {
-    var harga = 0
-    var showBonusItem = false
-
-    if (type === 'penjualan') {
-      harga = produk.harga_jual
-      if (appConfig !== undefined) showBonusItem = appConfig.penjualan.harga_0_barang_bonus
-      else showBonusItem = true
-    } else {
-      harga = produk.harga_modal
-      if (appConfig !== undefined) showBonusItem = appConfig.pembelian.harga_0_barang_bonus
-      else showBonusItem = true
-    }
-    var res = false
-    if (showBonusItem) {
-      if (harga === 0) res = true
-    }
-    return res
-  },
-
-  getTextSisKem (total, bayar) {
-    var sisa = total - bayar
-    var text = 'Kembali'
-
-    if (sisa === 0) {
-      text = 'Uang Pas'
-    } else if (sisa > 0) {
-      text = 'Kurang'
-    } else {
-      text = 'Kembali'
-    }
-
-    return text
-  },
-
-  initDefault () {
-    // init sumber list
-    var listSUmber = [
-      {
-        id: 1,
-        nama: 'ADAMAR'
-      },
-      {
-        id: 2,
-        nama: 'XONE'
-      },
-      {
-        id: 3,
-        nama: 'BONUS'
-      }
-    ]
-
-    if (this.checkLdb('sumber') === false) {
-      this.saveLdb('sumber', listSUmber)
-    }
-  },
-
-  optimizeBarcodeMode () {
-    var optmzScanner = ModuleConfig.getAppConfig('app_config', 'optimize_barcode_mode')
-    // console.log('optimizeBarcodeMode', optmzScanner)
-    if (optmzScanner) {
-      document.addEventListener('keydown', function (event) {
-        // console.log(event)
-        if (event.keyCode === 13 || event.keyCode === 17 || event.keyCode === 74) { event.preventDefault() }
-      })
-    }
-  },
-
-  msgChangeGudang (stokName, gudangBefore, val) {
-    return 'Informasi ' + stokName + ' pada daftar, adalah nilai dari stok ' + gudangBefore + ', untuk mendapatkan informasi stok ' + val + ' terakhir, simpan terlebih dahulu dengan mengganti gudang terbaru, lalu edit kembali.'
   },
 
   persentase (val, from, up = true) { // up : pembulatan keatas (true), pembulatan kebawah (false)
@@ -787,6 +693,80 @@ export const Helper = {
     }
 
     return res
-  }
+  },
 
+  async filterSelect (val, update, target, selectSource, searchField) {
+    var targetNameTmp = target + 'Tmp'
+    console.log('select.' + targetNameTmp, selectSource[targetNameTmp])
+    await update(() => {
+      selectSource[target] = selectSource[targetNameTmp]
+    })
+
+    await update(() => {
+      const needle = val.toLowerCase()
+      var tmp = selectSource[targetNameTmp]
+      selectSource[target] = tmp.filter(v => v[searchField || 'name'].toLowerCase().indexOf(needle) > -1)
+    })
+    return selectSource
+  },
+
+  unReactive (arr) {
+    arr = JSON.stringify(arr)
+    return JSON.parse(arr)
+  },
+
+  logInfo (date, time = true) {
+    const newDate = new Date(date),
+      getDate = newDate.getDate(),
+      getMonth = newDate.getMonth(),
+      getYear = newDate.getFullYear(),
+      getHours = newDate.getHours(),
+      getMinutes = newDate.getMinutes()
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    // const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+    const res = `${getDate} ${months[getMonth]} ${getYear} ${time ? `- ${getHours}:${getMinutes}` : ''}`
+    return res
+  },
+
+  // function splitUppercaseToStrip($string){
+  //   $selector = preg_replace('/([a-z0-9])?([A-Z])/','$1-$2',$string);
+  //   if($selector[0] == '-') $selector = substr($selector, 1); // hapus underscore di awal text
+  //   return $selector;
+  // }
+
+  formatCamelCase (text, withS = true) {
+    let res = text.replace(/[A-Z]/g, str => `-${str.toLowerCase()}`)
+    res = `${res.substring(1)}${withS ? 's' : ''}`
+    return res
+  },
+
+  numberSay (number) {
+    const first = ['', 'one ', 'two ', 'three ', 'four ', 'five ', 'six ', 'seven ', 'eight ', 'nine ', 'ten ', 'eleven ', 'twelve ', 'thirteen ', 'fourteen ', 'fifteen ', 'sixteen ', 'seventeen ', 'eighteen ', 'nineteen ']
+    const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety']
+    const mad = ['', 'thousand', 'million', 'billion', 'trillion']
+    let word = ''
+
+    for (let i = 0; i < mad.length; i++) {
+      let tempNumber = number % (100 * Math.pow(1000, i))
+      if (Math.floor(tempNumber / Math.pow(1000, i)) !== 0) {
+        if (Math.floor(tempNumber / Math.pow(1000, i)) < 20) {
+          word = first[Math.floor(tempNumber / Math.pow(1000, i))] + mad[i] + ' ' + word
+        } else {
+          word = tens[Math.floor(tempNumber / (10 * Math.pow(1000, i)))] + '-' + first[Math.floor(tempNumber / Math.pow(1000, i)) % 10] + mad[i] + ' ' + word
+        }
+      }
+
+      tempNumber = number % (Math.pow(1000, i + 1))
+      if (Math.floor(tempNumber / (100 * Math.pow(1000, i))) !== 0) word = first[Math.floor(tempNumber / (100 * Math.pow(1000, i)))] + 'hundred ' + word
+    }
+    return word
+  },
+
+  handlerFocusAutocomplete (_this, selectSource, data) {
+    setTimeout(() => {
+      var el = _this.$refs[selectSource]
+      if (el) el.focus()
+    }, 300)
+  }
 }

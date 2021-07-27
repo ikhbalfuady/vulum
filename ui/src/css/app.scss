@@ -311,6 +311,10 @@ Orig :
   display: none
 }
 
+.display-inline {
+  display: inline
+}
+
 .slider-home {
   height: 620px
 }
@@ -649,7 +653,35 @@ Orig :
   padding-bottom: 50px
 }
 
+.radius { border-radius:5px; }
+.radius-1 { border-radius:10px; }
+.radius-1-5 { border-radius:15px; }
+.radius-2 { border-radius:20px; }
+.radius-2-5 { border-radius:25px; }
+.radius-3 { border-radius:30px; }
+.radius-3-5 { border-radius:35px; }
+.radius-4 { border-radius:40px; }
+.radius-4-5 { border-radius:45px; }
+.radius-5 { border-radius:50px; }
+
 // Hijack
+.q-field--outlined div.q-field__inner div.q-field__control div.q-field__control-container div.q-field__native {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.q-field--outlined div.q-field__inner div.q-field__control div.q-field__control-container div.q-field__label {
+  // font-size: 11px;
+  font-weight: bold;
+}
+
+.q-field--outlined {
+  border-radius: 3px !important;
+}
+.q-field--outlined .q-field__control::before {
+  border-color: #fff !important;
+}
+
 .q-table th, .q-table td {
   padding: 1px 15px !important;
 }
@@ -687,7 +719,7 @@ Orig :
 }
 
 .q-uploader__list:before {
-  content: "Seret file kesini..";
+  content: "Drag file here..";
   position: absolute;
   left: 40%;
   font-size: 28px;
@@ -739,7 +771,7 @@ Orig :
   font-weight: bold;
   color: $primary;
   opacity: 0.8;
-  text-align: center
+  // text-align: center
 }
 
 .fix-space .q-table__middle {
@@ -1659,8 +1691,8 @@ Orig :
 }
 
 .animated {
-  -webkit-animation-duration: .5s;
-  animation-duration: .5s;
+  -webkit-animation-duration: .3s;
+  animation-duration: .3s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
 }
@@ -1697,7 +1729,7 @@ Orig :
 // menu drawer
 
 .drawer-primary aside , .drawer-area {
-  background: $primary;
+  background: $secondary;
 }
 
 .drawer-area div div .q-list div div div div .q-item__label {
@@ -1708,8 +1740,12 @@ Orig :
   color: #fff;
 }
 
-.drawer-area div div .q-list div div div div .q-item__label, .drawer-area div div .q-list div div div div i {
-  font-size: 1em;
+.drawer-area div div .q-list div div div div .q-item__label {
+  font-size: 12.6px;
+}
+
+.drawer-area div div .q-list div div div div i {
+  font-size: 15px;
 }
 
 // sub menu
@@ -1725,6 +1761,70 @@ Orig :
 }
 
 .drawer-area div div div div div .q-expansion-item__content div div, .drawer-area div div div div div .q-expansion-item__content div div i {
-  font-size: 0.9em;
+  font-size: 12px;
 }
 
+$linear-red: linear-gradient(to right top, $red-6, $pink-5);
+$linear-orange: linear-gradient(to right top, $red-6, $orange);
+$linear-green: linear-gradient(to right top, $green-6, $teal-4);
+$linear-blue: linear-gradient(to right top, $blue-6, $light-blue-4);
+
+.bg-linear-red { background-image: $linear-red }
+.bg-linear-orange { background-image: $linear-orange }
+.bg-linear-green { background-image: $linear-green }
+.bg-linear-blue { background-image: $linear-blue }
+
+.reporting-header{
+  border-bottom: 1px solid #999;
+  margin: 10px 0px;
+  padding: 10px 0px;
+  h5{
+    margin: 0px;
+  }
+}
+
+.quote {
+  border-left: 5px solid #ccc;
+  padding-left: 5px;
+  font-style: italic;
+}
+
+.line-down {
+  border-bottom:1px solid #ccc;
+  margin-bottom:5px;
+}
+.reporting td{
+  padding: 10px 0px !important;
+}
+
+.reporting thead, .reporting tr, .reporting th, .reporting td {
+  border-color: #999 !important;
+}
+.reporting th{
+  text-align: left !important;
+  padding: 0px 20px 0px 0px !important;
+}
+.dashed {
+  border-top: 1px dashed #888;
+  margin: 0px;
+}
+.dashed-v{
+  margin: 0px;
+  height: inherit;
+  align-self: stretch;
+  border-left: 1px dashed #888;
+}
+.printDiv {
+  font-size: 12px !important;
+}
+
+.printDiv td, .printDiv th {
+  font-size: 10px !important;
+  vertical-align: top;
+}
+.printDiv tr {
+  height: 0px !important;
+}
+.printDiv th {
+  padding: 5px !important;
+}

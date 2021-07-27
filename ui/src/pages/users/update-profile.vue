@@ -11,7 +11,7 @@
         <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
           <div class="title">
             <span class="text-caption text-grey-8">Master {{Meta.name}}</span><br>
-            <span class="text-h5 bold text-primary capital">{{title}} {{Meta.name}} <span v-if="title === 'Update'" >#{{dataModel.id}}</span></span>
+            <span class="text-h5 bold text-primary capital">{{title}}<span v-if="title === 'Update'" >#{{dataModel.id}}</span></span>
           </div>
         </div>
       </div>
@@ -42,47 +42,6 @@
                   ]" />
                 </div>
 
-                <div class="col-12 col-sm-4 col-md-3 pv ph" >
-                  <q-input v-model="dataModel.password" :label="(dataModel.id === null) ? 'password *' : 'password' " dense filled square
-                  :hint="(dataModel.id === null) ? 'Password is required' : 'Leave blank if dont want to change' " />
-                </div>
-
-                <div class="col-12 col-sm-4 col-md-3 pv ph" >
-                  <q-select label="Menu *" dense filled square
-                    :options="select.menus"
-                    v-model="dataModel.menu_id"
-                    option-value="id" option-label="name"
-                    emit-value map-options use-input
-                    @filter="(val, update) => filterSelect(val, update, 'menus')"
-                    lazy-rules :rules="[
-                      val => val !== null && val !== '' || 'Menu is required!',
-                    ]"
-                  >
-                    <template v-slot:selected-item="row"> <span class="ellipsis">{{ row.opt.name }}</span> </template>
-                    <template v-slot:no-option>
-                      <q-item> <q-item-section class="text-grey"> Data not found </q-item-section> </q-item>
-                    </template>
-                  </q-select>
-                </div>
-
-                <div class="col-12 col-sm-4 col-md-3 pv ph" >
-                  <q-select label="Role *" dense filled square
-                    :options="select.roles"
-                    v-model="dataModel.role_id"
-                    option-value="id" option-label="name"
-                    emit-value map-options use-input
-                    @filter="(val, update) => filterSelect(val, update, 'roles')"
-                    lazy-rules :rules="[
-                      val => val !== null && val !== '' || 'Role is required!',
-                    ]"
-                  >
-                    <template v-slot:selected-item="row"> <span class="ellipsis">{{ row.opt.name }}</span> </template>
-                    <template v-slot:no-option>
-                      <q-item> <q-item-section class="text-grey"> Data not found </q-item-section> </q-item>
-                    </template>
-                  </q-select>
-                </div>
-
               </q-card-section>
 
               <q-card-actions align="right" class="">
@@ -100,19 +59,21 @@
 import Meta from './meta'
 
 export default {
-  name: 'Users',
+  name: 'Profile',
   data () {
     return {
       Meta,
       API: this.$Api,
       // default data
-      title: 'Create',
+      title: 'Edit Profile',
       dataModel: {},
       rules: {
         permission: Meta.permission
       },
       disableSubmit: false,
       select: {
+        departments: [],
+        departmentsTmp: [],
         roles: [],
         rolesTmp: [],
         menus: [],
@@ -166,8 +127,6 @@ export default {
 
     onRefresh () {
       //
-      this.getListSelect('master-menus?limit=0', 'menus')
-      this.getListSelect('roles?limit=0', 'roles')
     },
 
     initTopBar () {
@@ -175,7 +134,6 @@ export default {
     },
 
     getData (id) {
-      console.log('getData')
       this.$Helper.loadingOverlay(true, 'Loading..')
       var endpoint = this.Meta.module + '/' + id
       this.API.get(endpoint, (status, data, message, response, full) => {
@@ -183,7 +141,7 @@ export default {
         if (status === 200) {
           // inject data
           this.dataModel = data
-          this.title = 'Edit'
+          this.title = 'Edit Profile'
         }
       })
     },
@@ -193,7 +151,7 @@ export default {
     },
 
     backToRoot () {
-      this.$router.push({ name: this.Meta.module })
+      this.$router.push({ name: 'update-profile-users' })
     },
 
     emitModel (target, val) {
@@ -203,14 +161,13 @@ export default {
     submit () {
       if (this.validateSubmit()) {
         this.disableSubmit = true
-        if (this.dataModel.id !== null) this.update()
-        else this.save()
+        this.update()
       }
     },
 
     validateSubmit () {
-      if (this.dataModel.id === null && this.dataModel.password === null) {
-        this.$Helper.showAlert('Password Empty!', 'Password must be filled!')
+      if (this.dataModel.name === null && this.dataModel.username === null && this.dataModel.email === null) {
+        this.$Helper.showAlert('Text Empty!', 'Field must be filled!')
         return false
       } else return true
     },
@@ -228,7 +185,7 @@ export default {
 
     update () {
       this.$Helper.loadingOverlay(true, 'Saving..')
-      this.API.put(this.Meta.module + '/' + this.dataModel.id, this.dataModel, (status, data, message, response, full) => {
+      this.API.post('me/update-profile/' + this.dataModel.id, this.dataModel, (status, data, message, response, full) => {
         this.$Helper.loadingOverlay(false)
         if (status === 200) {
           this.messageSubmit('Update', message)
@@ -239,26 +196,6 @@ export default {
 
     messageSubmit (titleAdd = '', msg) {
       this.$Helper.showSuccess(titleAdd + ' Succesfully', msg)
-    },
-
-    async filterSelect (val, update, target) {
-      this.select = await this.$Helper.filterSelect(val, update, target, this.select)
-    },
-
-    getListSelect (endpoint, selectSource = null) {
-      this.$Helper.loadingOverlay(true)
-      // var endpoint = 'menus'
-      this.API.get(endpoint, (status, data, message, response, full) => {
-        this.$Helper.loadingOverlay(false)
-        if (status === 200) {
-          var targetSource = endpoint
-          if (selectSource) targetSource = selectSource
-          var tmpName = targetSource + 'Tmp'
-
-          this.select[targetSource] = data
-          this.select[tmpName] = data
-        }
-      })
     }
 
   }

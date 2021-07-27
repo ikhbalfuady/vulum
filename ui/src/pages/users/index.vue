@@ -6,10 +6,10 @@
     <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
 
       <!-- Header Title -->
-      <div class="row pl-2 pt-3 pb-2 mb-2 box-shadow bg-white">
+      <div class="row pl-2 pt-2">
         <div class="col-12 col-sm-3 col-md-5 pb-1 pv info-page">
           <div class="title">
-            <span class="text-caption text-grey-8">{{Meta.parent}}</span><br>
+            <span class="text-caption text-grey-8">Master {{Meta.name}}</span><br>
             <span class="text-h5 bold text-primary capital">{{Meta.name}}</span>
           </div>
         </div>
@@ -24,7 +24,7 @@
 
         <div class="col-6 col-sm-3 col-md-2 pb-1 pr-1-5">
           <q-select :options="table.searchBy" dense outlined
-            v-model="dataModel.searchBySelected" label="Search By" class="bg-white box-shadow"
+            v-model="dataModel.searchBy" label="Search By" class="bg-white box-shadow"
             style="border-radius:5px; " transition-show="jump-up" transition-hide="jump-down" />
         </div>
 
@@ -97,12 +97,6 @@
             </div>
           </template>
 
-          <template v-slot:body-cell-log_info="props">
-            <q-td :props="props">
-              <log-info :data="props.row" />
-            </q-td>
-          </template>
-
           <template v-slot:top>
             <div v-if="rules.permission.create" class="action animated zoomIn" >
               <q-btn @click="add" unelevated color="primary" class="capital  mr-1" icon="add" label="Add" />
@@ -148,7 +142,6 @@ export default {
         search: '',
         data: [],
         searchBy: [],
-        searchBySelected: null,
         columns: [
           { name: 'action', label: '#', align: 'left', style: 'width: 20px' },
           { name: 'name', label: 'name', field: 'name', align: 'left' },
@@ -156,8 +149,7 @@ export default {
           { name: 'email', label: 'email', field: 'email', align: 'left' },
           { name: 'role', label: 'role', field: 'role_id', align: 'left' },
           { name: 'menu', label: 'menu', field: 'menu_id', align: 'left' },
-          { name: 'active', label: 'active', field: 'active', align: 'left' },
-          { name: 'log_info', label: 'Record Log', field: 'log_info', align: 'left' }
+          { name: 'active', label: 'active', field: 'active', align: 'left' }
 
         ],
         pagination: {
@@ -186,11 +178,9 @@ export default {
   mounted () {
     // generate filter search
     for (const col of this.table.columns) {
-      if (col.name !== 'action') {
-        if (col.name !== 'logInfo') this.table.searchBy.push(col)
-      }
+      if (col.name !== 'action') this.table.searchBy.push(col)
     }
-    this.dataModel.searchBySelected = this.table.searchBy[0]
+    this.dataModel.searchBy = this.table.columns[1].name
   },
 
   methods: {
@@ -240,7 +230,7 @@ export default {
       var endpoint = this.Meta.module + '?table'
       endpoint = endpoint + '&page=' + page
       endpoint = endpoint + '&limit=' + perpage
-      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.dataModel.searchBySelected.field + ':' + this.table.search
+      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.dataModel.searchBy.field + ':' + this.table.search
       if (this.dataModel.status === 'TRASH') endpoint = endpoint + '&trash=true'
 
       this.API.get(endpoint, (status, data, message, response, full) => {

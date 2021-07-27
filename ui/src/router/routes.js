@@ -29,6 +29,9 @@ const routes = [
       { name: 'add-users', path: '/users/form', component: () => import('pages/users/form.vue') },
       { name: 'edit-users', path: '/users/form/:id', component: () => import('pages/users/form.vue') },
 
+      { name: 'update-profile-users', path: '/users/update-profile/:id', component: () => import('../pages/users/update-profile.vue') },
+      { name: 'change-password-users', path: '/users/change-password/:id', component: () => import('../pages/users/change-password.vue') },
+
       { name: 'user-sessions-list', path: '/user-sessions', component: () => import('pages/user-sessions/index.vue') },
       { name: 'view-user-sessions', path: '/user-sessions/view/:id', component: () => import('pages/user-sessions/detail.vue') },
       { name: 'add-user-sessions', path: '/user-sessions/form', component: () => import('pages/user-sessions/form.vue') },

@@ -7,29 +7,82 @@
     <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
 
       <!-- Header Title -->
-      <div class="row pl-2 pt-3 pb-2 mb-2 box-shadow bg-white">
+      <div class="row pl-2 pt-2">
         <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
           <div class="title">
-            <span class="text-caption text-grey-8">Detail</span><br>
-            <span class="text-h5 bold text-primary capital">{{Meta.name}}</span>
+             <div class="flex">
+              <div>
+                <div class="" style="margin-left:35px"><span class="text-h5-caption text-grey-8">Detail</span><br></div>
+                <span class="text-h5 bold text-primary capital"><q-btn class="capital bold" dense unelevated flat color="text-primary" label="" icon="arrow_back" @click="backToRoot" />
+                {{Meta.name}} <q-btn @click="edit" unelevated color="green" class="capital" icon="edit" label="Edit" /></span>
+              </div>
+            </div>
           </div>
-          <q-btn @click="edit" unelevated color="green" class="capital" icon="edit" label="Edit" />
+          <!-- <q-btn @click="edit" unelevated color="green" class="capital" icon="edit" label="Edit" /> -->
         </div>
       </div>
 
       <div class="row mv-2">
-
-        <q-list bordered separator class="box-shadow bg-white" style="width:100%">
-
-          <q-item  v-for="(props, index) in dataModel" :key="index" v-ripple>
-            <q-item-section>
-              <q-item-label caption>{{index}}</q-item-label>
-              <q-item-section>{{props}}</q-item-section>
-            </q-item-section>
-          </q-item>
-
-        </q-list>
-
+        <div class="col-12 col-sm-6 pv ph">
+          <q-card class="box-shadow full-height">
+            <q-card-section>
+              <q-list separator>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label caption>Name</q-item-label>
+                    <q-item-section>{{ dataModel.name }}</q-item-section>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label caption>Username</q-item-label>
+                    <q-item-section>{{ dataModel.username }}</q-item-section>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label caption>Email</q-item-label>
+                    <q-item-section>{{ dataModel.email }}</q-item-section>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label caption>Menu</q-item-label>
+                    <q-item-section>{{ dataModel.menu ? dataModel.menu.name : '' }}</q-item-section>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label caption>Role</q-item-label>
+                    <q-item-section>{{ dataModel.role ? dataModel.role.name : '' }}</q-item-section>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label caption>Department</q-item-label>
+                    <q-item-section>{{ dataModel.department ? dataModel.department.name : '' }}</q-item-section>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label caption>Active</q-item-label>
+                    <q-item-section>
+                      {{ dataModel.active ? 'Active' : 'Non Active' }}
+                    </q-item-section>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label caption>Log Info</q-item-label>
+                    <q-item-section>
+                      <log-info :data="dataModel" />
+                    </q-item-section>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-card-section>
+          </q-card>
+        </div>
       </div>
 
   </div>

@@ -55,7 +55,6 @@ class UsersController extends Controller
             $data = $this->repository->findAll($request, true, [
                 'Role',
                 'Menu',
-                'department',
                 'createdByUser',
                 'updatedByUser',
                 'deletedByUser',

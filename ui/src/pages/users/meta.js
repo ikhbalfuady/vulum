@@ -1,5 +1,4 @@
 const Meta = {
-  parent: 'Master Data',
   name: 'Users',
   icon: 'stop_circle',
   module: 'users',

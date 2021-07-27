@@ -3,7 +3,7 @@
     <div class="row no-wrap q-pa-md">
       <div class="column items-center">
         <q-avatar size="72px">
-        <img src="https://image.flaticon.com/icons/png/512/149/149071.png">
+        <img src="assets/avatar.jpg">
         </q-avatar>
 
         <div class="text-subtitle1 q-mt-md q-mb-xs">
