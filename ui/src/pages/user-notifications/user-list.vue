@@ -24,7 +24,7 @@
 
         <div class="col-6 col-sm-3 col-md-2 pb-1 pr-1-5">
           <q-select :options="table.searchBy" dense outlined
-            v-model="dataModel.searchBySelected" label="Search By" class="bg-white box-shadow"
+            v-model="dataModel.searchBy" label="Searc By" class="bg-white box-shadow"
             style="border-radius:5px; " transition-show="jump-up" transition-hide="jump-down" />
         </div>
 
@@ -100,7 +100,6 @@ export default {
         search: '',
         data: [],
         searchBy: [],
-        searchBySelected: null,
         columns: [
           { name: 'action', label: '#', align: 'left', style: 'width: 20px' },
           { name: 'is_read', label: 'status', field: 'is_read', align: 'center' },
@@ -135,11 +134,9 @@ export default {
   mounted () {
     // generate filter search
     for (const col of this.table.columns) {
-      if (col.name !== 'action') {
-        if (col.name !== 'logInfo') this.table.searchBy.push(col)
-      }
+      if (col.name !== 'action') this.table.searchBy.push(col)
     }
-    this.dataModel.searchBySelected = this.table.searchBy[0]
+    this.dataModel.searchBy = this.table.columns[1].name
   },
 
   methods: {
@@ -189,7 +186,7 @@ export default {
       var endpoint = 'me/all-notifications?table'
       endpoint = endpoint + '&page=' + page
       endpoint = endpoint + '&limit=' + perpage
-      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.dataModel.searchBySelected.field + ':' + this.table.search
+      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.dataModel.searchBy.field + ':' + this.table.search
       if (this.dataModel.status === 'TRASH') endpoint = endpoint + '&trash=true'
 
       this.API.get(endpoint, (status, data, message, response, full) => {

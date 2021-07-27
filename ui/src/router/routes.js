@@ -32,41 +32,37 @@ const routes = [
       { name: 'update-profile-users', path: '/users/update-profile/:id', component: () => import('../pages/users/update-profile.vue') },
       { name: 'change-password-users', path: '/users/change-password/:id', component: () => import('../pages/users/change-password.vue') },
 
-      { name: 'user-sessions-list', path: '/user-sessions', component: () => import('pages/user-sessions/index.vue') },
-      { name: 'view-user-sessions', path: '/user-sessions/view/:id', component: () => import('pages/user-sessions/detail.vue') },
-      { name: 'add-user-sessions', path: '/user-sessions/form', component: () => import('pages/user-sessions/form.vue') },
-      { name: 'edit-user-sessions', path: '/user-sessions/form/:id', component: () => import('pages/user-sessions/form.vue') },
+      { name: 'user-sessions', path: '/user-sessions', component: () => import('../pages/user-sessions/index.vue') },
+      { name: 'view-user-sessions', path: '/user-sessions/view/:id', component: () => import('../pages/user-sessions/detail.vue') },
+      { name: 'add-user-sessions', path: '/user-sessions/form', component: () => import('../pages/user-sessions/form.vue') },
+      { name: 'edit-user-sessions', path: '/user-sessions/form/:id', component: () => import('../pages/user-sessions/form.vue') },
 
-      { name: 'permissions-list', path: '/permissions', component: () => import('pages/permissions/index.vue') },
-      { name: 'view-permissions', path: '/permissions/view/:id', component: () => import('pages/permissions/detail.vue') },
-      { name: 'add-permissions', path: '/permissions/form', component: () => import('pages/permissions/form.vue') },
-      { name: 'edit-permissions', path: '/permissions/form/:id', component: () => import('pages/permissions/form.vue') },
+      { name: 'permissions', path: '/permissions', component: () => import('../pages/permissions/index.vue') },
+      { name: 'view-permissions', path: '/permissions/view/:id', component: () => import('../pages/permissions/detail.vue') },
+      { name: 'add-permissions', path: '/permissions/form', component: () => import('../pages/permissions/form.vue') },
+      { name: 'edit-permissions', path: '/permissions/form/:id', component: () => import('../pages/permissions/form.vue') },
 
-      { name: 'role-permissions-list', path: '/role-permissions', component: () => import('pages/role-permissions/index.vue') },
-      { name: 'view-role-permissions', path: '/role-permissions/view/:id', component: () => import('pages/role-permissions/detail.vue') },
-      { name: 'add-role-permissions', path: '/role-permissions/form', component: () => import('pages/role-permissions/form.vue') },
-      { name: 'edit-role-permissions', path: '/role-permissions/form/:id', component: () => import('pages/role-permissions/form.vue') },
+      { name: 'roles', path: '/roles', component: () => import('../pages/roles/index.vue') },
+      { name: 'view-roles', path: '/roles/view/:id', component: () => import('../pages/roles/detail.vue') },
+      { name: 'add-roles', path: '/roles/form', component: () => import('../pages/roles/form.vue') },
+      { name: 'edit-roles', path: '/roles/form/:id', component: () => import('../pages/roles/form.vue') },
 
-      { name: 'roles-list', path: '/roles', component: () => import('pages/roles/index.vue') },
-      { name: 'view-roles', path: '/roles/view/:id', component: () => import('pages/roles/detail.vue') },
-      { name: 'add-roles', path: '/roles/form', component: () => import('pages/roles/form.vue') },
-      { name: 'edit-roles', path: '/roles/form/:id', component: () => import('pages/roles/form.vue') },
+      { name: 'menu-items', path: '/menu-items', component: () => import('../pages/menu-items/index.vue') },
+      { name: 'view-menu-items', path: '/menu-items/view/:id', component: () => import('../pages/menu-items/detail.vue') },
+      { name: 'add-menu-items', path: '/menu-items/form', component: () => import('../pages/menu-items/form.vue') },
+      { name: 'edit-menu-items', path: '/menu-items/form/:id', component: () => import('../pages/menu-items/form.vue') },
 
-      { name: 'menu-items-list', path: '/menu-items', component: () => import('pages/menu-items/index.vue') },
-      { name: 'view-menu-items', path: '/menu-items/view/:id', component: () => import('pages/menu-items/detail.vue') },
-      { name: 'add-menu-items', path: '/menu-items/form', component: () => import('pages/menu-items/form.vue') },
-      { name: 'edit-menu-items', path: '/menu-items/form/:id', component: () => import('pages/menu-items/form.vue') },
+      { name: 'master-menus', path: '/master-menus', component: () => import('../pages/master-menus/index.vue') },
+      { name: 'view-master-menus', path: '/master-menus/view/:id', component: () => import('../pages/master-menus/detail.vue') },
+      { name: 'add-master-menus', path: '/master-menus/form', component: () => import('../pages/master-menus/form.vue') },
+      { name: 'edit-master-menus', path: '/master-menus/form/:id', component: () => import('../pages/master-menus/form.vue') },
 
-      { name: 'menus-list', path: '/menus', component: () => import('pages/menus/index.vue') },
-      { name: 'view-menus', path: '/menus/view/:id', component: () => import('pages/menus/detail.vue') },
-      { name: 'add-menus', path: '/menus/form', component: () => import('pages/menus/form.vue') },
-      { name: 'edit-menus', path: '/menus/form/:id', component: () => import('pages/menus/form.vue') },
+      { name: 'user-notifications', path: '/user-notifications', component: () => import('../pages/user-notifications/index.vue') },
+      { name: 'view-user-notifications', path: '/user-notifications/view/:id', component: () => import('../pages/user-notifications/detail.vue') },
+      { name: 'add-user-notifications', path: '/user-notifications/form', component: () => import('../pages/user-notifications/form.vue') },
+      { name: 'edit-user-notifications', path: '/user-notifications/form/:id', component: () => import('../pages/user-notifications/form.vue') },
+      { name: 'notifications', path: '/notifications', component: () => import('../pages/user-notifications/user-list.vue') }
 
-      { name: 'master-menus-list', path: '/master-menus', component: () => import('pages/master-menus/index.vue') },
-      { name: 'view-master-menus', path: '/master-menus/view/:id', component: () => import('pages/master-menus/detail.vue') },
-      { name: 'add-master-menus', path: '/master-menus/form', component: () => import('pages/master-menus/form.vue') },
-      { name: 'edit-master-menus', path: '/master-menus/form/:id', component: () => import('pages/master-menus/form.vue') }
-      //
     ]
   },
 
