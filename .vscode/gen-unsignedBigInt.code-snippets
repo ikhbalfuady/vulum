@@ -1,0 +1,12 @@
+{
+    "Print to console": {
+        "scope": "php",
+        "prefix": "gen:usigned-big-integer",
+        "body": [
+            "[ \"name\" => \"$1\",",
+            "    \"type\"      => \"unsignedBigInteger\",",
+            "],"
+        ],
+        "description": "Generator array"
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "Print to console": {
+        "scope": "php",
+        "prefix": "gen:pubfunc",
+        "body": [
+      "public function method$1() {",
+            " // code",
+            "}"
+        ],
+        "description": "Generator array"
+    }
+}

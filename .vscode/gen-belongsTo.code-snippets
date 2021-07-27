@@ -1,0 +1,19 @@
+{
+    "Print to console": {
+        "scope": "php",
+        "prefix": "gen:belongsTo",
+        "body": [
+            "[ \"name\" => \"$1\",",
+            "    \"type\"   => \"unsignedBigInteger\",",
+            "    \"attributes\" => ['index'],",
+            "    \"belongsTo\"  => [",
+            "       \"model\"  => \"$2\",",
+            "       \"name\"  => \"$2\", // delete this property to use default from 'model' value",
+            "       \"foreign\"  => \"$1\", // define '_self' or delete this property to use default column name",
+            "       \"foreign2\"  => \"id\", // delete this property to use default id of foreign module",
+            "    ]",
+            "],"
+        ],
+        "description": "Generator array"
+    }
+}

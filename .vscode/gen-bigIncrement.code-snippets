@@ -1,0 +1,13 @@
+{
+    "Print to console": {
+        "scope": "php",
+        "prefix": "gen:big-increment",
+        "body": [
+            "[ \"name\" => \"$1\",",
+            "    \"type\"      => \"bigIncrements\",",
+            "    \"attributes\"      => ['index'],",
+            "],"
+        ],
+        "description": "Generator array"
+    }
+}

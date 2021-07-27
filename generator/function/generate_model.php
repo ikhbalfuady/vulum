@@ -4,12 +4,54 @@ function generateModel ($list, $outputDir = '') {
 
 foreach($list as $item){
 
+    $belongsTo = '';
+    $hasMany = '';
+
     $name = $item->name;
     $selector =  strtolower(splitUppercaseToUnderscore($name));
 
     $property = '';
+
     foreach ($item->column as $col) {
         $property .= ' * @property '.$col->type.' $'.$col->name.' ' ."\r\n";
+
+        // get blongsTo
+        if (isset($col->belongsTo)) {
+            $bt = $col->belongsTo;
+            if (isset($bt->model)) {
+                $btName = (isset($bt->name)) ? $bt->name : $bt->model;
+                $fk = (isset($bt->foreign)) ? $bt->foreign : $col->name;
+                $fk = ($fk == '_self') ? $col->name : $fk;
+
+                $fk2 = (isset($bt->foreign2)) ? $bt->foreign2 : 'id';
+                $fk2 = ($fk2 == '_self') ? 'id' : $bt->foreign2;
+
+                $belongsTo = '    public function '.$btName.'() {'."\r\n";
+                $belongsTo .= '        return $this->belongsTo('.$bt->model.'::class, "'.$fk.'", "'.$fk2.'")->withTrashed();'."\r\n";
+                $belongsTo .= '    }';
+
+            }
+        }
+
+        // get hasMany
+        if (isset($col->hasMany)) {
+            $hm = $col->hasMany;
+            if (isset($hm->model)) {
+                $hmName = (isset($hm->name)) ? $hm->name : $hm->model;
+                $fk = (isset($hm->foreign)) ? $hm->foreign : $col->name;
+                $fk = ($fk == '_self') ? $col->name : $fk;
+
+                $fk2 = (isset($hm->foreign2)) ? $hm->foreign2 : 'id';
+
+                $hasMany = '    public function '.$hmName.'() {'."\r\n";
+                $hasMany .= '        return $this->hasMany('.$hm->model.'::class, "'.$fk2.'", "'.$fk.'")->withTrashed();'."\r\n";
+                $hasMany .= '    }';
+
+            }
+        }
+
+
+
     }
 
     $last = count($item->column) - 1;
@@ -22,6 +64,8 @@ foreach($list as $item){
         if($value->name !== 'id') $fillable .= '"'.$value->name.'"'.$coma ;
 
     }
+
+    
 
     $script = '<?php
 
@@ -70,6 +114,10 @@ class '.$name.' extends Model
     public function Columns() {
         return $this->fillable;
     }
+
+'.$belongsTo.'
+
+'.$hasMany.'
 
 }        
         ';

@@ -1,0 +1,14 @@
+{
+    "Print to console": {
+        "scope": "php",
+        "prefix": "gen:decimal",
+        "body": [
+            "[ \"name\" => \"$1\",",
+            "    \"type\"      => \"double\",",
+            "    \"length\"      => $2,",
+            "    \"length2\"      => $3,",
+            "],"
+        ],
+        "description": "Generator array"
+    }
+}

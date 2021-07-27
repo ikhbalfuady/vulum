@@ -1,0 +1,14 @@
+{
+    "Print to console": {
+        "scope": "php",
+        "prefix": "gen:timestamp",
+        "body": [
+      "array(",
+            "  \"name\"       => \"$1\",",
+            "  \"type\"       => \"timestamp\",",
+            "  \"attributes\" => ['nullable'],",
+            "),"
+        ],
+        "description": "Generator array"
+    }
+}

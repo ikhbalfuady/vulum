@@ -1,0 +1,16 @@
+{
+    "Print to console": {
+        "scope": "php",
+        "prefix": "gen:table",
+        "body": [
+      "array( \"name\" => \"$1\",",
+            "  \"loging_date\" => true,",
+            "  \"column\" => ",
+            "  array(",
+            "    $2",
+            "  ),",
+            "),"
+        ],
+        "description": "Generator array"
+    }
+}

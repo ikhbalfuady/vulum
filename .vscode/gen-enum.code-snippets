@@ -1,0 +1,14 @@
+{
+    "Print to console": {
+        "scope": "php",
+        "prefix": "gen:enum",
+        "body": [
+      "[ \"name\" => \"$1\",",
+            "    \"type\"      => \"enum\",",
+            "    \"default\"      => \"'$2'\",",
+            "    \"enum_list\" => \"['$2', '$3']\",",
+            "],"
+        ],
+        "description": "Generator array"
+    }
+}

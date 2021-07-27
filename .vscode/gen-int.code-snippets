@@ -1,0 +1,12 @@
+{
+    "Print to console": {
+        "scope": "php",
+        "prefix": "gen:int",
+        "body": [
+            "[ \"name\" => \"$1\",",
+            "    \"type\"      => \"integer\",",
+            "],"
+        ],
+        "description": "Generator array"
+    }
+}

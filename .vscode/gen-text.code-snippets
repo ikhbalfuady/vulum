@@ -1,0 +1,13 @@
+{
+    "Print to console": {
+        "scope": "php",
+        "prefix": "gen:text",
+        "body": [
+      "array(",
+            "  \"name\" => \"$1\",",
+            "  \"type\" => \"text\",",
+            "),"
+        ],
+        "description": "Generator array"
+    }
+}

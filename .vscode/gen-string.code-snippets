@@ -1,0 +1,12 @@
+{
+    "Print to console": {
+        "scope": "php",
+        "prefix": "gen:string",
+        "body": [
+            "[ \"name\" => \"$1\",",
+            "    \"type\"      => \"string\",",
+            "],"
+        ],
+        "description": "Generator array"
+    }
+}
