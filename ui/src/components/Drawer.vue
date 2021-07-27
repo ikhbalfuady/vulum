@@ -42,7 +42,8 @@
           </div>
         </q-btn>
 
-        <q-avatar class="cursor ml-2" size="28px">
+        <profile-popup :data="userInfo" />
+        <!-- <q-avatar class="cursor ml-2" size="28px">
           <img src="assets/avatar.jpg">
           <q-menu fit
           transition-show="jump-left"
@@ -78,7 +79,7 @@
 
             </div>
           </q-menu>
-        </q-avatar>
+        </q-avatar>-->
 
       </q-toolbar>
     </q-header>
@@ -487,13 +488,6 @@ export default {
       if (icon === null) return 'label_important'
       else if (icon === '') return 'label_important'
       else return icon
-    },
-
-    changeMiniMode () {
-      var current = this.miniModeMenu
-      // console.log('changeMiniMode', current)
-      this.$Helper.saveLdb('miniModeMenu', current)
-      if (!current) this.miniState = false
     },
 
     miniStateMenu (val) {
