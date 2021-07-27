@@ -47,6 +47,7 @@ $outputDir = 'output/';
 if (!file_exists($outputDir)) mkdir($outputDir, 0777, true); // generate folder output
 
 include 'function/generate_migrations.php';
+include 'function/generate_single_migrations.php';
 include 'function/generate_route.php';
 include 'function/generate_model.php';
 include 'function/generate_controller.php';
@@ -65,6 +66,7 @@ $list = json_encode($list);
 $list = json_decode($list);
 
 generateMigrations($list, $outputDir); // login user di exec disini
+generateSingleMigrations($list, $outputDir);
 generateModel($list, $outputDir);
 generateController($list, $outputDir);
 generateRepository($list, $outputDir);
@@ -74,5 +76,5 @@ generateMenuPermission($list, $outputDir);
 generateUi($list, $outputDir);
 generateUiNonPermission($list, $outputDir);
 generateRouteModelUi($list, $outputDir);
-echo "Generate Completed! <br>";
+echo "<h1>Generate Completed! </h1><br>";
 
