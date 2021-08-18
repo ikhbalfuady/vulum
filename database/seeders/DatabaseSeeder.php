@@ -58,6 +58,7 @@ class DatabaseSeeder extends Seeder
         $masterRole = Roles::create([
             'name' => 'ADMINISTRATOR',
             'slug' => 'administrator',
+            'code' => 'ADM',
             'created_by' => 1,
         ]);
 

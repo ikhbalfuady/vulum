@@ -26,9 +26,9 @@ foreach($list as $item){
                 $fk2 = (isset($bt->foreign2)) ? $bt->foreign2 : 'id';
                 $fk2 = ($fk2 == '_self') ? 'id' : $bt->foreign2;
 
-                $belongsTo = '    public function '.$btName.'() {'."\r\n";
+                $belongsTo .= '    public function '.$btName.'() {'."\r\n";
                 $belongsTo .= '        return $this->belongsTo('.$bt->model.'::class, "'.$fk.'", "'.$fk2.'")->withTrashed();'."\r\n";
-                $belongsTo .= '    }';
+                $belongsTo .= '    }'."\r\n\r\n";
 
             }
         }
@@ -43,9 +43,9 @@ foreach($list as $item){
 
                 $fk2 = (isset($hm->foreign2)) ? $hm->foreign2 : 'id';
 
-                $hasMany = '    public function '.$hmName.'() {'."\r\n";
+                $hasMany .= '    public function '.$hmName.'() {'."\r\n";
                 $hasMany .= '        return $this->hasMany('.$hm->model.'::class, "'.$fk2.'", "'.$fk.'")->withTrashed();'."\r\n";
-                $hasMany .= '    }';
+                $hasMany .= '    }'."\r\n\r\n";
 
             }
         }
@@ -79,7 +79,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Lumen\Auth\Authorizable;
 
-use App\Traits\RelationActionBy;
+use App\Traits\GlobalDBRelations;
 
 
 /**
@@ -88,7 +88,7 @@ use App\Traits\RelationActionBy;
 class '.$name.' extends Model
 {
     use Authenticatable, Authorizable, HasFactory;
-    use SoftDeletes, RelationActionBy; 
+    use SoftDeletes, GlobalDBRelations; 
 
     /**
      * Table Configuration

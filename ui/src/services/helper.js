@@ -768,5 +768,19 @@ export const Helper = {
       var el = _this.$refs[selectSource]
       if (el) el.focus()
     }, 300)
+  },
+
+  makeRef (res) {
+    res = res.replace(' ', '_')
+    res = res.replace(' ', '_')
+    res = res.replace(' ', '_')
+    res = res.replace('-', '_')
+    res = res.replace('-', '_')
+    res = res.replace('-', '_')
+    res = res.replace('-', '_')
+    res = res.replace('-', '_')
+    res = res.replace('-', '_')
+    return res
   }
+
 }

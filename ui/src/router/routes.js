@@ -21,8 +21,25 @@ const routes = [
   },
   {
     path: '/',
+    component: () => import('layouts/Default.vue'),
+    children: [
+      { name: 'example', path: '/example', component: () => import('pages/example/index.vue') },
+      { name: 'view-page', path: '/example/view/:id', component: () => import('pages/example/detail.vue') },
+      { name: 'add-page', path: '/example/form', component: () => import('pages/example/form.vue') },
+      { name: 'edit-page', path: '/example/form/:id', component: () => import('pages/example/form.vue') }
+    ]
+  },
+  {
+    path: '/',
     component: () => import('layouts/Main.vue'),
     children: [
+      // exampel page
+      // { name: 'example', path: '/example', component: () => import('pages/example/index.vue') },
+      // { name: 'view-page', path: '/example/view/:id', component: () => import('pages/example/detail.vue') },
+      // { name: 'add-page', path: '/example/form', component: () => import('pages/example/form.vue') },
+      // { name: 'edit-page', path: '/example/form/:id', component: () => import('pages/example/form.vue') },
+
+      // module page
       { name: 'home', path: '/', component: () => import('pages/index.vue') },
       { name: 'users-list', path: '/users', component: () => import('pages/users/index.vue') },
       { name: 'view-users', path: '/users/view/:id', component: () => import('pages/users/detail.vue') },
@@ -61,7 +78,12 @@ const routes = [
       { name: 'view-user-notifications', path: '/user-notifications/view/:id', component: () => import('../pages/user-notifications/detail.vue') },
       { name: 'add-user-notifications', path: '/user-notifications/form', component: () => import('../pages/user-notifications/form.vue') },
       { name: 'edit-user-notifications', path: '/user-notifications/form/:id', component: () => import('../pages/user-notifications/form.vue') },
-      { name: 'notifications', path: '/notifications', component: () => import('../pages/user-notifications/user-list.vue') }
+      { name: 'notifications', path: '/notifications', component: () => import('../pages/user-notifications/user-list.vue') },
+
+      { name: 'department', path: '/department', component: () => import('pages/department/index.vue') },
+      { name: 'view-department', path: '/department/view/:id', component: () => import('pages/department/detail.vue') },
+      { name: 'add-department', path: '/department/form', component: () => import('pages/department/form.vue') },
+      { name: 'edit-department', path: '/department/form/:id', component: () => import('pages/department/form.vue') }
 
     ]
   },

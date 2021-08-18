@@ -18,6 +18,9 @@ Vue.prototype.$Config = Config
 import Api from './../services/Api'
 Vue.prototype.$Api = new Api()
 
+import { Handler } from './../services/Handler'
+Vue.prototype.$Handler = Handler
+
 Vue.use(VueRouter)
 Vue.use(money, { precision: 4 })
 
