@@ -16,12 +16,13 @@
         </div>
 
         <div class="col-2 col-sm-2 col-md-2 pb-1 pr-1 btn-filter">
-          <q-btn unelevated color="primary" class="capital" icon="filter_list">
+          <q-btn unelevated color="primary" class="capital" icon="tune">
             <q-popup-proxy ref="popupFilter" transition-show="jump-up" transition-hide="jump-down">
               <q-banner dense>
                 <div class="row pt-1 pl-1 pb-1" style="min-width:320px">
-                  <div class="col-12 text-grey-7 bold pb-1 pt"> Filter</div>
+                  <div class="col-12 text-grey-7 bold pb-1 pt"> Settings</div>
 
+                  <vl-select col="12" label="Action Mode" v-model="dataModel.actionMode" :options="select.actionMode" @input="val => { onRefresh() }"/>
                   <vl-select col="12" label="Status" v-model="dataModel.status" :options="select.status" @input="val => { onRefresh() }"/>
                   <vl-select col="12" label="Searc By" v-model="table.searchBySelected" :options="table.searchBy" />
 
@@ -31,7 +32,7 @@
                 </div>
               </q-banner>
             </q-popup-proxy>
-            <span class="gt-xs pl-1">filter</span>
+            <span class="gt-xs pl-1">Settings</span>
           </q-btn>
         </div>
 
@@ -123,7 +124,7 @@ export default {
       API: this.$Api,
       // default data
       dataModel: {
-        searchBy: null,
+        actionMode: 'PAGE',
         status: 'ACTIVE'
       },
       table: this.$Handler.table([
@@ -132,7 +133,8 @@ export default {
         { name: 'slug', label: 'slug', field: 'slug', align: 'left' }
       ]),
       select: {
-        status: this.$Handler.toObjectSelect(['ACTIVE', 'TRASH'])
+        status: this.$Handler.toObjectSelect(['ACTIVE', 'TRASH']),
+        actionMode: this.$Handler.toObjectSelect(['PAGE', 'MODAL'])
 
       },
       modal: {
@@ -209,27 +211,33 @@ export default {
     },
 
     add () {
-      // this.$router.push({ name: 'add-' + this.Meta.module })
-      this.modal.show = true
-      this.modal.mode = 'form'
-      this.modal.title = 'Create ' + Meta.name
-      this.modal.params = null
+      if (this.dataModel.actionMode === 'PAGE') this.$router.push({ name: 'add-' + this.Meta.module })
+      else {
+        this.modal.show = true
+        this.modal.mode = 'form'
+        this.modal.title = 'Create ' + Meta.name
+        this.modal.params = null
+      }
     },
 
     edit (data) {
-      // this.$router.push({ name: 'edit-' + this.Meta.module, params: data })
-      this.modal.show = true
-      this.modal.mode = 'form'
-      this.modal.title = 'Update ' + Meta.name
-      this.modal.params = data
+      if (this.dataModel.actionMode === 'PAGE') this.$router.push({ name: 'edit-' + this.Meta.module, params: data })
+      else {
+        this.modal.show = true
+        this.modal.mode = 'form'
+        this.modal.title = 'Update ' + Meta.name
+        this.modal.params = data
+      }
     },
 
     detail (data) {
-      // this.$router.push({ name: 'view-' + this.Meta.module, params: data })
-      this.modal.show = true
-      this.modal.mode = 'detail'
-      this.modal.title = 'View ' + Meta.name
-      this.modal.params = data
+      if (this.dataModel.actionMode === 'PAGE') this.$router.push({ name: 'view-' + this.Meta.module, params: data })
+      else {
+        this.modal.show = true
+        this.modal.mode = 'detail'
+        this.modal.title = 'View ' + Meta.name
+        this.modal.params = data
+      }
     },
 
     deleteSelected () {

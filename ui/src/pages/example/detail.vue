@@ -23,14 +23,7 @@
 
       <q-card :class="classArea">
         <q-card-section class=" pb-2">
-          <div class="text-center mt-5 pt-5 mb-5 pb-5" v-if="dataModel.id === null">
-            <q-spinner-facebook class="animated fadeIn"
-              color="primary"
-              size="7em"
-            /> <br>
-            <div class="text-grey-7 animated fadeIn" >Loading...</div>
-          </div>
-
+          <loading v-if="dataModel.id === null" />
           <q-markup-table style="width:100%" class="no-shadow animated fadeIn" v-if="dataModel.id">
             <tbody>
               <tr v-for="(props, index) in dataModel" :key="index" >

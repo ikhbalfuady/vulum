@@ -5,6 +5,7 @@ import ProfilePopup from '../components/ProfilePopup'
 import LogInfo from '../components/LogInfo'
 import ImageUploader from '../components/ImageUploader'
 import Echo from '../components/Echo'
+import Loading from '../components/Loading'
 
 // components default
 import _Input from '../components/default/Input'
@@ -21,6 +22,7 @@ Vue.component('profile-popup', ProfilePopup)
 Vue.component('log-info', LogInfo)
 Vue.component('img-uploader', ImageUploader)
 Vue.component('echo', Echo)
+Vue.component('loading', Loading)
 
 Vue.component('vl-input', _Input)
 Vue.component('vl-number', _Number)
