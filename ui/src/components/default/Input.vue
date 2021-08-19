@@ -5,6 +5,7 @@
   </div>
   <q-input
     :class="(className) ? className : ''"
+    :hint="(hint) ? hint : ''"
     :style="(styleEl) ? styleEl : ''"
     :label="(label && toplabel !== '') ? label : ''"
     dense filled
@@ -54,6 +55,11 @@ USAGE    : < optional >
 USAGE    : < :rules="[ val => val !== null && val !== '' || 'Field is required!']" >
 
 --------------------------------------------------
+* hint <attributeWithValue:any>
+> define hint text
+USAGE    : < hint="label input" >
+
+--------------------------------------------------
 * col <attributeWithValue:number>
 > define column of this element on medium breakpoint with defaul col-12 in mobile
 > value follow a breakpoint number, 1 - 12
@@ -73,6 +79,7 @@ export default {
     'toplabel',
     'optional',
     'rules',
+    'hint',
     'col'
   ],
   data () {

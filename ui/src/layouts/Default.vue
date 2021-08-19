@@ -1,5 +1,6 @@
 <template>
-  <q-layout view="lhh Lpr ffr">
+  <!-- Lhh Lpr ffr -->
+  <q-layout view="Lhh Lpr ffr">
 
     <q-page-container>
       <transition  appear mode="out-in"

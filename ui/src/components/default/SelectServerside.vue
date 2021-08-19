@@ -1,9 +1,9 @@
 <template>
 <div :class="columnSize" >
   <div v-if="toplabel === ''" class="bold capital text-primary mh-1" >
-    {{(label) ? label : ''}}
+    {{(label) ? label : ''}} <small v-if="toplabel === '' || optional === ''" class="optional">(Optional)</small>
   </div>
-  <q-select dense filled square
+  <q-select dense filled
     :label="(label && toplabel !== '') ? label : ''"
     :class="(className) ? className : ''"
     :style="(styleEl) ? styleEl : ''"
@@ -110,6 +110,7 @@ export default {
     'value',
     'toplabel',
     'rules',
+    'optional',
     'col',
     'options',
     'optionValue',

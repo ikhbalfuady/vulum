@@ -1,5 +1,4 @@
 <template >
-
   <div class="root bg-soft">
 
     <!-- drawer & top menu -->
@@ -123,11 +122,7 @@ export default {
   },
 
   mounted () {
-    // generate filter search
-    // for (const col of this.table.columns) {
-    //   if (col.name !== 'action') this.table.searchBy.push(col)
-    // }
-    // this.dataModel.searchBy = this.table.columns[1].name
+    //
   },
 
   methods: {

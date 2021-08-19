@@ -6,6 +6,7 @@ const Meta = {
   permission: {
     browse: true,
     create: true,
+    read: true,
     update: true,
     delete: true,
     restore: true

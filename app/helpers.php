@@ -1206,3 +1206,17 @@ function H_getValueForOperator($key, $val) {
         throw new Exception($e->getMessage());
     }
 }
+
+function H_extractParamLike($str) {
+    if ($str && $str !== '') {
+        $ex = explode(':', $str);
+        $columns = collect(explode(',', $ex[0]));
+        $value = $ex[1];
+
+        return (object) [
+            'columns' => $columns,
+            'value' => $value,
+        ];
+    }
+    return null;
+}

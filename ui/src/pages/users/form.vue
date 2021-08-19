@@ -3,95 +3,58 @@
 
   <div class="root bg-soft">
 
-    <!-- drawer di init di: boot/extend-component.js -->
-    <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
+    <!-- drawer & top menu -->
+    <top-menu v-if="!isModal" :data="Meta"  />
+    <side-menu v-if="!isModal" :data="Meta" />
 
-      <!-- Header Title -->
-      <div class="row pl-2 pt-2">
-        <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
-          <div class="title">
-            <span class="text-caption text-grey-8">Master {{Meta.name}}</span><br>
-            <span class="text-h5 bold text-primary capital">{{title}} {{Meta.name}} <span v-if="title === 'Update'" >#{{dataModel.id}}</span></span>
-          </div>
-        </div>
-      </div>
+    <!-- Header Title -->
+    <header-title :meta="Meta" :isModal="isModal" :backToRoot="backToRoot" form-mode />
 
-      <q-card class="box-shadow mv-2">
-          <q-card-section>
-            <q-form @submit="submit">
-              <q-card-section class="row">
+    <q-card :class="classArea">
+      <q-card-section>
+        <q-form @submit="submit">
+          <q-card-section class="row">
 
-                <div class="col-12 col-sm-4 col-md-4 pv ph" >
-                  <q-input v-model="dataModel.name" label="name *" dense filled square
-                  lazy-rules :rules="[
-                    val => val !== null && val !== '' || 'Name must be filled!',
-                  ]" />
-                </div>
+            <vl-input col="6" v-model="dataModel.name" label="name" :rules="[
+                val => val !== null && val !== '' || 'name must be filled!',
+              ]"
+            />
 
-                <div class="col-12 col-sm-4 col-md-4 pv ph" >
-                  <q-input v-model="dataModel.username" label="username *" dense filled square
-                  lazy-rules :rules="[
-                    val => val !== null && val !== '' || 'username must be filled!',
-                  ]" />
-                </div>
+            <vl-input col="6" v-model="dataModel.username" label="username" :rules="[
+                val => val !== null && val !== '' || 'username must be filled!',
+              ]"
+            />
 
-                <div class="col-12 col-sm-4 col-md-4 pv ph" >
-                  <q-input v-model="dataModel.email" label="email *" dense filled square
-                  lazy-rules :rules="[
-                    val => val !== null && val !== '' || 'email must be filled!',
-                  ]" />
-                </div>
+            <vl-input col="6" v-model="dataModel.email" label="email *" :rules="[
+                val => val !== null && val !== '' || 'email must be filled!',
+              ]"
+            />
 
-                <div class="col-12 col-sm-4 col-md-3 pv ph" >
-                  <q-input v-model="dataModel.password" :label="(dataModel.id === null) ? 'password *' : 'password' " dense filled square
-                  :hint="(dataModel.id === null) ? 'Password is required' : 'Leave blank if dont want to change' " />
-                </div>
+            <vl-input col="6" v-model="dataModel.password" :label="(dataModel.id === null) ? 'password *' : 'password' "
+              :hint="(dataModel.id === null) ? 'Password is required' : 'Leave blank if dont want to change' "/>
 
-                <div class="col-12 col-sm-4 col-md-3 pv ph" >
-                  <q-select label="Menu *" dense filled square
-                    :options="select.menus"
-                    v-model="dataModel.menu_id"
-                    option-value="id" option-label="name"
-                    emit-value map-options use-input
-                    @filter="(val, update) => filterSelect(val, update, 'menus')"
-                    lazy-rules :rules="[
-                      val => val !== null && val !== '' || 'Menu is required!',
-                    ]"
-                  >
-                    <template v-slot:selected-item="row"> <span class="ellipsis">{{ row.opt.name }}</span> </template>
-                    <template v-slot:no-option>
-                      <q-item> <q-item-section class="text-grey"> Data not found </q-item-section> </q-item>
-                    </template>
-                  </q-select>
-                </div>
+            <vl-select-serverside col="6" label="Role"
+              url="roles"
+              :option-label="opt => `${opt.code} | ${opt.name}`"
+              :default-data="dataModel.role"
+              v-model="dataModel.role_id"
+            />
 
-                <div class="col-12 col-sm-4 col-md-3 pv ph" >
-                  <q-select label="Role *" dense filled square
-                    :options="select.roles"
-                    v-model="dataModel.role_id"
-                    option-value="id" option-label="name"
-                    emit-value map-options use-input
-                    @filter="(val, update) => filterSelect(val, update, 'roles')"
-                    lazy-rules :rules="[
-                      val => val !== null && val !== '' || 'Role is required!',
-                    ]"
-                  >
-                    <template v-slot:selected-item="row"> <span class="ellipsis">{{ row.opt.name }}</span> </template>
-                    <template v-slot:no-option>
-                      <q-item> <q-item-section class="text-grey"> Data not found </q-item-section> </q-item>
-                    </template>
-                  </q-select>
-                </div>
+            <vl-select-serverside col="6" label="Menu"
+              url="master-menus"
+              :default-data="dataModel.menu"
+              v-model="dataModel.menu_id"
+            />
 
-              </q-card-section>
-
-              <q-card-actions align="right" class="">
-                <q-btn class="capital bold" unelevated flat color="red" label="Cancel" icon="cancel" @click="backToRoot" />
-                <q-btn class="capital bold" unelevated color="green" label="Save" :disable="disableSubmit" type="submit" icon="check_circle"/>
-              </q-card-actions>
-            </q-form>
           </q-card-section>
-      </q-card>
+
+          <q-card-actions align="right" class="">
+            <q-btn class="capital bold" unelevated flat color="red" label="Cancel" icon="cancel" @click="backToRoot" />
+            <q-btn class="capital bold" unelevated color="green" label="Save" :disable="disableSubmit" type="submit" icon="check_circle"/>
+          </q-card-actions>
+        </q-form>
+      </q-card-section>
+    </q-card>
 
   </div>
 </template>
@@ -101,16 +64,17 @@ import Meta from './meta'
 
 export default {
   name: 'Users',
+  props: [
+    'fromModal'
+  ],
   data () {
     return {
       Meta,
       API: this.$Api,
       // default data
       title: 'Create',
+      loading: false,
       dataModel: {},
-      rules: {
-        permission: Meta.permission
-      },
       disableSubmit: false,
       select: {
         roles: [],
@@ -124,54 +88,48 @@ export default {
   created () {
     this.dataModel = this.$Helper.unReactive(this.Meta.model)
     this.initTopBar()
-    this.$ModuleConfig.getCurrentPermissions((status, data) => {
-      console.log('initPermissionPage:' + Meta.module, data)
-      this.initialize()
-    }, 'user-form')
+
+    var action = this.$Handler.formMode(this)
+
+    this.$Handler.permissions(this, action.mode, Meta, (status, data) => {
+      this.Meta.permission = data // update current permissions of this module
+      if (action.mode === 'update' && action.params.id !== undefined) this.getData(action.params.id)
+      this.onRefresh()
+    })
   },
 
   mounted () {
-
+    this.handleFromModal()
   },
 
-  watch: {
-    $route (to, from) {
-      this.dataModel = Meta.model
+  computed: {
+    isModal () {
+      return (this.fromModal) ?? false
+    },
+    classArea () {
+      return (this.fromModal) ? 'mt-2 no-shadow' : 'box-shadow mv-2 mt-2'
     }
   },
 
   methods: {
 
-    checkPermission (mode = 'create') {
-      var access = this.$ModuleConfig.checkPermission(this.$router, this.Meta.module + '-' + mode)
-      if (access) return true
-      else this.$router.push({ name: '403' })
-    },
-
-    initialize () {
-      var params = this.$route.params
-      if (this.$Helper.checkParams(params)) { // checking access update
-        if (this.checkPermission('update')) {
-          if (params.id !== undefined) {
-            this.onRefresh()
-            this.getData(params.id)
-          } else this.backToRoot()
-        }
-      } else { // checking access create
-        if (this.checkPermission('create')) {
+    handleFromModal () {
+      if (this.fromModal && this.fromModal.params) {
+        if (this.fromModal.params.id !== undefined && this.fromModal.params.id !== null) {
+          this.getData(this.fromModal.params.id)
           this.onRefresh()
         }
       }
     },
 
-    onRefresh () {
-      //
-      this.getListSelect('master-menus?limit=0', 'menus')
-      this.getListSelect('roles?limit=0', 'roles')
-    },
-
     initTopBar () {
       this.Meta.topBarMenu = [{ name: 'Refresh', event: this.onRefresh }]
+    },
+
+    onRefresh () {
+      //
+      // this.getListSelect('master-menus?limit=0', 'menus')
+      // this.getListSelect('roles?limit=0', 'roles')
     },
 
     getData (id) {
@@ -188,16 +146,10 @@ export default {
       })
     },
 
-    edit (data) {
-      this.triggerForm(data)
-    },
-
     backToRoot () {
-      this.$router.push({ name: this.Meta.module })
-    },
-
-    emitModel (target, val) {
-      this.dataModel[target] = val
+      if (this.fromModal) {
+        this.fromModal.show = false
+      } else this.$router.push({ name: this.Meta.module })
     },
 
     submit () {
@@ -209,10 +161,11 @@ export default {
     },
 
     validateSubmit () {
-      if (this.dataModel.id === null && this.dataModel.password === null) {
-        this.$Helper.showAlert('Password Empty!', 'Password must be filled!')
-        return false
-      } else return true
+      // if (this.dataModel.name === null) {
+      //   this.$Helper.showAlert('Nama Kosong!', 'Nama harus di isi!')
+      //   return false
+      // } else return true
+      return true
     },
 
     save () {
@@ -220,7 +173,7 @@ export default {
       this.API.post(this.Meta.module, this.dataModel, (status, data, message, response, full) => {
         this.$Helper.loadingOverlay(false)
         if (status === 200) {
-          this.messageSubmit('Saving', message)
+          this.$Helper.showSuccess('Saving Succesfully', message)
           this.backToRoot()
         } else this.disableSubmit = false
       })
@@ -231,14 +184,10 @@ export default {
       this.API.put(this.Meta.module + '/' + this.dataModel.id, this.dataModel, (status, data, message, response, full) => {
         this.$Helper.loadingOverlay(false)
         if (status === 200) {
-          this.messageSubmit('Update', message)
+          this.$Helper.showSuccess('Update Succesfully', message)
           this.backToRoot()
         } else this.disableSubmit = false
       })
-    },
-
-    messageSubmit (titleAdd = '', msg) {
-      this.$Helper.showSuccess(titleAdd + ' Succesfully', msg)
     },
 
     async filterSelect (val, update, target) {

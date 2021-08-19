@@ -57,7 +57,7 @@ export default {
       return (this.config.height) ?? '85vh'
     },
     width () {
-      return (this.config.width) ?? '60vw'
+      return (this.config.width) ?? '65vw'
     },
     contentHeight () {
       return (this.config.contentHeight) ?? '75vh'

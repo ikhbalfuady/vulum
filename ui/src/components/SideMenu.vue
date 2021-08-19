@@ -185,6 +185,7 @@ soft : #fff
 
 .side-menu aside { /* bg menu */
   background: $dark;
+  z-index: 990 !important;
 }
 
 .side-menu aside div .head-menu { /* bg head menu */

@@ -131,5 +131,27 @@ export const Handler = {
     }
     if (save) LocalStorage.set('menu', save)
     return LocalStorage.getItem('menu')
+  },
+
+  viewList (data, addExclude = []) {
+    var exlude = [
+      ...addExclude,
+      'created_at',
+      'updated_at',
+      'deleted_at',
+      'created_by',
+      'updated_by',
+      'deleted_by',
+      'created_by_user',
+      'updated_by_user',
+      'deleted_by_user'
+    ]
+    var list = {}
+    for (const key in data) {
+      console.log(key, data)
+      if (exlude.indexOf(key) < 0) list[key] = data[key]
+    }
+    // console.log('list', list)
+    return list
   }
 }

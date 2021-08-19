@@ -263,6 +263,9 @@ trait StandardRepo {
       $search = [];
       if (isset($payload['search'])) $search = H_extractParamsAttribute($payload['search']);
       
+      $searchLike = null;
+      if (isset($payload['search_like'])) $searchLike = H_extractParamLike($payload['search_like']);
+      
       $filter = [];
       if (isset($payload['filter'])) $filter = H_extractParamsAttribute($payload['filter']);
 
@@ -316,6 +319,19 @@ trait StandardRepo {
 
           }
         }
+      }
+
+      if ($searchLike) {
+        $data = $data->where(function($q) use($searchLike) {
+          $index = 0;
+          foreach($searchLike->columns as $r) {
+            if (in_array($r, $this->model->Columns())) {
+              if ($index === 0) $q->where($r, 'LIKE', "%{$searchLike->value}%");
+              else $q->orWhere($r, 'LIKE', "%{$searchLike->value}%");
+              $index++;
+            }
+          }
+        });
       }
 
       if (count($filter) != 0) { // filter

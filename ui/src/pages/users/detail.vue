@@ -3,87 +3,50 @@
 
   <div class="root bg-soft">
 
-    <!-- drawer di init di: boot/extend-component.js -->
-    <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
+    <!-- drawer & top menu -->
+    <top-menu v-if="!isModal" :data="Meta"  />
+    <side-menu v-if="!isModal" :data="Meta" />
 
-      <!-- Header Title -->
-      <div class="row pl-2 pt-2">
-        <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
-          <div class="title">
-             <div class="flex">
-              <div>
-                <div class="" style="margin-left:35px"><span class="text-h5-caption text-grey-8">Detail</span><br></div>
-                <span class="text-h5 bold text-primary capital"><q-btn class="capital bold" dense unelevated flat color="text-primary" label="" icon="arrow_back" @click="backToRoot" />
-                {{Meta.name}} <q-btn @click="edit" unelevated color="green" class="capital" icon="edit" label="Edit" /></span>
-              </div>
-            </div>
-          </div>
-          <!-- <q-btn @click="edit" unelevated color="green" class="capital" icon="edit" label="Edit" /> -->
-        </div>
-      </div>
+    <!-- Header Title -->
+    <header-title :meta="Meta" :title="Meta.name + ' Detail'" :isModal="isModal" :backToRoot="backToRoot" half-slot >
+      <template v-slot:half>
+        <q-btn v-if="Meta.permission.update" @click="edit" label="edit" icon="edit" flat dense class="animated slideInRight mr-1 capital bg-green-1 text-green-9 pv-1 fix-icon-btn" color="green"/>
+      </template>
+    </header-title>
 
-      <div class="row mv-2">
-        <div class="col-12 col-sm-6 pv ph">
-          <q-card class="box-shadow full-height">
-            <q-card-section>
-              <q-list separator>
-                <q-item>
-                  <q-item-section>
-                    <q-item-label caption>Name</q-item-label>
-                    <q-item-section>{{ dataModel.name }}</q-item-section>
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    <q-item-label caption>Username</q-item-label>
-                    <q-item-section>{{ dataModel.username }}</q-item-section>
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    <q-item-label caption>Email</q-item-label>
-                    <q-item-section>{{ dataModel.email }}</q-item-section>
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    <q-item-label caption>Menu</q-item-label>
-                    <q-item-section>{{ dataModel.menu ? dataModel.menu.name : '' }}</q-item-section>
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    <q-item-label caption>Role</q-item-label>
-                    <q-item-section>{{ dataModel.role ? dataModel.role.name : '' }}</q-item-section>
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    <q-item-label caption>Department</q-item-label>
-                    <q-item-section>{{ dataModel.department ? dataModel.department.name : '' }}</q-item-section>
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    <q-item-label caption>Active</q-item-label>
-                    <q-item-section>
-                      {{ dataModel.active ? 'Active' : 'Non Active' }}
-                    </q-item-section>
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    <q-item-label caption>Log Info</q-item-label>
-                    <q-item-section>
-                      <log-info :data="dataModel" />
-                    </q-item-section>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-card-section>
-          </q-card>
-        </div>
-      </div>
+    <q-card :class="classArea">
+      <q-card-section class=" pb-2">
+        <loading v-if="dataModel.id === null" />
+        <q-markup-table style="width:100%" class="no-shadow animated fadeIn" v-if="dataModel.id">
+          <tbody>
+            <template v-for="(props, key) in viewList" >
+
+              <!-- custom -->
+              <tr v-if="key === 'menu_id'" :key="key" >
+                <td class="bold text-primary capital">Menu</td>
+                <td v-ripple>{{ dataModel.menu ? dataModel.menu.name : '' }}</td>
+              </tr>
+
+              <tr v-else-if="key === 'role_id'" :key="key" >
+                <td class="bold text-primary capital">Role</td>
+                <td v-ripple>{{ dataModel.role ? dataModel.role.name : '' }}</td>
+              </tr>
+
+              <!-- default -->
+              <tr v-else :key="key" >
+                <td class="bold text-primary capital">{{key}}</td>
+                <td v-ripple>{{props}}</td>
+              </tr>
+
+            </template>
+            <tr >
+              <td class="bold text-primary capital">Log Info</td>
+              <td v-ripple><log-info :data="dataModel" /></td>
+            </tr>
+          </tbody>
+        </q-markup-table>
+      </q-card-section>
+    </q-card>
 
   </div>
 </template>
@@ -93,59 +56,60 @@ import Meta from './meta'
 
 export default {
   name: 'Users',
+  props: [
+    'fromModal'
+  ],
   data () {
     return {
       Meta,
       API: this.$Api,
       // default data
       dataModel: Meta.model,
-      rules: {
-        permission: Meta.permission
-      }
+      viewList: null
     }
   },
 
   created () {
     this.initTopBar()
-    this.initialize()
+    this.$Handler.permissions(this, 'read', Meta, (status, data) => {
+      this.Meta.permission = data // update current permissions of this module
+      this.onRefresh()
+    })
   },
 
   mounted () {
+    this.handleFromModal()
+  },
 
+  computed: {
+    isModal () {
+      return (this.fromModal) ?? false
+    },
+    classArea () {
+      return (this.fromModal) ? 'mt-2 no-shadow' : 'box-shadow mv-2 mt-2'
+    }
   },
 
   methods: {
 
-    callbackForm (params = null) {
-      this.onRefresh()
-    },
-
-    checkPermission (mode = 'create') {
-      var access = this.$ModuleConfig.checkPermission(this.$router, this.Meta.module + '-' + mode)
-      if (access) return true
-      else this.$router.push({ name: '403' })
-    },
-
-    initialize () {
-      var params = this.$route.params
-      if (this.$Helper.checkParams(params)) { // checking access update
-        if (this.checkPermission('read')) {
-          if (params.id !== undefined) this.getData(params.id)
-          else this.backToRoot()
+    handleFromModal () {
+      if (this.fromModal && this.fromModal.params) {
+        if (this.fromModal.params.id !== undefined && this.fromModal.params.id !== null) {
+          this.getData(this.fromModal.params.id)
         }
-      } else this.backToRoot()
-    },
-
-    onRefresh () {
-      this.initialize()
+      }
     },
 
     initTopBar () {
       this.Meta.topBarMenu = [{ name: 'Refresh', event: this.onRefresh }]
     },
 
+    onRefresh () {
+      var id = this.$Handler.getParamId(this)
+      if (id) this.getData(id)
+    },
+
     getData (id) {
-      console.log('getData')
       this.$Helper.loading()
       var endpoint = this.Meta.module + '/' + id
       this.API.get(endpoint, (status, data, message, response, full) => {
@@ -153,6 +117,10 @@ export default {
         if (status === 200) {
           // inject data
           this.dataModel = data
+          this.viewList = this.$Handler.viewList(this.dataModel, [
+            'role',
+            'menu'
+          ])
         }
       })
     },
@@ -162,7 +130,9 @@ export default {
     },
 
     backToRoot () {
-      this.$router.push({ name: this.Meta.module })
+      if (this.fromModal) {
+        this.fromModal.show = false
+      } else this.$router.push({ name: this.Meta.module })
     }
   }
 }

@@ -1,45 +1,34 @@
 
 <template >
 
-  <div class="root bg-soft" @show="onShow()">
+  <div class="root bg-soft">
 
     <!-- drawer & top menu -->
-    <top-menu :data="Meta"  />
-    <side-menu v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
+    <top-menu v-if="!isModal" :data="Meta"  />
+    <side-menu v-if="!isModal" :data="Meta" />
 
     <!-- Header Title -->
     <header-title :meta="Meta" :isModal="isModal" :backToRoot="backToRoot" form-mode />
 
-      <!-- Header Title -->
-      <div class="row pl-2 pt-2 bg-light" v-if="false">
-        <div class="col-11 pb-1 pv info-page">
-          <div class="title">
-            <span class="text-caption text-grey-7">Master {{Meta.name}}</span><br>
-            <q-btn @click="backToRoot" rounded icon="arrow_back" flat dense class="mr-1" color="grey-9"/>
-            <span class="text-h5 bold text-dark capital">{{title}} {{Meta.name}} <span v-if="title === 'Update'" >#{{dataModel.id}}</span></span>
-          </div>
-        </div>
-      </div>
+    <q-card :class="classArea">
+      <q-card-section>
+        <loading v-if="loading" />
+        <q-form @submit="submit" v-if="!loading" >
+          <q-card-section class="row animated fadeIn">
 
-      <q-card :class="classArea">
-        <q-card-section>
-          <loading v-if="loading" />
-          <q-form @submit="submit" v-if="!loading" >
-            <q-card-section class="row animated fadeIn">
+            <template v-for="(props, index) in dataModel" >
+              <vl-input v-model="dataModel[index]" :label="index" :key="index" toplabel/>
+            </template>
 
-              <template v-for="(props, index) in dataModel" >
-                <vl-input v-model="dataModel[index]" :label="index" :key="index" toplabel/>
-              </template>
+          </q-card-section>
 
-            </q-card-section>
-
-            <q-card-actions align="right" class="">
-              <q-btn class="capital bold" unelevated flat color="red" label="Cancel" icon="cancel" @click="backToRoot" />
-              <q-btn class="capital bold" unelevated color="green" label="Save" :disable="disableSubmit" type="submit" icon="check_circle"/>
-            </q-card-actions>
-          </q-form>
-        </q-card-section>
-      </q-card>
+          <q-card-actions align="right" class="">
+            <q-btn class="capital bold" unelevated flat color="red" label="Cancel" icon="cancel" @click="backToRoot" />
+            <q-btn class="capital bold" unelevated color="green" label="Save" :disable="disableSubmit" type="submit" icon="check_circle"/>
+          </q-card-actions>
+        </q-form>
+      </q-card-section>
+    </q-card>
 
   </div>
 </template>
