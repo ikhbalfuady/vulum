@@ -2,107 +2,76 @@
 
   <div class="root bg-soft">
 
-    <!-- drawer di init di: boot/extend-component.js
-    <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />-->
+    <!-- drawer & top menu -->
     <top-menu :data="Meta"  />
     <side-menu v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
 
-      <!-- Header Title -->
-      <div class="row pl-2 pt-2 bg-light">
-        <div class="col-12 col-sm-5 col-md-6 pb-1 pv info-page">
-          <div class="title">
-            <span class="text-caption text-grey-7">Master {{Meta.name}}</span><br>
-            <q-btn v-if="true" rounded icon="arrow_back" flat dense class="mr-1" color="grey-9"/>
-            <span class="text-h5 bold text-dark capital">{{Meta.name}}</span>
+    <!-- Header Title -->
+    <header-title :meta="Meta" cofig-label="Settings" cofig-icon="settings" >
+      <template v-slot:config>
+        <vl-select col="12" label="Status" v-model="dataModel.status" :options="select.status" @input="val => { onRefresh() }"/>
+        <vl-select col="12" label="Searc By" v-model="table.searchBySelected" :options="table.searchBy" />
+      </template>
+      <template v-slot:right>
+        <search-table v-model="table.search" :table="table" />
+      </template>
+    </header-title>
+
+    <div class="q-pa-md">
+      <q-table class="box-shadow th-lg "
+        title="Treats"
+        :data="table.data"
+        :columns="table.columns"
+        row-key="id"
+        :selected-rows-label="getTableSelected"
+        selection="multiple"
+        :pagination.sync="table.pagination"
+        :loading="table.loading"
+        :filter="table.search"
+        @request="getList"
+        :rows-per-page-options="[8, 16, 20, 50, 75, 100]"
+        :selected.sync="table.selected"
+        binary-state-sort
+      >
+
+        <template v-slot:body-cell-action="props">
+          <q-td :props="props">
+            <q-btn v-if="Meta.permission.update" class="bg-soft" dense round flat color="green" @click="edit(props.row)" icon="edit"><q-tooltip>Edit</q-tooltip></q-btn>
+            <q-btn class="bg-soft" dense round flat color="primary" @click="detail(props.row)" icon="visibility"><q-tooltip>View</q-tooltip></q-btn>
+          </q-td>
+        </template>
+
+        <template v-slot:no-data="{icon}">
+          <div class="full-width row flex-center text-primary q-gutter-sm">
+            <q-icon size="2em" :name="icon" /><span class="bold text-h6"> There are no data {{Meta.name}} yet</span>
           </div>
-        </div>
+        </template>
 
-        <div class="col-2 col-sm-2 col-md-2 pb-1 pr-1 btn-filter">
-          <q-btn unelevated color="primary" class="capital" icon="filter_list">
-            <q-popup-proxy ref="popupFilter" transition-show="jump-up" transition-hide="jump-down">
-              <q-banner dense>
-                <div class="row pt-1 pl-1 pb-1" style="min-width:320px">
-                  <div class="col-12 text-grey-7 bold pb-1 pt"> Filter</div>
+        <template v-slot:top>
+          <div v-if="Meta.permission.create" class="action animated zoomIn" >
+            <q-btn @click="add" unelevated color="primary" class="capital  mr-1" icon="add" label="Add" />
+          </div>
 
-                  <vl-select col="12" label="Status" v-model="dataModel.status" :options="select.status" @input="val => { onRefresh() }"/>
-                  <vl-select col="12" label="Searc By" v-model="table.searchBySelected" :options="table.searchBy" />
+          <div v-if="Meta.permission.delete && table.selected.length !== 0 ">
+            <q-btn @click="deleteSelected" unelevated class="capital "
+              :label="(dataModel.status === 'TRASH') ? 'Re-Activate' : 'Delete' "
+              :color="(dataModel.status === 'TRASH') ? 'green' : 'negative' "
+              :icon="(dataModel.status === 'TRASH') ? 'check' : 'delete' "
+            />
 
-                  <div class="col-12 text-grey-7 bold pb-1 pt pr-1 right">
-                    <q-btn dense label="apply" unelevated flat class="capital bg-blue-1 text-blue-9 pv-1" color="blue" @click="$refs.popupFilter.hide()"/>
-                  </div>
-                </div>
-              </q-banner>
-            </q-popup-proxy>
-            <span class="gt-xs pl-1">Filter</span>
-          </q-btn>
-        </div>
+          </div>
 
-        <div class="col-10 col-sm-5 col-md-4 pb-1 pr-1-5">
-          <q-input debounce="300" :placeholder="`Search by ${table.searchBySelected.name} ...`" v-model="table.search" outlined dense class="fix-after bg-grey-3" style="border-radius:5px; " >
-              <template v-slot:append>
-                <q-icon v-if="table.search !== ''" name="close" @click="table.search = ''" class="cursor-pointer" />
-                <q-icon name="search" />
-              </template>
-            </q-input>
-        </div>
+          <q-space />
 
-      </div>
+        </template>
 
-      <div class="q-pa-md">
-        <q-table class="box-shadow th-lg "
-          title="Treats"
-          :data="table.data"
-          :columns="table.columns"
-          row-key="id"
-          :selected-rows-label="getTableSelected"
-          selection="multiple"
-          :pagination.sync="table.pagination"
-          :loading="table.loading"
-          :filter="table.search"
-          @request="getList"
-          :rows-per-page-options="[8, 16, 20, 50, 75, 100]"
-          :selected.sync="table.selected"
-          binary-state-sort
-        >
+      </q-table>
+    </div>
 
-          <template v-slot:body-cell-action="props">
-            <q-td :props="props">
-              <q-btn v-if="Meta.permission.update" class="bg-soft" dense round flat color="green" @click="edit(props.row)" icon="edit"><q-tooltip>Edit</q-tooltip></q-btn>
-              <q-btn class="bg-soft" dense round flat color="primary" @click="detail(props.row)" icon="visibility"><q-tooltip>View</q-tooltip></q-btn>
-            </q-td>
-          </template>
-
-          <template v-slot:no-data="{icon}">
-            <div class="full-width row flex-center text-primary q-gutter-sm">
-              <q-icon size="2em" :name="icon" /><span class="bold text-h6"> There are no data {{Meta.name}} yet</span>
-            </div>
-          </template>
-
-          <template v-slot:top>
-            <div v-if="Meta.permission.create" class="action animated zoomIn" >
-              <q-btn @click="add" unelevated color="primary" class="capital  mr-1" icon="add" label="Add" />
-            </div>
-
-            <div v-if="Meta.permission.delete && table.selected.length !== 0 ">
-              <q-btn @click="deleteSelected" unelevated class="capital "
-                :label="(dataModel.status === 'TRASH') ? 'Re-Activate' : 'Delete' "
-                :color="(dataModel.status === 'TRASH') ? 'green' : 'negative' "
-                :icon="(dataModel.status === 'TRASH') ? 'check' : 'delete' "
-              />
-
-            </div>
-
-            <q-space />
-
-          </template>
-
-        </q-table>
-      </div>
-
-      <Modal :config="modal">
-        <Form v-if="modal.mode === 'form'" :from-modal="modal" />
-        <Detail v-if="modal.mode === 'detail'" :from-modal="modal" />
-      </Modal>
+    <Modal :config="modal">
+      <Form v-if="modal.mode === 'form'" :from-modal="modal" />
+      <Detail v-if="modal.mode === 'detail'" :from-modal="modal" />
+    </Modal>
   </div>
 </template>
 

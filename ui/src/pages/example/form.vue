@@ -3,11 +3,15 @@
 
   <div class="root bg-soft" @show="onShow()">
 
-    <!-- drawer di init di: boot/extend-component.js
-    <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  /> -->
+    <!-- drawer & top menu -->
+    <top-menu :data="Meta"  />
+    <side-menu v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
+
+    <!-- Header Title -->
+    <header-title :meta="Meta" :isModal="isModal" :backToRoot="backToRoot" form-mode />
 
       <!-- Header Title -->
-      <div class="row pl-2 pt-2 bg-light" v-if="!isModal">
+      <div class="row pl-2 pt-2 bg-light" v-if="false">
         <div class="col-11 pb-1 pv info-page">
           <div class="title">
             <span class="text-caption text-grey-7">Master {{Meta.name}}</span><br>
@@ -89,7 +93,7 @@ export default {
   methods: {
 
     handleFromModal () {
-      if (this.fromModal.params) {
+      if (this.fromModal && this.fromModal.params) {
         if (this.fromModal.params.id !== undefined && this.fromModal.params.id !== null) {
           this.getData(this.fromModal.params.id)
         }

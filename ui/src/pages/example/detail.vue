@@ -3,37 +3,30 @@
 
   <div class="root bg-soft">
 
-    <!-- drawer di init di: boot/extend-component.js
-    <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />-->
+    <!-- drawer & top menu -->
+    <top-menu :data="Meta"  />
+    <side-menu v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
 
-      <!-- Header Title -->
-      <div class="row pl-2 pt-2 bg-light" v-if="!isModal">
-        <div class="col-6 pb-1 pv info-page">
-          <div class="title animated fadeIn">
-            <span class="text-caption text-grey-7">Master {{Meta.name}}</span><br>
-            <q-btn @click="backToRoot" rounded icon="arrow_back" flat dense class="mr-1 animated slideInLeft" color="grey-9"/>
-            <span class="text-h5 bold text-dark capital ">Detail {{Meta.name}} </span>
-          </div>
-        </div>
+    <!-- Header Title -->
+    <header-title :meta="Meta" :title="Meta.name + ' Detail'" :isModal="isModal" :backToRoot="backToRoot" half-slot >
+      <template v-slot:half>
+        <q-btn v-if="Meta.permission.update" @click="edit" label="edit" icon="edit" flat dense class="animated slideInRight mr-1 capital bg-green-1 text-green-9 pv-1 fix-icon-btn" color="green"/>
+      </template>
+    </header-title>
 
-        <div class="col-6 pb-1 pr-1-5 right">
-            <q-btn v-if="Meta.permission.update" @click="edit" label="edit" icon="edit" flat dense class="animated slideInRight mr-1 capital bg-green-1 text-green-9 pv-1 fix-icon-btn" color="green"/>
-        </div>
-      </div>
-
-      <q-card :class="classArea">
-        <q-card-section class=" pb-2">
-          <loading v-if="dataModel.id === null" />
-          <q-markup-table style="width:100%" class="no-shadow animated fadeIn" v-if="dataModel.id">
-            <tbody>
-              <tr v-for="(props, index) in dataModel" :key="index" >
-                <td class="bold text-primary capital">{{index}}</td>
-                <td v-ripple>{{props}}</td>
-              </tr>
-            </tbody>
-          </q-markup-table>
-        </q-card-section>
-      </q-card>
+    <q-card :class="classArea">
+      <q-card-section class=" pb-2">
+        <loading v-if="dataModel.id === null" />
+        <q-markup-table style="width:100%" class="no-shadow animated fadeIn" v-if="dataModel.id">
+          <tbody>
+            <tr v-for="(props, index) in dataModel" :key="index" >
+              <td class="bold text-primary capital">{{index}}</td>
+              <td v-ripple>{{props}}</td>
+            </tr>
+          </tbody>
+        </q-markup-table>
+      </q-card-section>
+    </q-card>
   </div>
 </template>
 

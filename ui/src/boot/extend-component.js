@@ -8,6 +8,7 @@ import Echo from '../components/Echo'
 import Loading from '../components/Loading'
 import SideMenu from '../components/SideMenu'
 import TopMenu from '../components/TopMenu'
+import HeaderTitle from '../components/HeaderTitle'
 
 // components default
 import _Input from '../components/default/Input'
@@ -17,6 +18,7 @@ import _TextArea from '../components/default/TextArea'
 import _Toggle from '../components/default/Toggle'
 import _DatePicker from '../components/default/DatePicker'
 import _SelectServerSide from '../components/default/SelectServerSide'
+import _SearchTable from '../components/default/SearchTable'
 
 // we globally register our component
 Vue.component('drawer', Drawer)
@@ -29,6 +31,8 @@ Vue.component('loading', Loading)
 Vue.component('loading', Loading)
 Vue.component('side-menu', SideMenu)
 Vue.component('top-menu', TopMenu)
+Vue.component('header-title', HeaderTitle)
+Vue.component('search-table', _SearchTable)
 
 Vue.component('vl-input', _Input)
 Vue.component('vl-number', _Number)
