@@ -3,8 +3,8 @@
   <div class="root bg-soft">
 
     <!-- drawer & top menu -->
-    <top-menu :data="Meta"  />
-    <side-menu v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
+    <top-menu :data="Meta" />
+    <side-menu :data="Meta" />
 
     <!-- Header Title -->
     <header-title :meta="Meta" cofig-label="Settings" cofig-icon="settings" >

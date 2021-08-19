@@ -1,8 +1,13 @@
 <template>
-  <q-layout view="lhh LpR lFr">
+  <q-layout view="lhh Lpr ffr">
 
     <q-page-container>
-      <router-view />
+      <transition  appear mode="out-in"
+        enter-active-class="animated-page fadeIn "
+        leave-active-class="animated-page fadeOut"
+      >
+         <router-view class="layout-view"></router-view>
+      </transition>
     </q-page-container>
 
   </q-layout>

@@ -14,7 +14,7 @@ export function drawerMiniAction ({ commit }, data) {
 }
 
 export function notificationsAction ({ commit }, data) {
-  // console.log('notificationsAction', data)
+  console.log('notificationsAction', data)
   commit('notificationsCtrl', data)
 }
 

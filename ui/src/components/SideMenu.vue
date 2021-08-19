@@ -7,6 +7,7 @@
       @mouseover="miniStateMenu(false)"
       @mouseout="miniStateMenu(true)"
       :behavior="menuBehavior"
+      @on-layout="getMenu"
       >
       <q-scroll-area style="height: calc(100% - 120px); margin-top: 117px;">
         <q-list padding >
@@ -36,21 +37,25 @@
       </q-img>
 
     </q-drawer>
+    <Notifications />
     <q-resize-observer @resize="onResize" />
   </div>
 </template>
 
 <script>
 import SideMenuList from './SideMenuList'
+import Notifications from './Notifications'
 
 export default {
   name: 'SideMenu',
   components: {
-    SideMenuList
+    SideMenuList,
+    Notifications
   },
   props: ['data'],
   data () {
     return {
+      API: this.$Api,
       menuList: [],
       // handle automation menu behaviour
       menuBehavior: 'desktop',
@@ -61,7 +66,7 @@ export default {
 
   created () {
     //
-    this.menuList = this.$Helper.getFromLdb('menu', [])
+    this.menuList = this.$Handler.menu()
   },
 
   mounted () {
@@ -111,9 +116,21 @@ export default {
         this.$Helper.loading(false)
         if (status === 200) {
           this.menuList = data
-          this.$Helper.saveLdb('menu', data)
-          // console.log('menu', this.menuList)
-          // this.getUserInfo()
+          this.$Handler.menu(data)
+          this.getUserInfo()
+        }
+      })
+    },
+
+    getUserInfo () {
+      this.$Helper.loading()
+      this.API.get('me', (status, data, message, response, full) => {
+        this.$Helper.loading(false)
+        if (status === 200) {
+          setTimeout(() => {
+            this.$Config.credentials({ user: data })
+            //
+          }, 100)
         }
       })
     },
@@ -122,7 +139,6 @@ export default {
       var miniModeMenu = this.$Handler.drawerMini()
       if (miniModeMenu) this.miniState = val
     }
-
   }
 }
 </script>

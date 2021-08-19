@@ -15,12 +15,13 @@
 
         <q-space />
 
-        <q-btn dense flat round icon="notifications" @click="notificationsCtrl" >
+        <q-btn v-if="!notifications" dense flat round icon="notifications" @click="notificationsCtrl()" class="animated fadeIn" >
           <div class="animated fadeIn" v-if="notifList.length !== 0">
             <q-badge style="animation-duration: 1.5s" class="animated tada infinite" v-if="notifList.length !== 0" color="red" floating >{{notifList.length}}</q-badge>
           </div>
         </q-btn>
 
+        <q-btn v-if="notifications" dense flat round icon="close" @click="notificationsCtrl()" class="animated fadeIn" />
         <profile-popup/>
 
       </q-toolbar>
@@ -47,7 +48,7 @@ export default {
         },
         menu: this.topMenu
       },
-      notifList: [],
+      // notifList: [],
       userInfo: {
         name: 'John Doe',
         username: 'sijohn',
@@ -78,7 +79,7 @@ export default {
 
     notifications: {
       get () {
-        return this.$store.state.GlobalState.drawer
+        return this.$store.state.GlobalState.notifications
       },
       set (val) {
         this.$store.dispatch('GlobalState/notificationsAction', val)
@@ -100,6 +101,10 @@ export default {
         res = (this.data.topBarMenu) ? this.data.topBarMenu : res
       }
       return res
+    },
+
+    notifList () {
+      return this.$Handler.notifications()
     }
   },
 

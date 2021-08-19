@@ -115,6 +115,21 @@ export const Handler = {
     }
     if (val !== '') LocalStorage.set('miniModeMenu', val)
     return LocalStorage.getItem('miniModeMenu')
-  }
+  },
 
+  notifications (save = null) {
+    if (LocalStorage.has('notifications') === false) {
+      LocalStorage.set('notifications', [])
+    }
+    if (save) LocalStorage.set('notifications', save)
+    return LocalStorage.getItem('notifications')
+  },
+
+  menu (save = null) {
+    if (LocalStorage.has('menu') === false) {
+      LocalStorage.set('menu', [])
+    }
+    if (save) LocalStorage.set('menu', save)
+    return LocalStorage.getItem('menu')
+  }
 }

@@ -9,6 +9,7 @@ import Loading from '../components/Loading'
 import SideMenu from '../components/SideMenu'
 import TopMenu from '../components/TopMenu'
 import HeaderTitle from '../components/HeaderTitle'
+import Notifications from '../components/Notifications'
 
 // components default
 import _Input from '../components/default/Input'
@@ -33,6 +34,7 @@ Vue.component('side-menu', SideMenu)
 Vue.component('top-menu', TopMenu)
 Vue.component('header-title', HeaderTitle)
 Vue.component('search-table', _SearchTable)
+Vue.component('notifications', Notifications)
 
 Vue.component('vl-input', _Input)
 Vue.component('vl-number', _Number)

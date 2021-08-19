@@ -4,7 +4,7 @@
     v-for="(menuItem, index) in menuList">
 
     <!-- Overline -->
-    <q-item :key="'i'+index" v-if="menuItem.overline" dense class="animated fadeIn single-line-menu" >
+    <q-item  :key="'i'+index" v-if="menuItem.overline" dense class="animated fadeIn single-line-menu" >
       <q-item-section avatar v-if="miniState" >
         <small class="menu-overline capital" style="font-size:11px;" >---------</small>
       </q-item-section>
@@ -18,9 +18,9 @@
       <SideMenuList :data="menuItem.sub" :mini-state="miniState" :inset-level="insetLv"/>
     </q-expansion-item>
 
-    <q-expansion-item :key="'iii'+index" v-if="menuItem.sub.length === 0"
+    <q-expansion-item @click="actionMenu(menuItem)" :key="'iii'+index" v-if="menuItem.sub.length === 0"
       expand-icon="none" :class="'side-menu-item ic-'+menuIcon(menuItem.detail.icon)"
-      :header-inset-level="insetLevel"
+      :header-inset-level="insetLevel + 0.3"
       :icon="menuIcon(menuItem.detail.icon)" :label="menuItem.detail.name">
     </q-expansion-item>
 
@@ -79,7 +79,24 @@ export default {
       if (icon === null) return 'fiber_manual_record'
       else if (icon === '') return 'fiber_manual_record'
       else return icon
+    },
+
+    actionMenu (menu) {
+      // console.log('actionMenu', menu)
+      // console.log('router', this.$router)
+
+      if (menu.sub === undefined || menu.sub.length === 0) { // jika tidak ada sub, jadikan link
+        // var p = menu.detail.slug
+        var p = menu.detail.path
+        if (p === 'logout') this.logout()
+        else if (p === 'ApiRoot') this.ApiRoot()
+        else {
+          // this.$router.push({ name: p })
+          this.$router.push(p)
+        }
+      }
     }
+
   }
 }
 </script>

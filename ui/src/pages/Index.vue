@@ -2,8 +2,9 @@
 
   <div class="root">
 
-    <!-- drawer di init di: boot/extend-component.js -->
-    <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
+    <!-- drawer & top menu -->
+    <top-menu :data="Meta" />
+    <side-menu :data="Meta" />
 
     <div class="row">
       <div class="col-12 text-center pt-5 img-responsive" >

@@ -22,22 +22,15 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/Default.vue'),
-    children: [
-      { name: 'example', path: '/example', component: () => import('pages/example/index.vue') },
-      { name: 'view-page', path: '/example/view/:id', component: () => import('pages/example/detail.vue') },
-      { name: 'add-page', path: '/example/form', component: () => import('pages/example/form.vue') },
-      { name: 'edit-page', path: '/example/form/:id', component: () => import('pages/example/form.vue') }
-    ]
-  },
-  {
-    path: '/',
-    component: () => import('layouts/Main.vue'),
+    // component: () => import('layouts/Main.vue'),
     children: [
       // exampel page
       { name: 'exampleComponents', path: '/example-components', component: () => import('pages/example.vue') },
-      // { name: 'view-page', path: '/example/view/:id', component: () => import('pages/example/detail.vue') },
-      // { name: 'add-page', path: '/example/form', component: () => import('pages/example/form.vue') },
-      // { name: 'edit-page', path: '/example/form/:id', component: () => import('pages/example/form.vue') },
+
+      { name: 'example', path: '/example', component: () => import('pages/example/index.vue') },
+      { name: 'view-page', path: '/example/view/:id', component: () => import('pages/example/detail.vue') },
+      { name: 'add-page', path: '/example/form', component: () => import('pages/example/form.vue') },
+      { name: 'edit-page', path: '/example/form/:id', component: () => import('pages/example/form.vue') },
 
       // module page
       { name: 'home', path: '/', component: () => import('pages/index.vue') },

@@ -3,7 +3,7 @@
     <div class="col-12 col-sm-5 col-md-6 pb-1 pv info-page">
       <div class="title">
         <span class="text-caption text-grey-7">Master {{(meta) ? meta.name : 'Page'}}</span><br>
-        <q-btn v-if="backEvt" @click="backEvent" rounded icon="arrow_back" flat dense class="mr-1" color="grey-9"/>
+        <q-btn v-if="backEvt" @click="backEventHandle" rounded icon="arrow_back" flat dense class="mr-1" color="grey-9"/>
         <span class="text-h5 bold text-dark capital">{{overideTitle}}</span>
       </div>
     </div>
@@ -95,6 +95,11 @@ export default {
   },
 
   methods: {
+
+    backEventHandle (event) {
+      if (event) event()
+    },
+
     onRefresh () {
       console.log('activate')
     }
