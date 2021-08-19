@@ -4,7 +4,7 @@
       :persistent="persistent" maximized flat class="card-modal" transition-show="jump-up" transition-hide="jump-down" >
         <q-card :style="'width: '+optimizeWidth()+'; height: '+height+'; margin: 40px auto;'" >
           <q-card-section class="row items-center bg-primary">
-            <div class="text-h6 text-light">{{title}}</div>
+            <div class="text-h6 text-light bold">{{title}}</div>
             <q-space />
             <q-btn icon="close" flat round dense v-close-popup class="text-light" />
           </q-card-section>

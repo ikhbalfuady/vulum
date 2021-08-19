@@ -163,5 +163,17 @@ export const Config = {
     // if (type === 'bar') return barStyle
     // else return thumbStyle
     return null
+  },
+
+  noOptionLabel (modeulName = 'data') {
+    return 'Type 2 character to find ' + modeulName + '..'
+  },
+
+  actionMode () {
+    var mode = 'PAGE'
+    if (LocalStorage.has('actionmode') === false) {
+      LocalStorage.set('actionmode', mode)
+    }
+    return LocalStorage.getItem('actionmode')
   }
 }

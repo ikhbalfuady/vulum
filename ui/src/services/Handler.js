@@ -1,5 +1,8 @@
 import { Helper } from './helper'
 import Api from './Api'
+import {
+  LocalStorage
+} from 'quasar'
 
 export const Handler = {
 
@@ -89,6 +92,29 @@ export const Handler = {
       else _this.backToRoot()
     }
     return res
+  },
+
+  drawer (val = '') {
+    if (LocalStorage.has('openDrawer') === false) {
+      LocalStorage.set('openDrawer', true)
+    }
+
+    var mode = LocalStorage.getItem('openDrawer')
+    mode = !mode
+
+    if (val !== '') mode = val
+    // console.log('handler drawers', val, mode)
+
+    LocalStorage.set('openDrawer', mode)
+    return mode
+  },
+
+  drawerMini (val = '') {
+    if (LocalStorage.has('miniModeMenu') === false) {
+      LocalStorage.set('miniModeMenu', true)
+    }
+    if (val !== '') LocalStorage.set('miniModeMenu', val)
+    return LocalStorage.getItem('miniModeMenu')
   }
 
 }

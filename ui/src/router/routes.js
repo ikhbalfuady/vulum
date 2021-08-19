@@ -34,7 +34,7 @@ const routes = [
     component: () => import('layouts/Main.vue'),
     children: [
       // exampel page
-      // { name: 'example', path: '/example', component: () => import('pages/example/index.vue') },
+      { name: 'exampleComponents', path: '/example-components', component: () => import('pages/example.vue') },
       // { name: 'view-page', path: '/example/view/:id', component: () => import('pages/example/detail.vue') },
       // { name: 'add-page', path: '/example/form', component: () => import('pages/example/form.vue') },
       // { name: 'edit-page', path: '/example/form/:id', component: () => import('pages/example/form.vue') },

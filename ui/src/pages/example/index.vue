@@ -4,6 +4,8 @@
 
     <!-- drawer di init di: boot/extend-component.js
     <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />-->
+    <top-menu :data="Meta"  />
+    <side-menu v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
 
       <!-- Header Title -->
       <div class="row pl-2 pt-2 bg-light">
@@ -16,13 +18,12 @@
         </div>
 
         <div class="col-2 col-sm-2 col-md-2 pb-1 pr-1 btn-filter">
-          <q-btn unelevated color="primary" class="capital" icon="tune">
+          <q-btn unelevated color="primary" class="capital" icon="filter_list">
             <q-popup-proxy ref="popupFilter" transition-show="jump-up" transition-hide="jump-down">
               <q-banner dense>
                 <div class="row pt-1 pl-1 pb-1" style="min-width:320px">
-                  <div class="col-12 text-grey-7 bold pb-1 pt"> Settings</div>
+                  <div class="col-12 text-grey-7 bold pb-1 pt"> Filter</div>
 
-                  <vl-select col="12" label="Action Mode" v-model="dataModel.actionMode" :options="select.actionMode" @input="val => { onRefresh() }"/>
                   <vl-select col="12" label="Status" v-model="dataModel.status" :options="select.status" @input="val => { onRefresh() }"/>
                   <vl-select col="12" label="Searc By" v-model="table.searchBySelected" :options="table.searchBy" />
 
@@ -32,7 +33,7 @@
                 </div>
               </q-banner>
             </q-popup-proxy>
-            <span class="gt-xs pl-1">Settings</span>
+            <span class="gt-xs pl-1">Filter</span>
           </q-btn>
         </div>
 
@@ -133,9 +134,7 @@ export default {
         { name: 'slug', label: 'slug', field: 'slug', align: 'left' }
       ]),
       select: {
-        status: this.$Handler.toObjectSelect(['ACTIVE', 'TRASH']),
-        actionMode: this.$Handler.toObjectSelect(['PAGE', 'MODAL'])
-
+        status: this.$Handler.toObjectSelect(['ACTIVE', 'TRASH'])
       },
       modal: {
         show: false,
@@ -165,7 +164,38 @@ export default {
   methods: {
 
     initTopBar () {
-      this.Meta.topBarMenu = [{ name: 'Refresh', event: this.onRefresh }]
+      // this.Meta.topBarMenu = [{ name: 'Refresh', event: this.onRefresh }]
+      this.Meta.topBarMenu = [
+        { name: 'Refresh', event: this.onRefresh },
+        {
+          name: 'Setting',
+          sub: [
+            { name: 'Refresh', event: this.onRefresh },
+            { name: 'Reload', event: this.onRefresh },
+            {
+              name: 'Config',
+              sub: [
+                { name: 'c Refresh', event: this.onRefresh },
+                { name: 'c Reload', event: this.onRefresh },
+                {
+                  name: 'Config 3',
+                  sub: [
+                    { name: 'c3 Refresh', event: this.onRefresh },
+                    { name: 'c3 Reload', event: this.onRefresh },
+                    {
+                      name: 'Config 4',
+                      sub: [
+                        { name: 'c3 Refresh', event: this.onRefresh },
+                        { name: 'c3 Reload', event: this.onRefresh }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
 
     onRefresh () {
@@ -211,7 +241,7 @@ export default {
     },
 
     add () {
-      if (this.dataModel.actionMode === 'PAGE') this.$router.push({ name: 'add-' + this.Meta.module })
+      if (this.$Config.actionMode() === 'PAGE') this.$router.push({ name: 'add-' + this.Meta.module })
       else {
         this.modal.show = true
         this.modal.mode = 'form'
@@ -221,7 +251,7 @@ export default {
     },
 
     edit (data) {
-      if (this.dataModel.actionMode === 'PAGE') this.$router.push({ name: 'edit-' + this.Meta.module, params: data })
+      if (this.$Config.actionMode() === 'PAGE') this.$router.push({ name: 'edit-' + this.Meta.module, params: data })
       else {
         this.modal.show = true
         this.modal.mode = 'form'
@@ -231,7 +261,7 @@ export default {
     },
 
     detail (data) {
-      if (this.dataModel.actionMode === 'PAGE') this.$router.push({ name: 'view-' + this.Meta.module, params: data })
+      if (this.$Config.actionMode() === 'PAGE') this.$router.push({ name: 'view-' + this.Meta.module, params: data })
       else {
         this.modal.show = true
         this.modal.mode = 'detail'

@@ -307,4 +307,34 @@ $list = [
 
     // custom module
 
+    ["name" => "Department",
+        "loging_date" => true,
+        "loging_user" => true,
+        "column" => [
+            [ "name" => "id",
+                "type" => "bigIncrements",
+                "attributes" => ["index"],
+            ],
+            [ "name" => "name",
+                "type" => "string",
+                "attributes" => ["index"],
+            ],
+            [ "name" => "parent",
+                "type" => "unsignedBigInteger",
+                "attributes" => ["index"],
+                "belongsTo" => [ 
+                    "model" => "Users",
+                    "name" => "User", // delete this property to use default from "model" value
+                    "foreign" => "parent", // define "_self" or delete this property to use default column name
+                    "foreign2" => "id", // delete this property to use default id of foreign module
+                ],
+            ],
+            [ "name" => "rate",
+                "type"    => "double",
+                "length"  => 18,
+                "length2" => 2,
+            ],
+            
+        ],
+    ],
 ];  

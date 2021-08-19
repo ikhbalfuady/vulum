@@ -18,22 +18,23 @@
       </div>
 
       <q-card :class="classArea">
-          <q-card-section>
-            <q-form @submit="submit">
-              <q-card-section class="row">
+        <q-card-section>
+          <loading v-if="loading" />
+          <q-form @submit="submit" v-if="!loading" >
+            <q-card-section class="row animated fadeIn">
 
-                <template v-for="(props, index) in dataModel" >
-                  <vl-input v-model="dataModel[index]" :label="index" :key="index" toplabel/>
-                </template>
+              <template v-for="(props, index) in dataModel" >
+                <vl-input v-model="dataModel[index]" :label="index" :key="index" toplabel/>
+              </template>
 
-              </q-card-section>
+            </q-card-section>
 
-              <q-card-actions align="right" class="">
-                <q-btn class="capital bold" unelevated flat color="red" label="Cancel" icon="cancel" @click="backToRoot" />
-                <q-btn class="capital bold" unelevated color="green" label="Save" :disable="disableSubmit" type="submit" icon="check_circle"/>
-              </q-card-actions>
-            </q-form>
-          </q-card-section>
+            <q-card-actions align="right" class="">
+              <q-btn class="capital bold" unelevated flat color="red" label="Cancel" icon="cancel" @click="backToRoot" />
+              <q-btn class="capital bold" unelevated color="green" label="Save" :disable="disableSubmit" type="submit" icon="check_circle"/>
+            </q-card-actions>
+          </q-form>
+        </q-card-section>
       </q-card>
 
   </div>
@@ -53,6 +54,7 @@ export default {
       API: this.$Api,
       // default data
       title: 'Create',
+      loading: false,
       dataModel: {},
       disableSubmit: false
     }
@@ -103,10 +105,12 @@ export default {
     },
 
     getData (id) {
-      this.$Helper.loadingOverlay(true, 'Loading..')
+      // this.$Helper.loadingOverlay(true, 'Loading..')
+      this.loading = true
       var endpoint = this.Meta.module + '/' + id
       this.API.get(endpoint, (status, data, message, response, full) => {
-        this.$Helper.loadingOverlay(false)
+        // this.$Helper.loadingOverlay(false)
+        this.loading = false
         if (status === 200) {
           // inject data
           this.dataModel = data

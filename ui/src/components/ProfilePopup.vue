@@ -2,32 +2,29 @@
   <div>
     <q-avatar class="cursor ml-2" size="28px">
       <img src="assets/avatar.jpg">
-      <q-menu fit
+      <q-menu fit @before-show="onRefresh"
       transition-show="jump-left"
       transition-hide="jump-right"
       >
-        <div class="no-wrap q-pa-md">
+        <div class="no-wrap bg-grad ">
 
-          <div class="text-center">
+          <div class="text-center q-pa-md">
             <q-avatar size="72px">
               <img src="assets/avatar.jpg">
             </q-avatar>
 
-            <div class="text-subtitle1 q-mt-md q-mb-xs">
-              <q-skeleton v-if="data.role === undefined" class="animated fadeIn" type="text" />
-              <q-badge color="yellow-10" :label="dataModel.role ? dataModel.role.name : '-'" class="capital animated fadeIn" />
+            <div class="text-subtitle1 q-mt-md q-mb-xs text-light">
+              <q-badge color="yellow-10" :label="(user.role.name) ? user.role.name : user.role " class="capital animated fadeIn" />
             </div>
 
-            <div class="q-mb-md text-center">
-              <q-skeleton v-if="dataModel.name === ''" class="animated fadeIn" type="text" />
-              <span class="animated fadeIn text-h6 " v-if="dataModel.name !== ''" >{{dataModel.name}}</span>
+            <div class="q-mb-md text-center text-light">
+              <span class="animated fadeIn text-h6 " >{{user.name}}</span>
               <br>
-              <q-skeleton v-if="dataModel.email === ''" class="animated fadeIn" type="text" />
-              <span class="animated fadeIn  " v-if="dataModel.email !== ''" >{{dataModel.email}}</span>
+              <span class="animated fadeIn" >{{user.email}}</span>
             </div>
           </div>
 
-          <div class="">
+          <div class="q-pa-md bg-light">
             <q-toggle size="sm" @input="changeMiniMode()" v-model="miniModeMenu" left-label label="Mini Mode Menu" class="mb-1"/>
             <q-btn @click="openLink('profile')" flat color="primary" size="sm" class="bg-grey-2 capital mb-1 full-width" icon="person" label="Profile" /> <br>
             <q-btn @click="openLink('change-password')" flat color="primary" size="sm" class="bg-grey-2 capital mb-1 full-width" icon="gpp_good" label="Change Password" /> <br>
@@ -47,14 +44,7 @@ export default {
   props: ['data'],
   data () {
     return {
-      dataModel: {
-        name: 'John Doe',
-        username: 'sijohn',
-        email: 'johndoe@mail.com',
-        role: null
-      },
-      miniModeMenu: false,
-      miniState: false
+      miniModeMenu: false
     }
   },
 
@@ -64,14 +54,27 @@ export default {
     this.dataModel = credentials
   },
 
-  updated () {
-    console.log('profilePopup:data', this.data)
-    if (this.data !== undefined) this.dataModel = this.data
+  mounted () {
+    this.miniModeMenu = this.$Handler.drawerMini()
+  },
+
+  computed: {
+    user: {
+      set: function (val) {
+        this.$store.dispatch('GlobalState/userInfoAction', val)
+      },
+      get: function () {
+        var res = this.$store.state.GlobalState.userInfo
+        console.log('get', res)
+        return res
+      }
+    }
   },
 
   methods: {
     onRefresh () {
-      console.log('activate')
+      var cre = this.$Config.credentials()
+      this.user = (cre.user) ? cre.user : cre
     },
 
     logout () {
@@ -82,10 +85,8 @@ export default {
     },
 
     changeMiniMode () {
-      var current = this.miniModeMenu
-      // console.log('changeMiniMode', current)
-      this.$Helper.saveLdb('miniModeMenu', current)
-      if (!current) this.miniState = false
+      this.$Handler.drawerMini(this.miniModeMenu)
+      this.$store.dispatch('GlobalState/drawerMiniAction', this.miniModeMenu)
     },
 
     openLink (val) {
