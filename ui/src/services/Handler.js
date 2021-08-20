@@ -19,14 +19,21 @@ export const Handler = {
       ],
       pagination: {
         page: 1,
-        rowsPerPage: 15,
+        rowsPerPage: 8,
         rowsNumber: 0
       },
       selected: []
     }
 
     for (const col of table.columns) {
-      if (col.name !== 'action') table.searchBy.push(col)
+      var obj = {
+        id: col.name,
+        name: col.name,
+        field: (col.search) ? col.search : col.field
+      }
+      if (col.name !== 'action') {
+        table.searchBy.push(obj)
+      }
     }
     if (table.searchBy.length > 0) table.searchBySelected = table.searchBy[0]
 
@@ -153,5 +160,17 @@ export const Handler = {
     }
     // console.log('list', list)
     return list
+  },
+
+  actionMode (val = null) {
+    var mode = 'PAGE'
+    if (LocalStorage.has('actionmode') === false) {
+      LocalStorage.set('actionmode', mode)
+    }
+    if (val) {
+      LocalStorage.set('actionmode', val)
+    }
+    console.log(val)
+    return LocalStorage.getItem('actionmode')
   }
 }

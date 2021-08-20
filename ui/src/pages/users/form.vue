@@ -44,6 +44,7 @@
               url="master-menus"
               :default-data="dataModel.menu"
               v-model="dataModel.menu_id"
+              :on-selected="test"
             />
 
           </q-card-section>
@@ -112,6 +113,10 @@ export default {
   },
 
   methods: {
+
+    test (data) {
+      console.log('selected', data)
+    },
 
     handleFromModal () {
       if (this.fromModal && this.fromModal.params) {

@@ -1,16 +1,18 @@
 <template>
 <div :class="columnSize" >
   <div v-if="toplabel === ''" class="bold capital text-primary mh-1" >
-    {{(label) ? label : ''}} <small v-if="toplabel === '' || optional === ''" class="optional">(Optional)</small>
+    {{(label) ? label : ''}}
   </div>
-  <q-input type="textarea"
+  <q-input
+    type="textarea"
     :class="(className) ? className : ''"
     :style="(styleEl) ? styleEl : ''"
     :label="(label && toplabel !== '') ? label : ''"
-    dense filled
+    dense filled square
     v-bind:value="value"
     v-on:input="emiters($event)"
     :rules="(rules) ? rules : []"
+    :rows="rows ? rows : 6"
   >
   </q-input >
 </div>
@@ -21,49 +23,44 @@
 </style>
 
 <script>
-/*
+/* v.1.0.1
 ? Components Attributes
---------------------------------------------------
-* className <attributeWithValue:string>
-> define class inner element input
-USAGE    : < className="classInput" >
+  --------------------------------------------------
+  * className <attributeWithValue:string>
+  > define class inner element input
+  USAGE    : < className="classInput" >
 
---------------------------------------------------
-* styleEl <attributeWithValue:string>
-> define style inner element input
-USAGE    : < styleEl="color:red" >
+  --------------------------------------------------
+  * styleEl <attributeWithValue:string>
+  > define style inner element input
+  USAGE    : < styleEl="color:red" >
 
---------------------------------------------------
-* label <attributeWithValue:any>
-> define label text
-USAGE    : < label="label input" >
+  --------------------------------------------------
+  * label <attributeWithValue:any>
+  > define label text
+  USAGE    : < label="label input" >
 
---------------------------------------------------
-* toplabel <attribute>
-> use top labels or default
-USAGE    : < toplabel >
+  --------------------------------------------------
+  * toplabel <attribute>
+  > use top labels or default
+  USAGE    : < toplabel >
 
---------------------------------------------------
-* optional <attribute>
-> use top labels or default
-USAGE    : < optional >
+  --------------------------------------------------
+  * rules <array:QuasarDefaultRule>
+  > rules like default common validation
+  USAGE    : < :rules="[ val => val !== null && val !== '' || 'Field is required!']" >
 
---------------------------------------------------
-* rules <array:QuasarDefaultRule>
-> rules like default common validation
-USAGE    : < :rules="[ val => val !== null && val !== '' || 'Field is required!']" >
+  --------------------------------------------------
+  * col <attributeWithValue:number>
+  > define column of this element on medium breakpoint with defaul col-12 in mobile
+  > value follow a breakpoint number, 1 - 12
+  USAGE    : < col="3" >
 
---------------------------------------------------
-* col <attributeWithValue:number>
-> define column of this element on medium breakpoint with defaul col-12 in mobile
-> value follow a breakpoint number, 1 - 12
-USAGE    : < col="3" >
+  ? USAGE Element :
+  <vl-textarea label="TextArea" v-model="modelName" />
 
-? USAGE Element :
-<vl-textarea label="TextArea" v-model="modelName" />
-
-! Tips
-if want to set height of content textarea, use style for sizing ex : height:10px
+  ! Tips
+  if want to set height of content textarea, use style for sizing ex : height:10px
 */
 export default {
   name: 'VlTextArea',
@@ -73,9 +70,9 @@ export default {
     'label',
     'value',
     'toplabel',
-    'optional',
     'rules',
-    'col'
+    'col',
+    'rows'
   ],
   data () {
     return {

@@ -167,13 +167,5 @@ export const Config = {
 
   noOptionLabel (modeulName = 'data') {
     return 'Type 2 character to find ' + modeulName + '..'
-  },
-
-  actionMode () {
-    var mode = 'PAGE'
-    if (LocalStorage.has('actionmode') === false) {
-      LocalStorage.set('actionmode', mode)
-    }
-    return LocalStorage.getItem('actionmode')
   }
 }

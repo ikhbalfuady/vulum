@@ -67,10 +67,10 @@
       </q-table>
     </div>
 
-    <Modal :config="modal">
+    <modal :config="modal">
       <Form v-if="modal.mode === 'form'" :from-modal="modal" />
       <Detail v-if="modal.mode === 'detail'" :from-modal="modal" />
-    </Modal>
+    </modal>
   </div>
 </template>
 
@@ -78,12 +78,10 @@
 import Meta from './meta'
 import Form from './form'
 import Detail from './detail'
-import Modal from '../../components/Modal'
 
 export default {
   name: 'Department',
   components: {
-    Modal,
     Detail,
     Form
   },
@@ -205,7 +203,7 @@ export default {
     },
 
     add () {
-      if (this.$Config.actionMode() === 'PAGE') this.$router.push({ name: 'add-' + this.Meta.module })
+      if (this.$Handler.actionMode() === 'PAGE') this.$router.push({ name: 'add-' + this.Meta.module })
       else {
         this.modal.show = true
         this.modal.mode = 'form'
@@ -215,7 +213,7 @@ export default {
     },
 
     edit (data) {
-      if (this.$Config.actionMode() === 'PAGE') this.$router.push({ name: 'edit-' + this.Meta.module, params: data })
+      if (this.$Handler.actionMode() === 'PAGE') this.$router.push({ name: 'edit-' + this.Meta.module, params: data })
       else {
         this.modal.show = true
         this.modal.mode = 'form'
@@ -225,7 +223,7 @@ export default {
     },
 
     detail (data) {
-      if (this.$Config.actionMode() === 'PAGE') this.$router.push({ name: 'view-' + this.Meta.module, params: data })
+      if (this.$Handler.actionMode() === 'PAGE') this.$router.push({ name: 'view-' + this.Meta.module, params: data })
       else {
         this.modal.show = true
         this.modal.mode = 'detail'

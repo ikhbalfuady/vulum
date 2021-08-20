@@ -1,7 +1,7 @@
 <template>
 <div :class="columnSize" >
   <div v-if="toplabel === ''" class="bold capital text-primary mh-1" >
-    {{(label) ? label : ''}} <small v-if="toplabel === '' || optional === ''" class="optional">(Optional)</small>
+    {{(label) ? label : ''}}
   </div>
   <q-toggle floating dense
     :size="(size) ? size : 'md'"
@@ -21,61 +21,56 @@
 </style>
 
 <script>
-/*
+/* v.1.0.1
 ? Components Attributes
---------------------------------------------------
-* className <attributeWithValue:string>
-> define class inner element input
-USAGE    : < className="classInput" >
+  --------------------------------------------------
+  * className <attributeWithValue:string>
+  > define class inner element input
+  USAGE    : < className="classInput" >
 
---------------------------------------------------
-* styleEl <attributeWithValue:string>
-> define style inner element input
-USAGE    : < styleEl="color:red" >
+  --------------------------------------------------
+  * styleEl <attributeWithValue:string>
+  > define style inner element input
+  USAGE    : < styleEl="color:red" >
 
---------------------------------------------------
-* label <attributeWithValue:any>
-> define label text
-USAGE    : < label="label input" >
+  --------------------------------------------------
+  * label <attributeWithValue:any>
+  > define label text
+  USAGE    : < label="label input" >
 
---------------------------------------------------
-* toplabel <attribute>
-> use top labels or default
-USAGE    : < toplabel >
+  --------------------------------------------------
+  * toplabel <attribute>
+  > use top labels or default
+  USAGE    : < toplabel >
 
---------------------------------------------------
-* optional <attribute>
-> use top labels or default
-USAGE    : < optional >
+  --------------------------------------------------
+  * rules <array:QuasarDefaultRule>
+  > rules like default common validation
+  USAGE    : < :rules="[ val => val !== null && val !== '' || 'Field is required!']" >
 
---------------------------------------------------
-* rules <array:QuasarDefaultRule>
-> rules like default common validation
-USAGE    : < :rules="[ val => val !== null && val !== '' || 'Field is required!']" >
+  --------------------------------------------------
+  * col <attributeWithValue:number>
+  > define column of this element on medium breakpoint with defaul col-12 in mobile
+  > value follow a breakpoint number, 1 - 12
+  USAGE    : < col="3" >
 
---------------------------------------------------
-* col <attributeWithValue:number>
-> define column of this element on medium breakpoint with defaul col-12 in mobile
-> value follow a breakpoint number, 1 - 12
-USAGE    : < col="3" >
+  --------------------------------------------------
+  * icon <attributeWithValue:string>
+  > define icon on toggle
+  USAGE    : < icon="power" >
 
---------------------------------------------------
-* icon <attributeWithValue:string>
-> define icon on toggle
-USAGE    : < icon="power" >
+  --------------------------------------------------
+  * size <attributeWithValue:string>
+  > define size on toggle, default set is 'md', avail : xs, sm, md, lg
+  USAGE    : < size="md" >
 
---------------------------------------------------
-* size <attributeWithValue:string>
-> define size on toggle, default set is 'md', avail : xs, sm, md, lg
-USAGE    : < size="md" >
+  --------------------------------------------------
+  * block <attribute>
+  > set display block toogle
+  USAGE    : < block >
 
---------------------------------------------------
-* block <attribute>
-> set display block toogle
-USAGE    : < block >
-
-? USAGE Element :
-<vl-toggle label="Toggle" v-model="modelName" />
+  ? USAGE Element :
+  <vl-toggle label="Toggle" v-model="modelName" />
 */
 export default {
   name: 'VlToggle',
@@ -85,7 +80,6 @@ export default {
     'label',
     'value',
     'toplabel',
-    'optional',
     'rules',
     'icon',
     'size',

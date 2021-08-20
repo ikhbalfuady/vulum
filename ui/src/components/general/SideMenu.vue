@@ -9,7 +9,7 @@
       :behavior="menuBehavior"
       @on-layout="getMenu"
       >
-      <q-scroll-area style="height: calc(100% - 120px); margin-top: 117px;">
+      <q-scroll-area style="height: calc(100% - 120px); margin-top: 120px;">
         <q-list padding >
           <SideMenuList :data="menuList" :mini-state="miniState"/>
         </q-list>
@@ -19,7 +19,7 @@
         <!-- Full Mode -->
         <div class="bg-transparent text-center full-width" v-if="!miniState">
           <div class="logo animated">
-            <img src="assets/icons/logo-xs-light.png" /> <br>
+            <img src="assets/icons/logo-md-light.png" width="182"/> <br>
             <span class="text-grey-1">v.{{$Config.version()}}</span>
           </div>
           <q-chip size="sm">
@@ -185,7 +185,7 @@ soft : #fff
 
 .side-menu aside { /* bg menu */
   background: $dark;
-  z-index: 990 !important;
+
 }
 
 .side-menu aside div .head-menu { /* bg head menu */

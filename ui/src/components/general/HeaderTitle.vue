@@ -56,8 +56,8 @@ export default {
   props: ['meta', 'cofigLabel', 'cofigIcon', 'isModal', 'backToRoot', 'halfSlot', 'title', 'formMode'],
   data () {
     return {
-      dataModel: null,
-      backEvent: null
+      dataModel: null
+      // backEvent: null
     }
   },
 
@@ -66,7 +66,7 @@ export default {
   },
 
   mounted () {
-    this.backEvent = this.backEvt
+    // this.backEvent = this.backEvt
   },
 
   computed: {
@@ -96,8 +96,9 @@ export default {
 
   methods: {
 
-    backEventHandle (event) {
-      if (event) event()
+    backEventHandle () {
+      console.log(this.backEvt)
+      if (this.backEvt) this.backToRoot()
     },
 
     onRefresh () {

@@ -1,19 +1,56 @@
 <template>
 <div :class="columnSize" >
   <div v-if="toplabel === ''" class="bold capital text-primary mh-1" >
-    {{(label) ? label : ''}} <small v-if="toplabel === '' || optional === ''" class="optional">(Optional)</small>
+    {{(label) ? label : ''}}
   </div>
-  <q-input
+  <q-input v-if="toplabel === ''"
     :class="(className) ? className : ''"
-    :hint="(hint) ? hint : ''"
     :style="(styleEl) ? styleEl : ''"
-    :label="(label && toplabel !== '') ? label : ''"
-    dense filled
+    dense filled square
     v-bind:value="value"
     v-on:input="emiters($event)"
     :rules="(rules) ? rules : []"
+    :readonly="(readonly==='') ? true : false"
+    :placeholder="(placeholder) ? placeholder : ''"
+    :bottom-slots="(bottomSlots==='') ? true : false"
   >
-  </q-input >
+    <template v-if="$slots.prepend" v-slot:prepend>
+      <slot name="prepend"></slot>
+    </template>
+
+    <template v-if="$slots.append" v-slot:append>
+      <slot name="append"></slot>
+    </template>
+
+    <template v-if="$slots.hint" v-slot:hint>
+      <slot name="hint"></slot>
+    </template>
+  </q-input>
+
+  <q-input v-if="toplabel === undefined"
+    :class="(className) ? className : ''"
+    :style="(styleEl) ? styleEl : ''"
+    :label="(label && toplabel !== '') ? label : null"
+    dense filled square
+    v-bind:value="value"
+    v-on:input="emiters($event)"
+    :rules="(rules) ? rules : []"
+    :readonly="(readonly==='') ? true : false"
+    :placeholder="(placeholder) ? placeholder : ''"
+    :bottom-slots="(bottomSlots==='') ? true : false"
+  >
+    <template v-if="$slots.prepend" v-slot:prepend>
+      <slot name="prepend"></slot>
+    </template>
+
+    <template v-if="$slots.append" v-slot:append>
+      <slot name="append"></slot>
+    </template>
+
+    <template v-if="$slots.hint" v-slot:hint>
+      <slot name="hint"></slot>
+    </template>
+  </q-input>
 </div>
 </template>
 
@@ -22,51 +59,54 @@
 </style>
 
 <script>
-/*
+/* v.1.0.1
 ? Components Attributes
---------------------------------------------------
-* className <attributeWithValue:string>
-> define class inner element input
-USAGE    : < className="classInput" >
+  --------------------------------------------------
+  * className <attributeWithValue:string>
+  > define class inner element input
+  USAGE    : < className="classInput" >
 
---------------------------------------------------
-* styleEl <attributeWithValue:string>
-> define style inner element input
-USAGE    : < styleEl="color:red" >
+  --------------------------------------------------
+  * styleEl <attributeWithValue:string>
+  > define style inner element input
+  USAGE    : < styleEl="color:red" >
 
---------------------------------------------------
-* label <attributeWithValue:any>
-> define label text
-USAGE    : < label="label input" >
+  --------------------------------------------------
+  * label <attributeWithValue:any>
+  > define label text
+  USAGE    : < label="label input" >
 
---------------------------------------------------
-* toplabel <attribute>
-> use top labels or default
-USAGE    : < toplabel >
+  --------------------------------------------------
+  * toplabel <attribute>
+  > use top labels or default
+  USAGE    : < toplabel >
 
---------------------------------------------------
-* optional <attribute>
-> use top labels or default
-USAGE    : < optional >
+  --------------------------------------------------
+  * rules <array:QuasarDefaultRule>
+  > rules like default common validation
+  USAGE    : < :rules="[ val => val !== null && val !== '' || 'Field is required!']" >
 
---------------------------------------------------
-* rules <array:QuasarDefaultRule>
-> rules like default common validation
-USAGE    : < :rules="[ val => val !== null && val !== '' || 'Field is required!']" >
+  --------------------------------------------------
+  * col <attributeWithValue:number>
+  > define column of this element on medium breakpoint with defaul col-12 in mobile
+  > value follow a breakpoint number, 1 - 12
+  USAGE    : < col="3" >
 
---------------------------------------------------
-* hint <attributeWithValue:any>
-> define hint text
-USAGE    : < hint="label input" >
+  --------------------------------------------------
+  * bottomSlots <attribute>
+  > to enable slot hint
+  USAGE    : < bottomSlots >
 
---------------------------------------------------
-* col <attributeWithValue:number>
-> define column of this element on medium breakpoint with defaul col-12 in mobile
-> value follow a breakpoint number, 1 - 12
-USAGE    : < col="3" >
+  --------------------------------------------------
+  * readonly <attribute>
+  > define readonly element
+  USAGE    : < readonly >
 
-? USAGE Element :
-<vl-input label="Input" v-model="modelName" />
+  ? USAGE Element :
+  <vl-input label="Input" v-model="modelName" />
+
+  !Tips
+  if want to use hint slot, you must be define "bottomSlots" attribute
 
 */
 export default {
@@ -77,10 +117,11 @@ export default {
     'label',
     'value',
     'toplabel',
-    'optional',
     'rules',
-    'hint',
-    'col'
+    'col',
+    'placeholder',
+    'bottomSlots',
+    'readonly'
   ],
   data () {
     return {
@@ -94,7 +135,7 @@ export default {
 
   computed: {
     columnSize () {
-      var col = 'pr-1 pb-1 col-12 col-md-6'
+      var col = 'pr-1 pb-1'
       if (this.col !== undefined) col = 'pr-1 pb-1 col-12 col-md-' + this.col
       return col
     }

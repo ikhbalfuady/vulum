@@ -34,7 +34,7 @@ const routes = [
 
       // module page
       { name: 'home', path: '/', component: () => import('pages/index.vue') },
-      { name: 'users-list', path: '/users', component: () => import('pages/users/index.vue') },
+      { name: 'users', path: '/users', component: () => import('pages/users/index.vue') },
       { name: 'view-users', path: '/users/view/:id', component: () => import('pages/users/detail.vue') },
       { name: 'add-users', path: '/users/form', component: () => import('pages/users/form.vue') },
       { name: 'edit-users', path: '/users/form/:id', component: () => import('pages/users/form.vue') },

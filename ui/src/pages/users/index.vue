@@ -10,7 +10,9 @@
     <header-title :meta="Meta">
       <template v-slot:config>
         <vl-select col="12" label="Status" v-model="dataModel.status" :options="select.status" @input="val => { onRefresh() }"/>
-        <vl-select col="12" label="Searc By" v-model="table.searchBySelected" :options="table.searchBy" />
+        <vl-select col="12" label="Searc By" v-model="table.searchBySelected" :options="table.searchBy" raw />
+        {{table.searchBySelected}}
+        {{table.searchBy}}
       </template>
       <template v-slot:right>
         <search-table v-model="table.search" :table="table" />
@@ -36,8 +38,8 @@
 
         <template v-slot:body-cell-action="props">
           <q-td :props="props">
-            <q-btn v-if="Meta.permission.update" class="bg-soft" dense round flat color="green" @click="edit(props.row)" icon="edit"></q-btn>
-            <q-btn class="bg-soft" dense round flat color="primary" @click="detail(props.row)" icon="visibility"></q-btn>
+            <q-btn v-if="Meta.permission.update" class="bg-soft" dense round flat color="green" @click="edit(props.row)" icon="edit"><q-tooltip>Edit</q-tooltip></q-btn>
+            <q-btn class="bg-soft" dense round flat color="primary" @click="detail(props.row)" icon="visibility"><q-tooltip>View</q-tooltip></q-btn>
           </q-td>
         </template>
 
@@ -96,10 +98,10 @@
       </q-table>
     </div>
 
-    <Modal :config="modal">
+    <modal :config="modal">
       <Form v-if="modal.mode === 'form'" :from-modal="modal" />
       <Detail v-if="modal.mode === 'detail'" :from-modal="modal" />
-    </Modal>
+    </modal>
 
   </div>
 </template>
@@ -108,12 +110,10 @@
 import Meta from './meta'
 import Form from './form'
 import Detail from './detail'
-import Modal from '../../components/Modal'
 
 export default {
   name: 'Users',
   components: {
-    Modal,
     Detail,
     Form
   },
@@ -131,9 +131,8 @@ export default {
         { name: 'name', label: 'name', field: 'name', align: 'left' },
         { name: 'username', label: 'username', field: 'username', align: 'left' },
         { name: 'email', label: 'email', field: 'email', align: 'left' },
-        { name: 'role', label: 'role', field: 'role_id', align: 'left' },
-        { name: 'menu', label: 'menu', field: 'menu_id', align: 'left' },
-        { name: 'active', label: 'active', field: 'active', align: 'left' }
+        { name: 'role', label: 'role', field: 'role_id', align: 'left', search: 'Role.name' },
+        { name: 'menu', label: 'menu', field: 'menu_id', align: 'left', search: 'Menu.name' }
       ]),
       select: {
         status: this.$Handler.toObjectSelect(['ACTIVE', 'TRASH'])
@@ -190,7 +189,7 @@ export default {
       var endpoint = this.Meta.module + '?table'
       endpoint = endpoint + '&page=' + page
       endpoint = endpoint + '&limit=' + perpage
-      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.table.searchBySelected.field + ':' + this.table.search
+      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.table.searchBySelected + ':' + this.table.search
       if (this.dataModel.status === 'TRASH') endpoint = endpoint + '&trash=true'
 
       this.API.get(endpoint, (status, data, message, response, full) => {
@@ -208,7 +207,7 @@ export default {
     },
 
     add () {
-      if (this.$Config.actionMode() === 'PAGE') this.$router.push({ name: 'add-' + this.Meta.module })
+      if (this.$Handler.actionMode() === 'PAGE') this.$router.push({ name: 'add-' + this.Meta.module })
       else {
         this.modal.show = true
         this.modal.mode = 'form'
@@ -218,7 +217,7 @@ export default {
     },
 
     edit (data) {
-      if (this.$Config.actionMode() === 'PAGE') this.$router.push({ name: 'edit-' + this.Meta.module, params: data })
+      if (this.$Handler.actionMode() === 'PAGE') this.$router.push({ name: 'edit-' + this.Meta.module, params: data })
       else {
         this.modal.show = true
         this.modal.mode = 'form'
@@ -228,7 +227,7 @@ export default {
     },
 
     detail (data) {
-      if (this.$Config.actionMode() === 'PAGE') this.$router.push({ name: 'view-' + this.Meta.module, params: data })
+      if (this.$Handler.actionMode() === 'PAGE') this.$router.push({ name: 'view-' + this.Meta.module, params: data })
       else {
         this.modal.show = true
         this.modal.mode = 'detail'

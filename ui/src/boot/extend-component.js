@@ -1,15 +1,27 @@
 import Vue from 'vue'
 import Drawer from '../components/Drawer'
 import UserMenu from '../components/UserMenu'
-import ProfilePopup from '../components/ProfilePopup'
+import ProfilePopup from '../components/general/ProfilePopup'
 import LogInfo from '../components/LogInfo'
 import ImageUploader from '../components/ImageUploader'
 import Echo from '../components/Echo'
-import Loading from '../components/Loading'
-import SideMenu from '../components/SideMenu'
-import TopMenu from '../components/TopMenu'
-import HeaderTitle from '../components/HeaderTitle'
-import Notifications from '../components/Notifications'
+
+// general
+import Loading from '../components/general/Loading'
+import SideMenu from '../components/general/SideMenu'
+import TopMenu from '../components/general/TopMenu'
+import HeaderTitle from '../components/general/HeaderTitle'
+import Notifications from '../components/general/Notifications'
+import SearchTable from '../components/general/SearchTable'
+import Modal from '../components/general/Modal'
+
+Vue.component('loading', Loading)
+Vue.component('side-menu', SideMenu)
+Vue.component('top-menu', TopMenu)
+Vue.component('header-title', HeaderTitle)
+Vue.component('search-table', SearchTable)
+Vue.component('notifications', Notifications)
+Vue.component('modal', Modal)
 
 // components default
 import _Input from '../components/default/Input'
@@ -19,7 +31,6 @@ import _TextArea from '../components/default/TextArea'
 import _Toggle from '../components/default/Toggle'
 import _DatePicker from '../components/default/DatePicker'
 import _SelectServerSide from '../components/default/SelectServerSide'
-import _SearchTable from '../components/default/SearchTable'
 
 // we globally register our component
 Vue.component('drawer', Drawer)
@@ -28,13 +39,6 @@ Vue.component('profile-popup', ProfilePopup)
 Vue.component('log-info', LogInfo)
 Vue.component('img-uploader', ImageUploader)
 Vue.component('echo', Echo)
-Vue.component('loading', Loading)
-Vue.component('loading', Loading)
-Vue.component('side-menu', SideMenu)
-Vue.component('top-menu', TopMenu)
-Vue.component('header-title', HeaderTitle)
-Vue.component('search-table', _SearchTable)
-Vue.component('notifications', Notifications)
 
 Vue.component('vl-input', _Input)
 Vue.component('vl-number', _Number)
