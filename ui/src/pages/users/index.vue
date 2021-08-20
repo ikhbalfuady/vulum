@@ -11,8 +11,6 @@
       <template v-slot:config>
         <vl-select col="12" label="Status" v-model="dataModel.status" :options="select.status" @input="val => { onRefresh() }"/>
         <vl-select col="12" label="Searc By" v-model="table.searchBySelected" :options="table.searchBy" raw />
-        {{table.searchBySelected}}
-        {{table.searchBy}}
       </template>
       <template v-slot:right>
         <search-table v-model="table.search" :table="table" />
@@ -189,7 +187,7 @@ export default {
       var endpoint = this.Meta.module + '?table'
       endpoint = endpoint + '&page=' + page
       endpoint = endpoint + '&limit=' + perpage
-      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.table.searchBySelected + ':' + this.table.search
+      if (this.table.search !== '') endpoint = endpoint + '&search=' + this.table.searchBySelected.field + ':' + this.table.search
       if (this.dataModel.status === 'TRASH') endpoint = endpoint + '&trash=true'
 
       this.API.get(endpoint, (status, data, message, response, full) => {
