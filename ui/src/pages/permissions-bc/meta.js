@@ -1,12 +1,12 @@
 const Meta = {
-  name: 'Department',
+  parent: 'Master Data',
+  name: 'Permissions',
   icon: 'stop_circle',
-  module: 'department',
+  module: 'permissions',
   topBarMenu: [],
   permission: {
     browse: true,
     create: true,
-    read: true,
     update: true,
     delete: true,
     restore: true
@@ -14,11 +14,7 @@ const Meta = {
   model: {
     id: null,
     name: null,
-    parent: null,
-    rate: null,
-    created_by: null,
-    updated_by: null,
-    deleted_by: null
+    slug: null
 
   }
 }

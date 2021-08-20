@@ -3,38 +3,32 @@
 
   <div class="root bg-soft">
 
-    <!-- drawer di init di: boot/extend-component.js -->
-    <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
+    <!-- drawer & top menu -->
+    <top-menu v-if="!isModal" :data="Meta"  />
+    <side-menu v-if="!isModal" :data="Meta" />
 
-      <!-- Header Title -->
-      <div class="row pl-2 pt-2">
-        <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
-          <div class="title">
-            <span class="text-caption text-grey-8">Master {{Meta.name}}</span><br>
-            <span class="text-h5 bold text-primary capital">{{title}} {{Meta.name}} <span v-if="title === 'Update'" >#{{dataModel.id}}</span></span>
-          </div>
-        </div>
-      </div>
+    <!-- Header Title -->
+    <header-title :meta="Meta" :isModal="isModal" :backToRoot="backToRoot" form-mode />
 
-      <q-card class="box-shadow mv-2">
-          <q-card-section>
-            <q-form @submit="submit">
-              <q-card-section class="row">
+    <q-card class="box-shadow mv-2">
+        <q-card-section>
+          <q-form @submit="submit">
+            <q-card-section class="row">
 
-                <div class="col-12 col-sm-6 col-md-6 pv ph"
-                  v-for="(props, index) in dataModel" :key="index">
-                  <q-input v-model="dataModel[index]" :label="index" dense filled square />
-                </div>
+              <div class="col-12 col-sm-6 col-md-6 pv ph"
+                v-for="(props, index) in dataModel" :key="index">
+                <vl-input v-model="dataModel[index]" :label="index" />
+              </div>
 
-              </q-card-section>
+            </q-card-section>
 
-              <q-card-actions align="right" class="">
-                <q-btn class="capital bold" unelevated flat color="red" label="Cancel" icon="cancel" @click="backToRoot" />
-                <q-btn class="capital bold" unelevated color="green" label="Save" :disable="disableSubmit" type="submit" icon="check_circle"/>
-              </q-card-actions>
-            </q-form>
-          </q-card-section>
-      </q-card>
+            <q-card-actions align="right" class="">
+              <q-btn class="capital bold" unelevated flat color="red" label="Cancel" icon="cancel" @click="backToRoot" />
+              <q-btn class="capital bold" unelevated color="green" label="Save" :disable="disableSubmit" type="submit" icon="check_circle"/>
+            </q-card-actions>
+          </q-form>
+        </q-card-section>
+    </q-card>
 
   </div>
 </template>
@@ -44,77 +38,78 @@ import Meta from './meta'
 
 export default {
   name: 'Department',
+  props: [
+    'fromModal'
+  ],
   data () {
     return {
       Meta,
       API: this.$Api,
       // default data
       title: 'Create',
+      loading: false,
       dataModel: {},
-      rules: {
-        permission: Meta.permission
-      },
-      disableSubmit: false
+      disableSubmit: false,
+      select: {
+        roles: [],
+        rolesTmp: [],
+        menus: [],
+        menusTmp: []
+      }
     }
   },
 
   created () {
     this.dataModel = this.$Helper.unReactive(this.Meta.model)
     this.initTopBar()
-    this.$ModuleConfig.getCurrentPermissions((status, data) => {
-      console.log('initPermissionPage:' + Meta.module, data)
-      this.initialize()
-    }, 'department')
+
+    var action = this.$Handler.formMode(this)
+
+    this.$Handler.permissions(this, action.mode, Meta, (status, data) => {
+      this.Meta.permission = data // update current permissions of this module
+      if (action.mode === 'update' && action.params.id !== undefined) this.getData(action.params.id)
+      this.onRefresh()
+    })
   },
 
   mounted () {
-
+    this.handleFromModal()
   },
 
-  watch: {
-    $route (to, from) {
-      this.dataModel = Meta.model
+  computed: {
+    isModal () {
+      return (this.fromModal) ?? false
+    },
+    classArea () {
+      return (this.fromModal) ? 'mt-2 no-shadow' : 'box-shadow mv-2 mt-2'
     }
   },
 
   methods: {
 
-    checkPermission (mode = 'create') {
-      var access = this.$ModuleConfig.checkPermission(this.$router, this.Meta.module + '-' + mode)
-      if (access) return true
-      else this.$router.push({ name: '403' })
-    },
-
-    initialize () {
-      var params = this.$route.params
-      if (this.$Helper.checkParams(params)) { // checking access update
-        if (this.checkPermission('update')) {
-          if (params.id !== undefined) {
-            this.onRefresh()
-            this.getData(params.id)
-          } else this.backToRoot()
-        }
-      } else { // checking access create
-        if (this.checkPermission('create')) {
-          //
+    handleFromModal () {
+      if (this.fromModal && this.fromModal.params) {
+        if (this.fromModal.params.id !== undefined && this.fromModal.params.id !== null) {
+          this.getData(this.fromModal.params.id)
+          this.onRefresh()
         }
       }
-    },
-
-    onRefresh () {
-      //
     },
 
     initTopBar () {
       this.Meta.topBarMenu = [{ name: 'Refresh', event: this.onRefresh }]
     },
 
+    onRefresh () {
+      //
+    },
+
     getData (id) {
       console.log('getData')
-      this.$Helper.loadingOverlay(true, 'Loading..')
+      this.loading = false
       var endpoint = this.Meta.module + '/' + id
       this.API.get(endpoint, (status, data, message, response, full) => {
-        this.$Helper.loadingOverlay(false)
+        this.loading = true
         if (status === 200) {
           // inject data
           this.dataModel = data
@@ -123,16 +118,10 @@ export default {
       })
     },
 
-    edit (data) {
-      this.triggerForm(data)
-    },
-
     backToRoot () {
-      this.$router.push({ name: this.Meta.module })
-    },
-
-    emitModel (target, val) {
-      this.dataModel[target] = val
+      if (this.fromModal) {
+        this.fromModal.show = false
+      } else this.$router.push({ name: this.Meta.module })
     },
 
     submit () {
@@ -156,7 +145,7 @@ export default {
       this.API.post(this.Meta.module, this.dataModel, (status, data, message, response, full) => {
         this.$Helper.loadingOverlay(false)
         if (status === 200) {
-          this.messageSubmit('Saving', message)
+          this.$Helper.showSuccess('Save Succesfully', message)
           this.backToRoot()
         } else this.disableSubmit = false
       })
@@ -167,14 +156,10 @@ export default {
       this.API.put(this.Meta.module + '/' + this.dataModel.id, this.dataModel, (status, data, message, response, full) => {
         this.$Helper.loadingOverlay(false)
         if (status === 200) {
-          this.messageSubmit('Update', message)
+          this.$Helper.showSuccess('Update Succesfully', message)
           this.backToRoot()
         } else this.disableSubmit = false
       })
-    },
-
-    messageSubmit (titleAdd = '', msg) {
-      this.$Helper.showSuccess(titleAdd + ' Succesfully', msg)
     }
   }
 }

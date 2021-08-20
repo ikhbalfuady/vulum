@@ -1,5 +1,4 @@
 const Meta = {
-  parent: 'Master Data',
   name: 'Permissions',
   icon: 'stop_circle',
   module: 'permissions',
@@ -7,6 +6,7 @@ const Meta = {
   permission: {
     browse: true,
     create: true,
+    read: true,
     update: true,
     delete: true,
     restore: true
@@ -14,7 +14,10 @@ const Meta = {
   model: {
     id: null,
     name: null,
-    slug: null
+    slug: null,
+    created_by: null,
+    updated_by: null,
+    deleted_by: null
 
   }
 }

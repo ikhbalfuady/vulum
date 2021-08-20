@@ -57,6 +57,7 @@ include 'function/generate_menu_permission.php';
 include 'function/generate_postman.php';
 
 include 'function/generate_ui.php';
+include 'function/generate_ui_v2.php';
 include 'function/generate_ui_non_permission.php';
 include 'function/generate_route_model_ui.php';
 
@@ -74,6 +75,7 @@ generateRoute($list, $outputDir);
 generatePostman($list, $outputDir);
 generateMenuPermission($list, $outputDir);
 generateUi($list, $outputDir);
+generateUiV2($list, $outputDir);
 generateUiNonPermission($list, $outputDir);
 generateRouteModelUi($list, $outputDir);
 echo "<h1>Generate Completed! </h1><br>";

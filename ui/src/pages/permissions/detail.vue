@@ -3,34 +3,39 @@
 
   <div class="root bg-soft">
 
-    <!-- drawer di init di: boot/extend-component.js -->
-    <drawer v-bind:topBarInfo="Meta"  v-bind:topBarMenu="Meta.topBarMenu"  />
+    <!-- drawer & top menu -->
+    <top-menu v-if="!isModal" :data="Meta"  />
+    <side-menu v-if="!isModal" :data="Meta" />
 
-      <!-- Header Title -->
-      <div class="row pl-2 pt-3 pb-2 mb-2">
-        <div class="col-12 col-sm-3 col-md-7 pb-1 pv info-page">
-          <div class="title">
-            <span class="text-caption text-grey-8">Detail</span><br>
-            <span class="text-h5 bold text-primary capital">{{Meta.name}}</span>
-          </div>
-          <q-btn @click="edit" unelevated color="green" class="capital" icon="edit" label="Edit" />
-        </div>
-      </div>
+    <!-- Header Title -->
+    <header-title :meta="Meta" :title="Meta.name + 'Detail'" :isModal="isModal" :backToRoot="backToRoot" half-slot >
+      <template v-slot:half>
+        <q-btn v-if="Meta.permission.update" @click="edit" label="edit" icon="edit" flat dense class="animated slideInRight mr-1 capital bg-green-1 text-green-9 pv-1 fix-icon-btn" color="green"/>
+      </template>
+    </header-title>
 
-      <div class="row mv-2">
+    <q-card :class="classArea">
+      <q-card-section class=" pb-2">
+        <loading v-if="dataModel.id === null" />
+        <q-markup-table style="width:100%" class="no-shadow animated fadeIn" v-if="dataModel.id">
+          <tbody>
+            <template v-for="(props, key) in viewList" >
 
-        <q-list bordered separator class="box-shadow bg-white" style="width:100%">
+              <!-- default -->
+              <tr :key="key" >
+                <td class="bold text-primary capital">{{key}}</td>
+                <td v-ripple>{{props}}</td>
+              </tr>
 
-          <q-item  v-for="(props, index) in filteredDataModel" :key="index" v-ripple>
-            <q-item-section>
-              <q-item-label caption>{{index}}</q-item-label>
-              <q-item-section>{{props}}</q-item-section>
-            </q-item-section>
-          </q-item>
-
-        </q-list>
-
-      </div>
+            </template>
+            <tr >
+              <td class="bold text-primary capital">Log Info</td>
+              <td v-ripple><log-info :data="dataModel" /></td>
+            </tr>
+          </tbody>
+        </q-markup-table>
+      </q-card-section>
+    </q-card>
 
   </div>
 </template>
@@ -40,66 +45,58 @@ import Meta from './meta'
 
 export default {
   name: 'Permissions',
+  props: [
+    'fromModal'
+  ],
   data () {
     return {
       Meta,
       API: this.$Api,
       // default data
-      dataModel: Meta.model,
-      rules: {
-        permission: Meta.permission
-      }
+      dataModel: {},
+      viewList: null
     }
   },
 
   created () {
+    this.dataModel = this.$Helper.unReactive(this.Meta.model)
     this.initTopBar()
-    this.initialize()
+    this.$Handler.permissions(this, 'read', Meta, (status, data) => {
+      this.Meta.permission = data // update current permissions of this module
+      this.onRefresh()
+    })
   },
 
   mounted () {
-
+    this.handleFromModal()
   },
 
   computed: {
-    filteredDataModel () {
-      const { dataModel } = this
-      return {
-        id: dataModel.id,
-        name: dataModel.name,
-        slug: dataModel.slug
-      }
+    isModal () {
+      return (this.fromModal) ?? false
+    },
+    classArea () {
+      return (this.fromModal) ? 'mt-2 no-shadow' : 'box-shadow mv-2 mt-2'
     }
   },
 
   methods: {
 
-    callbackForm (params = null) {
-      this.onRefresh()
-    },
-
-    checkPermission (mode = 'create') {
-      var access = this.$ModuleConfig.checkPermission(this.$router, this.Meta.module + '-' + mode)
-      if (access) return true
-      else this.$router.push({ name: '403' })
-    },
-
-    initialize () {
-      var params = this.$route.params
-      if (this.$Helper.checkParams(params)) { // checking access update
-        if (this.checkPermission('read')) {
-          if (params.id !== undefined) this.getData(params.id)
-          else this.backToRoot()
+    handleFromModal () {
+      if (this.fromModal && this.fromModal.params) {
+        if (this.fromModal.params.id !== undefined && this.fromModal.params.id !== null) {
+          this.getData(this.fromModal.params.id)
         }
-      } else this.backToRoot()
-    },
-
-    onRefresh () {
-      this.initialize()
+      }
     },
 
     initTopBar () {
       this.Meta.topBarMenu = [{ name: 'Refresh', event: this.onRefresh }]
+    },
+
+    onRefresh () {
+      var id = this.$Handler.getParamId(this)
+      if (id) this.getData(id)
     },
 
     getData (id) {
@@ -109,7 +106,11 @@ export default {
       this.API.get(endpoint, (status, data, message, response, full) => {
         this.$Helper.loading(false)
         if (status === 200) {
+          // inject data
           this.dataModel = data
+          this.viewList = this.$Handler.viewList(this.dataModel, [
+            // except / remove property from list
+          ])
         }
       })
     },
@@ -119,7 +120,9 @@ export default {
     },
 
     backToRoot () {
-      this.$router.push({ name: this.Meta.module })
+      if (this.fromModal) {
+        this.fromModal.show = false
+      } else this.$router.push({ name: this.Meta.module })
     }
   }
 }

@@ -121,7 +121,6 @@ export default {
       API: this.$Api,
       // default data
       dataModel: {
-        searchBy: null,
         status: 'ACTIVE'
       },
       table: this.$Handler.table([
@@ -178,7 +177,6 @@ export default {
     },
 
     getList (props) {
-      this.$Helper.loading()
       this.table.loading = true
       this.table.selected = []
       const { page, rowsPerPage } = props.pagination
@@ -191,7 +189,6 @@ export default {
       if (this.dataModel.status === 'TRASH') endpoint = endpoint + '&trash=true'
 
       this.API.get(endpoint, (status, data, message, response, full) => {
-        this.$Helper.loading(false)
         this.table.loading = false
         if (status === 200) {
           // inject data

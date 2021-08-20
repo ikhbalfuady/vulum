@@ -133,8 +133,6 @@ export default {
 
     onRefresh () {
       //
-      // this.getListSelect('master-menus?limit=0', 'menus')
-      // this.getListSelect('roles?limit=0', 'roles')
     },
 
     getData (id) {
