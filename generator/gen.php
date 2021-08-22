@@ -21,6 +21,13 @@ function fixUseName($string){
     return str_replace(" ","",$string);
 }
 
+function splitUnderscoreToSpace($string){
+    $selector = preg_replace('/([a_z0_9])?([A_Z])/','$1 $2',$string);
+    if($selector[0] == ' ') $selector = substr($selector, 1); // hapus underscore di awal text
+    $selector = str_replace("_"," ",$string);
+    return $selector;
+}
+
 function createList ($obj) {
     $col = $obj['column'];
     $col = str_replace('("','","',$col);

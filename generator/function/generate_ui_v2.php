@@ -38,7 +38,11 @@ foreach ($item->column as $col) {
   elseif ( $col->name == 'deleted_by') {}
   else $tableColumns2 .= "        { name: '".$col->name."', label: '".$col->name."', field: '".$col->name."', search: '".$col->name."', align: 'left' }$coma\r\n";
   
-  $model .= "    ".$col->name.": null$comaMeta\r\n";
+  $defaultValue = 'null';
+  if ($col->type == 'integer' || $col->type == 'double') $defaultValue = '0';
+  if ($col->type == 'tinyInteger' || $col->type == 'boolean') $defaultValue = 'false';
+
+  $model .= "    ".$col->name.": $defaultValue"."$comaMeta\r\n";
 $no++;}
 
 $dq = '"'; // double quotes
@@ -298,6 +302,66 @@ $index = '<template >
 '.$indexScript.'';
 
 // FORM --------------------------------------------------
+
+$inputComps = '';
+$selectSources = '';
+
+$totalSelect = 0;
+foreach ($item->column as $col) {
+  if ($col->type == 'enum') $totalSelect ++;
+}
+
+$currentSelect = 0;
+
+foreach ($item->column as $col) {
+  if ( $col->name == 'created_by') {}
+  elseif ( $col->name == 'updated_by') {}
+  elseif ( $col->name == 'deleted_by') {}
+  elseif ( $col->name == 'id') {}
+  else {
+    $label = splitUnderscoreToSpace($col->name);
+    $url = '';
+    if (isset($col->belongsTo) && isset($col->belongsTo->model)) {
+      $url =  strtolower(splitUppercaseToStrip($col->belongsTo->model));
+    }
+
+    $required = '';
+    $defaultValidation = '!!val || '.$sq . $label .' is required'.$sq.'';
+
+    if ($col->type == 'integer' || $col->type == 'double' ) $defaultValidation = 'val !== 0 || '.$sq . $label .' must be above 0'.$sq.'';
+
+    if (isset($col->attributes) && !in_array("nullable", $col->attributes)) {
+      $required = ':rules="[ val => '.$defaultValidation.' ]" ';
+    } else if (!isset($col->attributes)) {
+      $required = ':rules="[ val => '.$defaultValidation.' ]" ';
+    }
+
+
+    $string = '              <vl-input col="4" label="'.$label.'" v-model="dataModel.'.$col->name.'" '.$required.'/>';
+    $integer = '              <vl-number col="4" label="'.$label.'" v-model="dataModel.'.$col->name.'" '.$required.'/>';
+    $decimal = '              <vl-number col="4" label="'.$label.'" v-model="dataModel.'.$col->name.'" currency '.$required.'/>';
+    $selectApi = '              <vl-select-serverside col="4" label="'.$label.'" v-model="dataModel.'.$col->name.'" url="'.$url.'" searchable '.$required.'/>';
+    $select = '              <vl-select col="4" label="'.$label.'" v-model="dataModel.'.$col->name.'" :options="select.'.$col->name.'" searchable '.$required.'/>';
+    $textarea = '              <vl-textarea col="12" label="'.$label.'" v-model="dataModel.'.$col->name.'" '.$required.'/>';
+    $toggle = '              <vl-toggle col="4" label="'.$label.'" v-model="dataModel.'.$col->name.'" />';
+
+    if ($col->type == 'string') $inputComps .= "\n".$string."\n";
+    if ($col->type == 'integer') $inputComps .= "\n".$integer."\n";
+    if ($col->type == 'double') $inputComps .= "\n".$decimal."\n";
+    if ($col->type == 'unsignedBigInteger') $inputComps .= "\n".$selectApi."\n";
+    if ($col->type == 'text' || $col->type == 'longtext') $inputComps .= "\n".$textarea."\n";
+    if ($col->type == 'tinyInteger' || $col->type == 'boolean') $inputComps .= "\n".$toggle."\n";
+    if ($col->type == 'enum') {
+      $inputComps .= "\n".$select."\n";
+      $enumList = str_replace('"',"'", $col->enum_list);
+      $coma = ',';
+      $currentSelect ++;
+      if ($currentSelect == $totalSelect) $coma = '';
+      $selectSources .= "        ".$col->name.": this.".$dlr."Handler.toObjectSelect($enumList)".$coma."\n";
+    }
+  }
+}
+
 $formScript = "<script>
 import Meta from './meta'
 
@@ -316,10 +380,7 @@ export default {
       dataModel: {},
       disableSubmit: false,
       select: {
-        roles: [],
-        rolesTmp: [],
-        menus: [],
-        menusTmp: []
+".$selectSources."
       }
     }
   },
@@ -443,16 +504,16 @@ $form = '
     <!-- Header Title -->
     <header-title :meta="Meta" :isModal="isModal" :backToRoot="backToRoot" form-mode />
 
-    <q-card class="box-shadow mv-2">
+    <q-card :class="classArea">
         <q-card-section>
           <q-form @submit="submit">
             <q-card-section class="row">
 
-              <div class="col-12 col-sm-6 col-md-6 pv ph"
+            <!--<div class="col-12 col-sm-6 col-md-6 pv ph"
                 v-for="(props, index) in dataModel" :key="index">
                 <vl-input v-model="dataModel[index]" :label="index" />
-              </div>
-
+              </div>-->
+'.$inputComps.'
             </q-card-section>
 
             <q-card-actions align="right" class="">
