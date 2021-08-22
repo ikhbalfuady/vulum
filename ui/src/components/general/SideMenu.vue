@@ -11,7 +11,7 @@
       >
       <q-scroll-area style="height: calc(100% - 120px); margin-top: 120px;">
         <q-list padding >
-          <SideMenuList :data="menuList" :mini-state="miniState"/>
+          <SideMenuList :data="menuList" :mini-mode="miniState"/>
         </q-list>
       </q-scroll-area>
 
@@ -19,7 +19,7 @@
         <!-- Full Mode -->
         <div class="bg-transparent text-center full-width" v-if="!miniState">
           <div class="logo animated">
-            <img src="assets/icons/logo-md-light.png" width="182"/> <br>
+            <img src="assets/icons/logo-border.png" width="182"/> <br>
             <span class="text-grey-1">v.{{$Config.version()}}</span>
           </div>
           <q-chip size="sm">

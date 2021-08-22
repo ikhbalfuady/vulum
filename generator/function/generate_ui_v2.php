@@ -36,6 +36,7 @@ foreach ($item->column as $col) {
   if ( $col->name == 'created_by') {}
   elseif ( $col->name == 'updated_by') {}
   elseif ( $col->name == 'deleted_by') {}
+  elseif ( $col->name == 'id') {}
   else $tableColumns2 .= "        { name: '".$col->name."', label: '".$col->name."', field: '".$col->name."', search: '".$col->name."', align: 'left' }$coma\r\n";
   
   $defaultValue = 'null';
@@ -432,10 +433,10 @@ export default {
 
     getData (id) {
       console.log('getData')
-      this.loading = false
+      this.loading = true
       var endpoint = this.Meta.module + '/' + id
       this.API.get(endpoint, (status, data, message, response, full) => {
-        this.loading = true
+        this.loading = false
         if (status === 200) {
           // inject data
           this.dataModel = data
@@ -506,7 +507,8 @@ $form = '
 
     <q-card :class="classArea">
         <q-card-section>
-          <q-form @submit="submit">
+          <loading v-if="loading" />
+          <q-form @submit="submit" v-if="!loading" class="animated fadeIn">
             <q-card-section class="row">
 
             <!--<div class="col-12 col-sm-6 col-md-6 pv ph"
@@ -629,7 +631,7 @@ $detail ='
     <side-menu v-if="!isModal" :data="Meta" />
 
     <!-- Header Title -->
-    <header-title :meta="Meta" :title="Meta.name + '.$sq.'Detail'.$sq.'" :isModal="isModal" :backToRoot="backToRoot" half-slot >
+    <header-title :meta="Meta" :title="Meta.name + '.$sq.' Detail'.$sq.'" :isModal="isModal" :backToRoot="backToRoot" half-slot >
       <template v-slot:half>
         <q-btn v-if="Meta.permission.update" @click="edit" label="edit" icon="edit" flat dense class="animated slideInRight mr-1 capital bg-green-1 text-green-9 pv-1 fix-icon-btn" color="green"/>
       </template>

@@ -13,14 +13,15 @@
 
     <q-expansion-item :key="'ii'+index" v-if="menuItem.sub.length !== 0"
       :icon="menuIcon(menuItem.detail.icon)" :label="menuItem.detail.name"
-      :header-inset-level="insetLevel" :class="'side-menu-item ic-'+menuIcon(menuItem.detail.icon)"
+      :header-inset-level="insetLevel" :class="isSub+' side-menu-item ic-'+menuIcon(menuItem.detail.icon)"
+      :default-opened="checkOpen(menuItem.sub, menuItem.detail)"
       >
-      <SideMenuList :data="menuItem.sub" :mini-state="miniState" :inset-level="insetLv"/>
+      <SideMenuList :data="menuItem.sub" :mini-mode="miniState" :inset-level="insetLv" sub />
     </q-expansion-item>
 
     <q-expansion-item @click="actionMenu(menuItem)" :key="'iii'+index" v-if="menuItem.sub.length === 0"
-      expand-icon="none" :class="'side-menu-item ic-'+menuIcon(menuItem.detail.icon)"
-      :header-inset-level="insetLevel + 0.3"
+      expand-icon="none" :class="isSub+' side-menu-item '+isActive(menuItem.detail.slug)+' ic-'+menuIcon(menuItem.detail.icon)"
+      :header-inset-level="insetLevel"
       :icon="menuIcon(menuItem.detail.icon)" :label="menuItem.detail.name">
     </q-expansion-item>
 
@@ -28,6 +29,14 @@
   </div>
 </template>
 
+<style>
+.isSub {
+  background: rgba(0, 0, 0, 0.1);
+}
+.side-menu-item.active-menu {
+  border-left: 4px solid #0089ca;
+}
+</style>
 <script>
 import SideMenuList from './SideMenuList'
 
@@ -38,6 +47,7 @@ export default {
   },
   props: [
     'data',
+    'sub',
     'insetLevel',
     'miniMode'
   ],
@@ -67,8 +77,14 @@ export default {
     },
 
     insetLv () {
-      var res = 0.3
-      // if (this.insetLevel) res = this.insetLevel + res
+      var res = 0.2
+      if (this.insetLevel) res = this.insetLevel + res
+      return res
+    },
+
+    isSub () {
+      var res = ''
+      if (this.sub === '') res = 'isSub '
       return res
     }
   },
@@ -95,6 +111,33 @@ export default {
           this.$router.push(p)
         }
       }
+    },
+
+    checkOpen (subMenu, current) {
+      var route = this.$route.name
+      var menuRoute = current.slug
+      // console.log('active Route', route)
+
+      // var res = false
+      var area = [current.slug]
+      if (route === menuRoute) return true
+      for (const item of subMenu) {
+        area.push(item.detail.slug)
+      }
+
+      for (const menu of area) {
+        if (route === menu) {
+          return true
+        }
+      }
+
+      // console.log(`[${current.name} : ${current.slug}] ${route}`, area)
+      // return res
+    },
+
+    isActive (current) {
+      var route = this.$route.name
+      if (route === current) return 'active-menu'
     }
 
   }

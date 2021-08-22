@@ -35,7 +35,7 @@
       <slot name="half"></slot>
     </div>
 
-    <div v-if="$slots.bottom" class="col-12 pb-1 pr-1-5">
+    <div v-if="$slots.bottom" class="col-12 col-sm-6 pb-1 pr-1-5">
       <slot name="bottom"></slot>
     </div>
 
