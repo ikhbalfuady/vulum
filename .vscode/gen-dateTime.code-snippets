@@ -1,10 +1,10 @@
 {
     "Print to console": {
         "scope": "php",
-        "prefix": "gen:text",
+        "prefix": "gen:dateTime",
         "body": [
             "[ \"name\" => \"$1\",",
-            "    \"type\"      => \"text\",",
+            "    \"type\"      => \"dateTime\",",
             "    \"attributes\"      => ['nullable'],",
             "],",
             "$2",

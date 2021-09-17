@@ -1,11 +1,11 @@
 {
     "Print to console": {
         "scope": "php",
-        "prefix": "gen:text",
+        "prefix": "gen:boolean",
         "body": [
             "[ \"name\" => \"$1\",",
-            "    \"type\"      => \"text\",",
-            "    \"attributes\"      => ['nullable'],",
+            "    \"type\"      => \"boolean\",",
+            "    \"default\"      => false,",
             "],",
             "$2",
         ],

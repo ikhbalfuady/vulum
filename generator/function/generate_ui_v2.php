@@ -31,13 +31,22 @@ foreach ($item->column as $col) {
   if ($no == $lastCol) $coma = '';
   if ($no == $last) $comaMeta = '';
 
+  $labelCol = str_replace("_", " ", $col->name);
+  $format = '';
+  $field = $col->name;
+  if (isset($col->belongsTo) && isset($col->belongsTo->model)) {
+    $labelCol = str_replace("id", "", $labelCol);
+    $format = ", format: (val) => (val) ? val.name : ''";
+    $field = $col->belongsTo->name ?? $col->belongsTo->model;
+    $field = strtolower(splitUppercaseToUnderscore($field));
+  }
   
   // for table : index
   if ( $col->name == 'created_by') {}
   elseif ( $col->name == 'updated_by') {}
   elseif ( $col->name == 'deleted_by') {}
   elseif ( $col->name == 'id') {}
-  else $tableColumns2 .= "        { name: '".$col->name."', label: '".$col->name."', field: '".$col->name."', search: '".$col->name."', align: 'left' }$coma\r\n";
+  else $tableColumns2 .= "        { name: '".$col->name."', label: '".$labelCol."', field: '".$field."', search: '".$col->name."', align: 'left'".$format." }$coma\r\n";
   
   $defaultValue = 'null';
   if ($col->type == 'integer' || $col->type == 'double') $defaultValue = '0';
@@ -81,7 +90,8 @@ $tableColumns2
         show: false,
         mode: 'form',
         title: Meta.name,
-        params: null
+        params: null,
+        onClose: this.refreshList
       }
     }
   },
@@ -235,7 +245,7 @@ $index = '<template >
     <header-title :meta="Meta">
       <template v-slot:config>
         <vl-select col="12" label="Status" v-model="dataModel.status" :options="select.status" @input="val => { onRefresh() }"/>
-        <vl-select col="12" label="Searc By" v-model="table.searchBySelected" :options="table.searchBy" raw />
+        <vl-select col="12" label="Search By" v-model="table.searchBySelected" :options="table.searchBy" raw />
       </template>
       <template v-slot:right>
         <search-table v-model="table.search" :table="table" />
@@ -345,8 +355,12 @@ foreach ($item->column as $col) {
     $select = '              <vl-select col="4" label="'.$label.'" v-model="dataModel.'.$col->name.'" :options="select.'.$col->name.'" searchable '.$required.'/>';
     $textarea = '              <vl-textarea col="12" label="'.$label.'" v-model="dataModel.'.$col->name.'" '.$required.'/>';
     $toggle = '              <vl-toggle col="4" label="'.$label.'" v-model="dataModel.'.$col->name.'" />';
+    $dateTime = '              <vl-datepicker col="4" label="'.$label.'" v-model="dataModel.'.$col->name.'" />';
+    $date = '              <vl-datepicker col="4" label="'.$label.'" v-model="dataModel.'.$col->name.'" dateonly />';
 
     if ($col->type == 'string') $inputComps .= "\n".$string."\n";
+    if ($col->type == 'date') $inputComps .= "\n".$date."\n";
+    if ($col->type == 'dateTime') $inputComps .= "\n".$dateTime."\n";
     if ($col->type == 'integer') $inputComps .= "\n".$integer."\n";
     if ($col->type == 'double') $inputComps .= "\n".$decimal."\n";
     if ($col->type == 'unsignedBigInteger') $inputComps .= "\n".$selectApi."\n";
@@ -448,6 +462,7 @@ export default {
     backToRoot () {
       if (this.fromModal) {
         this.fromModal.show = false
+        if (this.fromModal.onClose) this.fromModal.onClose()
       } else this.".$dlr."router.push({ name: this.Meta.module })
     },
 

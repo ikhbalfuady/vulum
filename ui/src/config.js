@@ -167,5 +167,10 @@ export const Config = {
 
   noOptionLabel (modeulName = 'data') {
     return 'Type 2 character to find ' + modeulName + '..'
+  },
+  
+  appLogo (mini = false) {
+    if (mini) return 'assets/cnb-icon.png'
+    else return 'assets/cnb-logo-light.png'
   }
 }

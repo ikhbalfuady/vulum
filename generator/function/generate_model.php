@@ -6,6 +6,7 @@ foreach($list as $item){
 
     $belongsTo = '';
     $hasMany = '';
+    $searchRelations = '';
 
     $name = $item->name;
     $selector =  strtolower(splitUppercaseToUnderscore($name));
@@ -31,6 +32,8 @@ foreach($list as $item){
                 $belongsTo .= '    }'."\r\n\r\n";
 
             }
+
+            $searchRelations .= "            '".$bt->name."' => (new ".$bt->model."())->Columns(),"."\r\n";
         }
 
         // get hasMany
@@ -56,12 +59,32 @@ foreach($list as $item){
 
     $last = count($item->column) - 1;
     $fillable = '';
+    $casts = '';
 
     foreach ($item->column as $index => $value) {
         $coma = ', 
         ';
         if($index == $last) $coma = '';
         if($value->name !== 'id') $fillable .= '"'.$value->name.'"'.$coma ;
+
+        $type = 'string';
+        if ($value->type == 'decimal') $type = 'real';
+        if ($value->type == 'double') $type = 'real';
+        if ($value->type == 'json') $type = 'array';
+        if ($value->type == 'boolean' || $value->type == 'tinyInteger') $type = 'boolean';
+        if ($value->type == 'integer' || $value->type == 'unsignedBigInteger') $type = 'integer';
+
+        if($value->name !== 'id'
+        && $value->type !== 'string'
+        && $value->type !== 'text'
+        && $value->type !== 'longtext'
+        && $value->type !== 'enum'
+        && $value->name !== 'date'
+        && $value->name !== 'dateTime'
+        && $value->name !== 'created_by'
+        && $value->name !== 'updated_by'
+        && $value->name !== 'deleted_by'
+        )  $casts .="        '".$value->name."' => '$type',"."\r\n";
 
     }
 
@@ -79,7 +102,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Lumen\Auth\Authorizable;
 
-use App\Traits\GlobalDBRelations;
+use App\Traits\GlobalRelations;
 
 
 /**
@@ -88,7 +111,7 @@ use App\Traits\GlobalDBRelations;
 class '.$name.' extends Model
 {
     use Authenticatable, Authorizable, HasFactory;
-    use SoftDeletes, GlobalDBRelations; 
+    use SoftDeletes, GlobalRelations; 
 
     /**
      * Table Configuration
@@ -111,8 +134,20 @@ class '.$name.' extends Model
     // disable update col id
     protected $guarded = ["id"];
 
+    
+    protected $casts = [
+        // casting type
+'.$casts.'
+    ];
+
     public function Columns() {
         return $this->fillable;
+    }
+
+    public function searchRelations() {
+        return [
+'.$searchRelations.'
+        ];
     }
 
 '.$belongsTo.'

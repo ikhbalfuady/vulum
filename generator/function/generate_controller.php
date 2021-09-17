@@ -15,7 +15,27 @@ foreach($list as $item){
     $objectMessage = '';
     $last = count($item->column) - 1;
     $no = 1;
+    $belongsTo = '';
+    $hasMany = '';
     foreach ($item->column as $index => $col) {
+
+        if (isset($col->belongsTo)) {
+            $bt = $col->belongsTo;
+            if (isset($bt->model)) {
+                $btName = (isset($bt->name)) ? $bt->name : $bt->model;
+                $belongsTo .= "                '$btName',\r\n";
+            }
+        }
+
+        if (isset($col->hasMany)) {
+            $bt = $col->hasMany;
+            if (isset($bt->model)) {
+                $hmName = (isset($bt->name)) ? $bt->name : $bt->model;
+                $hasMany .= "                '$hmName',\r\n";
+            }
+        }
+
+
         if($col->name != 'id') {
             $coma = ', ';
             if($index == $last) $coma = '';
@@ -51,7 +71,7 @@ use '.$repoName.'
 use App\Providers\HelperProvider;
 use App\Providers\AuthProvider;
 use Maatwebsite\Excel\Facades\Excel;
-
+use DB;
 class '.$name.'Controller extends Controller
 {
     protected $repository;
@@ -69,7 +89,12 @@ class '.$name.'Controller extends Controller
         AuthProvider::has($request, "'.$slug.'-browse");
         try {
             $payload = $request->all();
-            $data = $this->repository->getList($request);
+            $data = $this->repository->getList($request, [
+'.$belongsTo.''.$hasMany.'                // default relations
+                \'createdByUser\',
+                \'updatedByUser\',
+                \'deletedByUser\',
+            ]);
             if (isset($payload["csv"])) return $this->exportCSV($data);
             else return H_apiResponse($data);
         } catch (Exception $e){
@@ -80,7 +105,12 @@ class '.$name.'Controller extends Controller
     public function findById(Request $request, $id) {
         AuthProvider::has($request, "'.$slug.'-read");
         try {
-            $data = $this->repository->findById($request, $id);
+            $data = $this->repository->findAll($request, true, [
+'.$belongsTo.''.$hasMany.'                // default relations
+                \'createdByUser\',
+                \'updatedByUser\',
+                \'deletedByUser\',
+            ])->find($id);
             return H_apiResponse($data);
         } catch (Exception $e){
             return H_apiResError($e);
@@ -90,10 +120,12 @@ class '.$name.'Controller extends Controller
     public function store(Request $request, $id = null) {
         if ($id) AuthProvider::has($request, "'.$slug.'-update");
         else AuthProvider::has($request, "'.$slug.'-create");
+        DB::beginTransaction();
         try {
             $validate = $this->validateStore($request, $id);
             if($validate["result"]) {
                 $data = $this->repository->store($request, $id);
+                DB::commit();
                 $msg = "succes saving data";
                 if ($id) $msg = "success update data";
                 return H_apiResponse($data, $msg);
@@ -101,29 +133,36 @@ class '.$name.'Controller extends Controller
                 return H_apiResponse(null, $validate["message"], 400);
             }
         } catch (Exception $e){
+            DB::rollback();
             return H_apiResError($e);
         }
     }
 
     public function restore(Request $request, $id = null) {
         AuthProvider::has($request, "'.$slug.'-restore");
+        DB::beginTransaction();
         try {
             $data = $this->repository->restore($request, $id);
+            DB::commit();
             return H_apiResponse($data, "Data has successfully restored");
         } catch (Exception $e){
+            DB::rollback();
             return H_apiResError($e);
         }
     }
 
     public function remove(Request $request, $id) {
         AuthProvider::has($request, "'.$slug.'-delete");
+        DB::beginTransaction();
         try {
             $payload = $request->all();
             $data = $this->repository->remove($request, $id);
+            DB::commit();
             $msg = "success deleted data";
             if(isset($payload["permanent"])) $msg = $msg . " permanently";
             return H_apiResponse($data, $msg);
         } catch (Exception $e){
+            DB::rollback();
             return H_apiResError($e);
         }
     }

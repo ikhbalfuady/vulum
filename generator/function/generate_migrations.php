@@ -121,19 +121,146 @@ fclose($createMigrations);
 
 }
 
-function logInfoGenerate ($item) {
+function logInfoGenerate_ ($item) {
     echo "<b style='font-size:23px;' >".$item->name . "</b>  <small style='padding:2px; color:#fff; background:green' > &nbsp; Generated &nbsp; </small><br>";
     $code = '';
     foreach ($item->column as $key => $col) {
         $attr = '';
-        if (isset($col->attributes)) $attr = "".json_encode($col->attributes)."";
-        $code .= "<tr>
-        <td>".$col->name . "</td> 
-        <td>". $col->type."</td> 
-        <td>".$attr."</td>
-        </tr>";
+        $enumList = '';
+        $default = '';
+        $length = '';
+        $belongsTo = '';
+
+        if (isset($col->attributes)) {
+            $attr = "".json_encode($col->attributes)."";
+            $attr = str_replace('"','', $attr);
+        }
+
+        if (isset($col->enum_list)) {
+            $enumList = $col->enum_list;
+        }
+        if (isset($col->default)) $default = 'default('.$col->default.')';
+
+        if (isset($col->length)) $length .= $col->length;
+        if (isset($col->length2)) $length .= ','.$col->length2;
+        if ($length !== '') $length =  '('.$length.')';
+        
+        if (isset($col->belongsTo)) $belongsTo .= '(Foreign: ' . $col->belongsTo->model.')';
+
+        $colType = $col->type;
+        if ($col->name === 'id') $colType = $col->type . ' PRIMARY KEY (Auto Increments)';
+
+        // format table
+        // $code .= "<tr>
+        // <td><b>".$col->name . "</b></td> 
+        // <td>: <span style='font-style: italic;color: #955504;letter-spacing: 0.5;'>". $col->type."</span></td> 
+        // <td>&nbsp; ".$attr."</td>
+        // </tr>";
+        // format text
+        $code .='- '.$col->name . ' : '.$colType. ''.$length. ' '.$belongsTo.' '.$enumList.' '.$default.' <br>';
     }
-    echo "<div style='margin:5px; background:#ccc; padding:5px; border-radius:5px;'><table><tbody>$code</tbody></table></div>";
+    echo "<div style='margin:5px; background:#ccc; padding:5px; border-radius:5px; font-family:consolas;line-height: 1.2em;'>$code</div>";
+    // echo "<div style='margin:5px; background:#ccc; padding:5px; border-radius:5px;'><table class='table'><tbody>$code</tbody></table></div>";
     echo "<hr>";
+
+}
+
+function logInfoGenerate ($item) { // format table
+    $nameCase =  strtolower(splitUppercaseToStrip($item->name));
+    $headingStyle = 'font-size:18px;';
+    echo "<strong style='$headingStyle'>Module Name &nbsp; : ".$item->name . "</strong><br>";
+    echo "<strong style='$headingStyle'>Table Name &nbsp; &nbsp; &nbsp; : ".$nameCase . "</strong><br><br>";
+    $colorSoft = '#9b9a9a';
+    $colorPrimary = '#0878ac';
+    $code = '';
+    $styleTh = 'text-align:center; color: #fff; background:'.$colorPrimary.'; padding: 5px 15px 5px 15px;';
+    $thead = "<tr>
+        <th style='$styleTh' >Name</th>
+        <th style='$styleTh' >Type</th>
+        <th style='$styleTh' >Length</th>
+        <th style='$styleTh' >Default</th>
+        <th style='$styleTh' >Attributes</th>
+        </tr>";
+
+    foreach ($item->column as $key => $col) {
+        $attr = '';
+        $enumList = '';
+        $default = '-';
+        $length = '';
+        $belongsTo = '';
+
+        if (isset($col->attributes)) {
+            $attr = "".json_encode($col->attributes)."";
+            $attr = str_replace('"','', $attr);
+        }
+
+        if (isset($col->enum_list)) {
+            $enumList = $col->enum_list;
+        }
+        if (isset($col->default)) $default = str_replace("'","",$col->default);
+
+        if (isset($col->length)) $length .= $col->length;
+        if (isset($col->length2)) $length .= ','.$col->length2;
+        if ($length !== '') $length =  ''.$length.'';
+        else $length =  '<small><em>default</em></small>';
+        
+        
+        $colType = $col->type;
+        if ($col->name === 'id') $colType = $col->type . ' <br><small style="color:'.$colorSoft.'">~ PRIMARY KEY (Auto Increments)</small>';
+        
+        if (isset($col->belongsTo)) $colType = $colType . '<br><small style="color:'.$colorSoft.'">~ Foreign : '.$col->belongsTo->model.' </small>';
+        if (isset($col->hasMany)) $colType = $colType . '<br><small style="color:'.$colorSoft.'">~ HasMany : '.$col->hasMany->model.' </small>';
+
+        // format table
+        $attr = str_replace("[","",$attr);
+        $attr = str_replace("]","",$attr);
+        $styleTr = 'padding: 5px 15px 5px 15px; border-bottom: 1px solid #ccc;';
+        $code .= "<tr>
+        <td style='$styleTr'><b>".$col->name . "</b></td> 
+        <td style='$styleTr '> <span style='font-style: italic;color: $colorPrimary;letter-spacing: 0.5;'>". $colType."</span></td> 
+        <td style='$styleTr text-align:center;' >&nbsp; ".$length."</td>
+        <td style='$styleTr text-align:center;' >&nbsp; ".$default."</td>
+        <td style='$styleTr '>&nbsp; ".$attr."</td>
+        </tr>";
+        // format text
+        // $code .='- '.$col->name . ' : '.$colType. ''.$length. ' '.$belongsTo.' '.$enumList.' '.$default.' <br>';
+
+        // $host = '<span style="color:'.$colorSoft.'">{host}</span>';
+        $host = '';
+        $index = "$host/$nameCase";
+        $getById = "$host/$nameCase/{id}";
+        $store = "$host/$nameCase/";
+        $delete = "$host/$nameCase/{id}";
+        $restore = "$host/$nameCase/{id}";
+
+        $apiRoute = "<ul>
+            <li><strong style='color: $colorPrimary;'>Index</strong> [GET] : $index</li>
+            <li><strong style='color: $colorPrimary;'>Get Single</strong> [GET] : $getById</li>
+            <li><strong style='color: $colorPrimary;'>Insert</strong> [POST] : $store</li>
+            <li><strong style='color: $colorPrimary;'>Update</strong> [PUT / POST </b><small style='color:$colorSoft'>(if have file upload)</small>] : $store{id}</li>
+            <li><strong style='color: $colorPrimary;'>Delete</strong> [DELETE] : $delete</li>
+            <li><strong style='color: $colorPrimary;'>Restore</strong> [PUT] : $restore</li>
+        </ul>";
+
+        $uiRoute = "<ul>
+            <li><strong style='color: $colorPrimary;'>Index</strong>  &nbsp; &nbsp; &nbsp;: /$nameCase</li>
+            <li><strong style='color: $colorPrimary;'>Create</strong> &nbsp; &nbsp;: /$nameCase/form</li>
+            <li><strong style='color: $colorPrimary;'>Update</strong> &nbsp;  : /$nameCase/form/{id}</li>
+            <li><strong style='color: $colorPrimary;'>Detail</strong> &nbsp; &nbsp; : /$nameCase/view/{id}</li>
+        </ul>";
+    }
+
+    
+
+    // echo "<div style='margin:5px; background:#ccc; padding:5px; border-radius:5px; font-family:consolas;line-height: 1.2em;'>$code</div>";
+    echo "<div style='margin:5px;'><table class='table' style='border-collapse: collapse;' ><thead>$thead</thead><tbody>$code</tbody></table></div>";
+    echo "<br><br>";
+    echo "<strong style='$headingStyle'>API Route Information</strong><br>";
+    echo "$apiRoute <br>";
+    echo "<strong style='$headingStyle'>Front-End Route Information</strong><br>";
+    echo "$uiRoute";
+    echo "<br><hr><br><br>";
+    echo "<strong>#Rules</strong><br><br> - <br><br>";
+    echo "<strong>#Notes</strong><br><br> - <br><br>";
 
 }

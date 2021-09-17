@@ -4,7 +4,7 @@
       <!-- drawer content -->
       <div class="bg-secondary">
         <div class=" ph-2 pv-2">
-          <q-btn @click="getNotif()" icon="refresh" flat color="light" size="lg" dense />
+          <q-btn @click="notifArea = false" icon="close" flat color="light" size="lg" dense />
           <q-btn @click="getNotif()" flat size="lg" dense color="light" label="Notifications" class="capital">
             <q-badge v-if="notifList.length !== 0" color="red" floating transparent>{{notifList.length}}</q-badge>
           </q-btn>

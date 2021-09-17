@@ -28,7 +28,7 @@ export const Handler = {
     for (const col of table.columns) {
       var obj = {
         id: col.name,
-        name: col.name,
+        name: col.label ?? col.name,
         field: (col.search) ? col.search : col.field
       }
       if (col.name !== 'action') {
@@ -78,15 +78,16 @@ export const Handler = {
     return temp
   },
 
-  formMode (_this) {
-    var params = _this.$route.params
+  formMode (_this, customParams = null, backToRoot = true) {
+    var params = customParams || _this.$route.params
     var res = {
       mode: 'create',
       params: params
     }
+
     if (_this.$Helper.checkParams(params)) { // validate params is set
       if (params.id !== undefined) res.mode = 'update'
-      else _this.backToRoot()
+      else if (backToRoot) _this.backToRoot()
     }
     return res
   },
@@ -97,6 +98,15 @@ export const Handler = {
     if (_this.$Helper.checkParams(params)) { // validate params is set
       if (params.id !== undefined) res = params.id
       else _this.backToRoot()
+    }
+    return res
+  },
+
+  haveId (_this) {
+    var params = _this.$route.params
+    var res = false
+    if (_this.$Helper.checkParams(params)) { // validate params is set
+      if (params.id !== undefined) res = true
     }
     return res
   },

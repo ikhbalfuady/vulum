@@ -5,7 +5,9 @@
         "body": [
             "[ \"name\" => \"$1\",",
             "    \"type\"      => \"integer\",",
-            "],"
+            "    \"default\"      => 0,",
+            "],",
+            "$2"
         ],
         "description": "Generator array"
     }

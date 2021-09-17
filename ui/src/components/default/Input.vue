@@ -13,6 +13,7 @@
     :readonly="(readonly==='') ? true : false"
     :placeholder="(placeholder) ? placeholder : ''"
     :bottom-slots="(bottomSlots==='') ? true : false"
+    standout="bg-grey"
   >
     <template v-if="$slots.prepend" v-slot:prepend>
       <slot name="prepend"></slot>
@@ -38,6 +39,7 @@
     :readonly="(readonly==='') ? true : false"
     :placeholder="(placeholder) ? placeholder : ''"
     :bottom-slots="(bottomSlots==='') ? true : false"
+    standout="bg-grey"
   >
     <template v-if="$slots.prepend" v-slot:prepend>
       <slot name="prepend"></slot>

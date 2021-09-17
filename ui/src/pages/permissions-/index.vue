@@ -97,14 +97,8 @@ export default {
       table: this.$Handler.table([
         { name: 'action', label: '#', align: 'left', style: 'width: 20px' },
         { name: 'id', label: 'id', field: 'id', search: 'id', align: 'left' },
-        { name: 'string', label: 'string', field: 'string', search: 'string', align: 'left' },
-        { name: 'integer', label: 'integer', field: 'integer', search: 'integer', align: 'left' },
-        { name: 'decimal', label: 'decimal', field: 'decimal', search: 'decimal', align: 'left' },
-        { name: 'select_serverside', label: 'select_serverside', field: 'select_serverside', search: 'select_serverside', align: 'left' },
-        { name: 'select', label: 'select', field: 'select', search: 'select', align: 'left' },
-        { name: 'select2', label: 'select2', field: 'select2', search: 'select2', align: 'left' },
-        { name: 'textarea', label: 'textarea', field: 'textarea', search: 'textarea', align: 'left' },
-        { name: 'toggle', label: 'toggle', field: 'toggle', search: 'toggle', align: 'left' }
+        { name: 'name', label: 'name', field: 'name', search: 'name', align: 'left' },
+        { name: 'slug', label: 'slug', field: 'slug', search: 'slug', align: 'left' }
 
       ]),
       select: {

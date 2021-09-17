@@ -13,14 +13,8 @@ const Meta = {
   },
   model: {
     id: null,
-    string: null,
-    integer: 0,
-    decimal: 0,
-    select_serverside: null,
-    select: null,
-    select2: null,
-    textarea: null,
-    toggle: false,
+    name: null,
+    slug: null,
     created_by: null,
     updated_by: null,
     deleted_by: null

@@ -35,7 +35,7 @@
       <slot name="half"></slot>
     </div>
 
-    <div v-if="$slots.bottom" class="col-12 col-sm-6 pb-1 pr-1-5">
+    <div v-if="$slots.bottom" class="col-12 pb-1 pr-1-5">
       <slot name="bottom"></slot>
     </div>
 
@@ -87,7 +87,7 @@ export default {
       var res = this.title ? this.title : this.meta.name
       console.log(this.formMode)
       if (this.formMode === '') {
-        var id = this.$Handler.getParamId(this)
+        var id = this.$Handler.haveId(this)
         res = (id) ? 'Update ' + this.meta.name : 'Create ' + this.meta.name
       }
       return res

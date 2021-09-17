@@ -12,7 +12,8 @@
             "       \"foreign\"  => \"$1\", // define '_self' or delete this property to use default column name",
             "       \"foreign2\"  => \"id\", // delete this property to use default id of foreign module",
             "    ]",
-            "],"
+            "],",
+            "$3"
         ],
         "description": "Generator array"
     }

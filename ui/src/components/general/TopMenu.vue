@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-header reveal class="bg-secondary text-white">
+    <q-header reveal class="bg-light text-grey-7 box-shadow">
       <q-toolbar>
         <q-btn flat @click="drawerCtrl" round dense icon="menu" />
         <div class="cursor-pointer bold capital" @click="drawerCtrl" >{{ title }}</div>
@@ -140,5 +140,22 @@ export default {
     margin-left: 20px !important;
     cursor: pointer;
     font-size: 13px !important;
+
+    span {
+      background: #f7f9fb;
+      color: #0095e8;
+      padding: 4px 7px 4px 7px;
+      border-radius: 4px;
+      font-size:12px;
+      transition: 0.5s;
+    }
+
+    span:hover {
+      background: #0095e8;
+      color: #fff;
+      padding: 4px 7px 4px 7px;
+      border-radius: 4px;
+      font-size:12px;
+    }
   }
 </style>

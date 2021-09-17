@@ -10,31 +10,15 @@
     <!-- Header Title -->
     <header-title :meta="Meta" :isModal="isModal" :backToRoot="backToRoot" form-mode />
 
-    <q-card :class="classArea">
+    <q-card class="box-shadow mv-2">
         <q-card-section>
           <q-form @submit="submit">
             <q-card-section class="row">
 
-            <!--<div class="col-12 col-sm-6 col-md-6 pv ph"
+              <div class="col-12 col-sm-6 col-md-6 pv ph"
                 v-for="(props, index) in dataModel" :key="index">
                 <vl-input v-model="dataModel[index]" :label="index" />
-              </div>-->
-
-              <vl-input col="4" label="string" v-model="dataModel.string" :rules="[ val => !!val || 'string is required' ]" />
-
-              <vl-number col="4" label="integer" v-model="dataModel.integer" :rules="[ val => val !== 0 || 'integer cannot be 0' ]" />
-
-              <vl-number col="4" label="decimal" v-model="dataModel.decimal" currency :rules="[ val => val !== 0 || 'decimal cannot be 0' ]" />
-
-              <vl-select-serverside col="4" label="select serverside" v-model="dataModel.select_serverside" url="users" searchable :rules="[ val => !!val || 'select serverside is required' ]" />
-
-              <vl-select col="4" label="select" v-model="dataModel.select" :options="select.select" searchable :rules="[ val => !!val || 'select is required' ]" />
-
-              <vl-select col="4" label="select2" v-model="dataModel.select2" :options="select.select2" searchable :rules="[ val => !!val || 'select2 is required' ]" />
-
-              <vl-textarea col="12" label="textarea" v-model="dataModel.textarea" />
-
-              <vl-toggle col="4" label="toggle" v-model="dataModel.toggle" />
+              </div>
 
             </q-card-section>
 
@@ -67,9 +51,10 @@ export default {
       dataModel: {},
       disableSubmit: false,
       select: {
-        select: this.$Handler.toObjectSelect(['VAL1', 'VAL2']),
-        select2: this.$Handler.toObjectSelect(['E1', 'E2'])
-
+        roles: [],
+        rolesTmp: [],
+        menus: [],
+        menusTmp: []
       }
     }
   },

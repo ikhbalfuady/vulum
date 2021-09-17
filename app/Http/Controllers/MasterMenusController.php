@@ -398,17 +398,23 @@ class MasterMenusController extends Controller
         try {
             if ($req->menu) {
                 $menu = explode('|', $req->menu);
-                $this->permissionRepository->generateNewModule($menu);
-                $this->menuItemRepository->generateNewModule($menu);
+ 
+				$data = [];
+				foreach ($menu as $key => $name) {
+					$data[$name] = [
+						"permissions" => $this->permissionRepository->generateNewModule([$name]),
+						"menus" => $this->menuItemRepository->generateNewModule([$name])
+					];
+				}
 
                 DB::commit();
-                return H_apiResponse($menu);
+                return H_apiResponse($data, 'Success init module (Only generate if data not available in every module listed)');
             } else {
                 return H_apiResponse(null, 'Params menu is required', 400);
             }
         } catch (Exception $e) {
             DB::rollBack();
-            return H_apiResError($e);
+			return H_apiResError($e);
         }
     }
 

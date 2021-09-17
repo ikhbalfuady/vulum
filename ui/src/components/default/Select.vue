@@ -141,7 +141,6 @@ export default {
     'readonly',
     'bottomSlots',
     'raw',
-    'resetClass',
     'searchable'
   ],
   data () {
@@ -171,7 +170,6 @@ export default {
     columnSize () {
       var col = 'pr-1 pb-1'
       if (this.col !== undefined) col = 'pr-1 pb-1 col-12 col-md-' + this.col
-      if (this.resetClass === '') col = this.col
       return col
     },
 

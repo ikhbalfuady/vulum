@@ -10,7 +10,8 @@
     :options="select.options"
     :option-value="(optionValue) ? optionValue : 'id'"
     :option-label="(optionLabel) ? optionLabel : searchField"
-    emit-value map-options
+    :emit-value="(raw === '') ? false : true"
+    map-options
     :use-input="true"
     :clearable="(searchable === '' && multiple === undefined) ? true : false"
     v-bind:value="value"

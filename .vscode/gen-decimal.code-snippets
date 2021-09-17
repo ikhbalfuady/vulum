@@ -7,7 +7,8 @@
             "    \"type\"      => \"double\",",
             "    \"length\"      => $2,",
             "    \"length2\"      => $3,",
-            "],"
+            "],",
+            "$4"
         ],
         "description": "Generator array"
     }

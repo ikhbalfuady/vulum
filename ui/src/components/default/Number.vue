@@ -12,7 +12,6 @@
     v-on:input="emiters($event)"
     :readonly="(readonly==='') ? true : false"
     :bottom-slots="(bottomSlots==='') ? true : false"
-    :rules="(rules) ? rules : []"
   >
     <template v-if="$slots.prepend" v-slot:prepend>
       <slot name="prepend"></slot>
@@ -32,7 +31,6 @@
         v-show="floatingLabel"
         v-on:input="emiters($event)"
         :readonly="(readonly==='') ? true : false"
-        :rules="(rules) ? rules : []"
       />
     </template>
   </q-field>

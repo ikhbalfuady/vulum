@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-avatar class="cursor ml-2" size="28px">
+    <q-avatar class="cursor ml-2" size="28px" >
       <img src="assets/avatar.jpg">
       <q-menu fit @before-show="onRefresh"
       transition-show="jump-left"

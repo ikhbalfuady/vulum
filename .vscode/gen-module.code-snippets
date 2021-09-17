@@ -1,0 +1,22 @@
+{
+    "Print to console": {
+        "scope": "php",
+        "prefix": "gen:module",
+        "body": [
+            "[ \"name\" => \"$1\",",
+            "    \"loging_date\" => true,",
+            "    \"loging_user\" => true,",
+            "    \"column\" =>",
+            "    [",
+            "        [ \"name\" => \"id\",",
+            "            \"type\" => \"bigIncrements\",",
+            "            \"attributes\" => ['index'],",
+            "        ],",
+            "        // next column here..",
+            "        $2",
+            "    ],",
+            "],"
+        ],
+        "description": "Generator array"
+    }
+}

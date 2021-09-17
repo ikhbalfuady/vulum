@@ -72,19 +72,29 @@ class PermissionsRepositoryEloquent extends BaseRepository implements Permission
     public function generateNewModule($modules = []) {
         try {
             $crud = [ 'Browse', 'Create', 'Read', 'Update', 'Delete', 'Restore' ];
+            $allow = [];
             $data = [];
             foreach ($modules as $module) {
                 $fixName = H_splitUppercaseWithSpace($module);
                 $slug = H_makeSlug($module);
 
                 foreach ($crud as $r) {
-                    $data[] = [
+                    $obj = [
                         'name' => $fixName.' '.$r,
                         'slug' => strtolower($slug.'-'.$r),
                     ];
+                    $check = $this->model
+                                ->whereName($obj['name'])
+                                ->whereSlug($obj['slug'])
+                                ->first();
+                    if (!$check) {
+                        $allow[] = $obj['name'];
+                        $data[] = $obj;
+                    }
                 }
             }
             $this->model->insert($data);
+            return $allow;
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

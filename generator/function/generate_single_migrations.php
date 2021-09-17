@@ -91,7 +91,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class '. $item->name .' extends Migration
+class '. $item->name .'Init extends Migration
 {
     /**
      * Run the migrations.
@@ -120,7 +120,9 @@ class '. $item->name .' extends Migration
 
 $scriptMigrations = str_replace('"',"'", $scriptMigrations);
 // $fname = gmdate("Y_m_d_His", time() + 60 * 60 * 7) . "_update_" . gmdate("YmdHis", time() + 60 * 60 * 7);
-$fname = gmdate("Y_m_d_His", time() + 60 * 60 * 7) .'_'.str_replace(' ',"_", $moduleSelector);
+$date = '2021_09_12_221840';
+// $date = gmdate("Y_m_d_His", time() + 60 * 60 * 7);
+$fname =  $date.'_'.str_replace(' ',"_", $moduleSelector).'_init';
 $fname = strtolower($fname);
 
     $createMigrations = fopen($outputDir."$fname.php", "w") or die("Unable to open file!");

@@ -4,7 +4,7 @@
     v-for="(menuItem, index) in menuList">
 
     <!-- Overline -->
-    <q-item  :key="'i'+index" v-if="menuItem.overline" dense class="animated fadeIn single-line-menu" >
+    <q-item  :key="'i'+index" v-if="menuItem.overline" dense :class="isSub+'animated fadeIn single-line-menu'" >
       <q-item-section avatar v-if="miniState" >
         <small class="menu-overline capital" style="font-size:11px;" >---------</small>
       </q-item-section>
@@ -29,13 +29,27 @@
   </div>
 </template>
 
-<style>
+<style lang="scss">
 .isSub {
   background: rgba(0, 0, 0, 0.1);
 }
 .side-menu-item.active-menu {
-  border-left: 4px solid #0089ca;
+  border-left: 6px solid $primary;
+
 }
+
+.side-menu-item.active-menu .q-expansion-item__container {
+  background: rgba(208, 208, 208, 0.08);
+}
+
+.side-menu-item.active-menu div div {
+  margin-left:-2px;
+}
+
+.side-menu-item.active-menu div, .side-menu-item.active-menu div i {
+  color: $primary !important;
+}
+
 </style>
 <script>
 import SideMenuList from './SideMenuList'

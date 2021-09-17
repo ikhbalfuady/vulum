@@ -5,7 +5,8 @@
         "body": [
             "[ \"name\" => \"$1\",",
             "    \"type\"      => \"string\",",
-            "],"
+            "],",
+            "$2",
         ],
         "description": "Generator array"
     }

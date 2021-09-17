@@ -157,13 +157,20 @@ class MenuItemsRepositoryEloquent extends BaseRepository implements MenuItemsRep
                 $fixName = H_splitUppercaseWithSpace($module);
                 $slug = H_makeSlug($module);
 
-                $data[] = [
+                $obj = [
                     'name' => $fixName,
                     'slug' => strtolower($slug),
                     'path' => '/'.strtolower($slug),
                 ];
+
+                $check = $this->model
+                            ->whereName($obj['name'])
+                            ->whereSlug($obj['slug'])
+                            ->first();
+                if (!$check) $data[] = $obj;
             }
             $this->model->insert($data);
+            return $data;
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

@@ -3,7 +3,8 @@
     <q-btn
       flat dense
       :class="classEl"
-      color="green"
+      :color="color"
+      @click="clicked"
     >
       <q-icon v-if="icon" :name="icon" style="font-size:1em !important; padding-right:5px;"/>
       <span v-if="label">{{label}}</span>
@@ -13,7 +14,7 @@
 
 <script>
 export default {
-  name: 'Echo',
+  name: 'ButtonSoft',
   props: [
     'className',
     'styleEl',
@@ -21,6 +22,7 @@ export default {
     'icon',
     'label',
     'background',
+    'click',
     'data'
   ],
   data () {
@@ -31,11 +33,16 @@ export default {
 
   computed: {
     bgColor () {
-      return (this.background) ? this.background : 'blue'
+      var color = 'blue'
+      if (this.color) color = this.color
+      if (this.background) color = this.background
+      return color
     },
 
     textColor () {
-      return (this.color) ? this.color : 'blue'
+      var color = 'blue'
+      color = (this.color) ? this.color : color
+      return color
     },
 
     classEl () {
@@ -49,6 +56,10 @@ export default {
   methods: {
     onRefresh () {
       console.log('activate')
+    },
+
+    clicked () {
+      this.$emit('click')
     }
   }
 
