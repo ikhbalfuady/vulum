@@ -1,3 +1,6 @@
+---
+description: asd
+---
 
 # Welcome To VuLum
 
@@ -17,15 +20,13 @@ Frontend built with Quasar Framework v.1 latest
 > * Toggle
 > * Text area
 
-
-
 {% hint style="info" %}
 default component make you easy to write simply & consistence code and making easily to manage style and behavior of component, so you just edit one affected in all.
 {% endhint %}
 
 ## Backend
 
-Backend built with Lumen \(Laravel 8\) 
+Backend built with Lumen \(Laravel 8\)
 
 > All of API Module have same pattern and functional, equipped with some traits to manage default method like :
 >
@@ -58,6 +59,4 @@ so, you can easily manage any resources only with query / url's params although 
 * Roles \( manage role of users\)
 * Menu Items \(manage list item of some menu\)
 * Menus \(manage menu of users\)
-
-
 
