@@ -1,7 +1,3 @@
----
-description: asd
----
-
 # Welcome To VuLum
 
 ## What is VuLum?
