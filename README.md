@@ -1,24 +1,66 @@
-# Lumen PHP Framework
+---
+description: Framework Package for build amazing web app
+---
 
-[![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
-[![Total Downloads](https://img.shields.io/packagist/dt/laravel/framework)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Stable Version](https://img.shields.io/packagist/v/laravel/framework)](https://packagist.org/packages/laravel/lumen-framework)
-[![License](https://img.shields.io/packagist/l/laravel/framework)](https://packagist.org/packages/laravel/lumen-framework)
+# Welcome To VuLum
 
-Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
+## What is VuLum?
 
-## Official Documentation
+VuLum made to help you make amazing web app large scale standard requirement for build web app with default admin panel concept for this stuff use Frontend \(ui\) & Backend \(Api\) with design pattern Repository
 
-Documentation for the framework can be found on the [Lumen website](https://lumen.laravel.com/docs).
+## **Frontend**
 
-## Contributing
+Frontend built with Quasar Framework v.1 latest
 
-Thank you for considering contributing to Lumen! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+> Default component \(encapsulated\)
+>
+> * Select / Autocomplete
+> * Input \(string, number, decimal\)
+> * Date Picker \(date time, date, time\)
+> * Toggle
+> * Text area
 
-## Security Vulnerabilities
 
-If you discover a security vulnerability within Lumen, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
 
-## License
+{% hint style="info" %}
+default component make you easy to write simply & consistence code and making easily to manage style and behavior of component, so you just edit one affected in all.
+{% endhint %}
 
-The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Backend
+
+Backend built with Lumen \(Laravel 8\) 
+
+> All of API Module have same pattern and functional, equipped with some traits to manage default method like :
+>
+> * Get List with format \(default & table\)
+> * Find by id
+> * Delete by id
+> * Restore By id
+
+"**Get List**" method supported shorthand code to allow you set condition to any resources of some module like :
+
+* Searching single & multiple column
+* Ordering single & multiple column
+* Search Like / Related keyword of some column
+* Search Relation \(belongsTo only\) table
+
+{% hint style="info" %}
+so, you can easily manage any resources only with query / url's params although it does not rule out the possibility you create special function to handle what you need
+{% endhint %}
+
+## Authorization Module
+
+* Authentication \(JWT\)
+* Permission / Gate \(UI & API\)
+* Generator \(all in module\)
+
+## Default Page & Module
+
+* Users \(manage users app\)
+* Permissions \(manage permission of role\)
+* Roles \( manage role of users\)
+* Menu Items \(manage list item of some menu\)
+* Menus \(manage menu of users\)
+
+
+
