@@ -56,3 +56,15 @@ so, you can easily manage any resources only with query / url's params although 
 * Menu Items \(manage list item of some menu\)
 * Menus \(manage menu of users\)
 
+
+
+# USAGE: 
+1. Composer install
+2. npm install inside "ui" folder
+3. defined your module in : /generator/list.php
+4. execute the file in : /generator/gen.php
+   copy the generated file inside /generator/output
+5. dont forget register the module in : app/Providers/AppServiceProvider.php
+6. run command in root : php artisan migrate --seed
+7. for run laravel & quasar you can see the doc in official page
+for login, you can see user & password in : /database/factories/UserFactory
