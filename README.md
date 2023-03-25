@@ -16,9 +16,10 @@ Frontend built with Quasar Framework v.1 latest
 > * Toggle
 > * Text area
 
-{% hint style="info" %}
+
+
 default component make you easy to write simply & consistence code and making easily to manage style and behavior of component, so you just edit one affected in all.
-{% endhint %}
+
 
 ## Backend
 
@@ -38,9 +39,13 @@ Backend built with Lumen \(Laravel 8\)
 * Search Like / Related keyword of some column
 * Search Relation \(belongsTo only\) table
 
-{% hint style="info" %}
+
 so, you can easily manage any resources only with query / url's params although it does not rule out the possibility you create special function to handle what you need
-{% endhint %}
+
+Example :
+- get user by gender male including name john
+```{host}/users?search=gender:male|name@like:john```
+
 
 ## Authorization Module
 
@@ -68,3 +73,57 @@ so, you can easily manage any resources only with query / url's params although 
 6. run command in root : php artisan migrate --seed
 7. for run laravel & quasar you can see the doc in official page
 for login, you can see user & password in : /database/factories/UserFactory
+
+---
+
+## Searchable API USage
+
+    - implement "like" sql: ?search=column:value
+    - implement "=" sql   : seach=column!:value
+
+    # Operator Slug
+    ~ Any             : like
+    ~ Date, DateTime  : start,end,ltd,gtd,lted,gted
+    ~ Float, Integer  : lt,gt,lte,gte
+    ~ Custom          : is_null, is_not_null
+
+
+    # greater, less with equal integer ----------------
+    - greater than        : ?search=column@gt:integerValue
+    - greater than equal  : ?search=column@gte:integerValue
+    - less than           : ?search=column@lt:integerValue
+    - less than equal     : ?search=column@lte:integerValue
+
+    # greater, less with equal date/dateTime format ----------------
+    - greater than        : ?search=column@gtd:dateValue 
+    - greater than equal  : ?search=column@gted:dateValue
+    - less than           : ?search=column@ltd:dateValue 
+    - less than equal     : ?search=column@lted:dateValue 
+
+    # date start & end point
+    - start               : ?search=column@start:dateValue 
+    - end                 : ?search=column@end:dateValue 
+
+    * [Order] :
+    - ASCENDING           : ?order=column:asc
+    - DESCENDING          : ?order=column:desc
+
+    * [Group] :
+    - default             : ?group=column1|column2ifNeed
+
+    * [Misc] :
+    - deleted             : ?trash
+    - active & deleted    : ?all
+
+
+    [Rules] :
+    # search with relation
+    ?search=relationModel.columName=value
+    ! makesure relation has mapped in model, in function searchRelations, ex :
+      `public function searchRelations() {
+          return [
+              'relationName' => (new ModelName())->Columns(),
+          ];
+      }`
+    ! if function not define, please define that function bellow function Columns()
+
